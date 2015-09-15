@@ -82,8 +82,12 @@ public interface ChecksumFactory {
 	 * @throws IOException
 	 *             Thrown, if the data could not be read from the path
 	 *             specified.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the current checksum has been
+	 *             interrupted.
 	 */
-	PathChecksum create(Path pPath, String pAlgorithm) throws NoSuchAlgorithmException, IOException;
+	PathChecksum create(Path pPath, String pAlgorithm)
+			throws NoSuchAlgorithmException, IOException, InterruptedException;
 
 	/**
 	 * <p>
@@ -119,6 +123,10 @@ public interface ChecksumFactory {
 	 * @throws IOException
 	 *             Thrown, if the data could not be read from the path
 	 *             specified.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the current checksum has been
+	 *             interrupted.
 	 */
-	PathChecksum create(Path pPath, String pAlgorithm, Executor pExecutor) throws NoSuchAlgorithmException, IOException;
+	PathChecksum create(Path pPath, String pAlgorithm, Executor pExecutor)
+			throws NoSuchAlgorithmException, IOException, InterruptedException;
 }
