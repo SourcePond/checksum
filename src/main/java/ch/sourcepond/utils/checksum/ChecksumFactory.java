@@ -27,10 +27,10 @@ public interface ChecksumFactory {
 
 	/**
 	 * Creates a new immutable {@link Checksum} instance. The necessary data is
-	 * read from {@link InputStream} specified. The stream will <em>not</em> be
-	 * closed by this method. The calculation of the checksum will be performed
-	 * <em>synchronously</em>, i.e. this method blocks until the calculation
-	 * process finishes.
+	 * read from {@link InputStream} specified. This method will close the
+	 * stream when the calculation is done. The calculation of the checksum will
+	 * be performed <em>synchronously</em>, i.e. this method blocks until the
+	 * calculation process finishes.
 	 * 
 	 * @param pInputStream
 	 *            The input-stream from where to read the data to be digested,
