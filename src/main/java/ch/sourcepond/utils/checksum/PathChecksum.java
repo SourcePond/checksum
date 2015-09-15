@@ -78,6 +78,9 @@ public interface PathChecksum extends Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not be read for some
 	 *             reason.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the current checksum has been
+	 *             interrupted.
 	 */
-	void update() throws IOException;
+	void update() throws IOException, InterruptedException;
 }
