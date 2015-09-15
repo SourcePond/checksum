@@ -14,22 +14,44 @@ limitations under the License.*/
 package ch.sourcepond.utils.checksum;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 
 /**
- * @author rolandhauser
+ * Represents a checksum based on a specific hashing algorithm. See
+ * {@link MessageDigest} for further information.
  *
  */
 public interface Checksum {
 
 	/**
-	 * @return
+	 * Returns the algorithm name used to calculate this checksum.
+	 * 
+	 * @return Algorithm name, never {@code null}
+	 */
+	String getAlgorithm();
+
+	/**
+	 * Calculates the checksum and returns the result as byte array. The length
+	 * of the array depends on the used hashing algorithm. See
+	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/
+	 * StandardNames.html#MessageDigest">MessageDigest Algorithms</a> for
+	 * further information.
+	 * 
+	 * @return The calculated checksum as byte array, never {@code null}
 	 * @throws IOException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason.
 	 */
 	byte[] getValue() throws IOException;
 
 	/**
-	 * @return
+	 * Calculates the checksum and returns the result as hex-string. See
+	 * {@link #getValue()} for further information.
+	 * 
+	 * @return The calculated checksum as hex-string, never {@code null}
 	 * @throws IOException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason.
 	 */
-	String getValueAsString() throws IOException;
+	String getHexValue() throws IOException;
 }
