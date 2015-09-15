@@ -59,5 +59,5 @@ public interface Checksum {
 	 *             Thrown, if the calculation of the checksum has been
 	 *             interrupted.
 	 */
-	String getHexValue() throws IOException;
+	String getHexValue() throws IOException, InterruptedException;
 }
