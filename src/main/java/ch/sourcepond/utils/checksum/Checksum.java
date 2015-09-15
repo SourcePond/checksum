@@ -41,8 +41,10 @@ public interface Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason.
+	 * @throws Thrown,
+	 *             if the calculation of the checksum has been interrupted.
 	 */
-	byte[] getValue() throws IOException;
+	byte[] getValue() throws IOException, InterruptedException;
 
 	/**
 	 * Calculates the checksum and returns the result as hex-string. See

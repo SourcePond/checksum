@@ -17,40 +17,66 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * @author rolandhauser
- *
+ * <p>
+ * Extension of the {@link Checksum} interface. It allows to calculate the
+ * checksum on the content of a {@link Path}. Furthermore, it allows to keep
+ * track about changes on the content.
+ * </p>
+ * 
+ * <p>
+ * If the path is a directory, any contained data file will be digested.
+ * Sub-directories will be scanned recursively. If the path is a regular file,
+ * its content will be digested.
+ * </p>
  */
 public interface PathChecksum extends Checksum {
 
 	/**
-	 * @return
+	 * Returns the path which is digested by this checksum. The path can be a
+	 * directory or a regular file.
+	 * 
+	 * @return Digested path, never {@code null}.
 	 */
 	Path getPath();
 
 	/**
-	 * @return
+	 * Checks whether the current checksum, i.e. the checksum <em>after</em> the
+	 * last {@link #update()} has been performed is equal to the previous
+	 * checksum, i.e. the checksum <em>before</em> the last {@link #update()}
+	 * has been performed.
+	 * 
+	 * @return {@code true} if the current and previous checksum are equal,
+	 *         {@code false} otherwise.
 	 * @throws IOException
+	 *             Thrown, if the necessary data could not be read for some
+	 *             reason.
 	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the current checksum has been
+	 *             interrupted.
 	 */
-	boolean equalsPrevious() throws IOException;
+	boolean equalsPrevious() throws IOException, InterruptedException;
 
 	/**
-	 * Returns the previous fingerprint before the last {@link #update()}
-	 * occurred. If {@link #update()} has never been called an empty array will
-	 * be returned.
+	 * Returns the previous checksum before the last {@link #update()} occurred.
+	 * If {@link #update()} has never been called an empty array will be
+	 * returned.
 	 * 
-	 * @return Previous fingerprint, never {@code null}
+	 * @return Previous checksum as byte array, never {@code null}
 	 */
 	byte[] getPreviousValue();
 
 	/**
-	 * Returns the previous fingerprint before the last {@link #update()}
-	 * occurred as hex string. If {@link #update()} has never been called an
-	 * empty string will be returned.
+	 * Returns the previous checksum before the last {@link #update()} occurred
+	 * as hex-string. If {@link #update()} has never been called an empty string
+	 * will be returned.
 	 * 
-	 * @return Previous fingerprint, never {@code null}
+	 * @return Previous checksum as hex-string, never {@code null}
 	 */
-	String getPreviousValueAsString();
+	String getPreviousHexValue();
 
-	void update() throws IOException;
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	void update() throws IOException, InterruptedException;
 }
