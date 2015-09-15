@@ -16,22 +16,41 @@ package ch.sourcepond.utils.checksum;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 
 /**
- * 
- * 
- * @author rolandhauser
+ * Factory to create new {@link Checksum} or {@link PathChecksum} instances.
  *
  */
 public interface ChecksumFactory {
 
 	/**
+	 * Creates a new immutable {@link Checksum} instance. The necessary data is
+	 * read from {@link InputStream} specified. The stream will <em>not</em> be
+	 * closed by this method. The calculation of the checksum will be performed
+	 * synchronously, i.e. this method blocks until the calculation process
+	 * finishes.
+	 * 
 	 * @param pInputStream
-	 * @return
+	 *            The input-stream from where to read the data to be digested,
+	 *            must not be {@code null}.
+	 * @param pAlgorithm
+	 *            The name of the algorithm requested. See the MessageDigest
+	 *            section in the <a href=
+	 *            "{@docRoot}/../technotes/guides/security/StandardNames.html#MessageDigest"
+	 *            > Java Cryptography Architecture Standard Algorithm Name
+	 *            Documentation</a> for information about standard algorithm
+	 *            names. Must not be {@code null}
+	 * @return New {@link Checksum} instance, never {@code null}.
+	 * @throws NoSuchAlgorithmException
+	 *             Thrown, if no provider supports a MessageDigestSpi
+	 *             implementation for the specified algorithm.
 	 * @throws IOException
+	 *             Thrown, if the data could not be read from the input-stream
+	 *             specified.
 	 */
-	Checksum create(InputStream pInputStream, String pAlgorithm) throws IOException;
+	Checksum create(InputStream pInputStream, String pAlgorithm) throws NoSuchAlgorithmException, IOException;
 
 	/**
 	 * @param pPath
@@ -39,11 +58,12 @@ public interface ChecksumFactory {
 	 * @return
 	 * @throws IOException
 	 */
-	PathChecksum create(Path pPath, String pAlgorithm) throws IOException;
+	PathChecksum create(Path pPath, String pAlgorithm) throws NoSuchAlgorithmException, IOException;
 
 	/**
 	 * @param pPath
 	 * @return
 	 */
-	PathChecksum create(ExecutorService pCalculator, Path pPath, String pAlgorithm);
+	PathChecksum create(ExecutorService pCalculator, Path pPath, String pAlgorithm)
+			throws NoSuchAlgorithmException, IOException;
 }
