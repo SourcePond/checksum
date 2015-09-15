@@ -55,8 +55,14 @@ public interface PathChecksum extends Checksum {
 	 * returned.
 	 * 
 	 * @return Previous checksum as byte array, never {@code null}
+	 * @throws IOException
+	 *             Thrown, if the necessary data could not be read for some
+	 *             reason.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the current checksum has been
+	 *             interrupted.
 	 */
-	byte[] getPreviousValue();
+	byte[] getPreviousValue() throws IOException, InterruptedException;
 
 	/**
 	 * Returns the previous checksum before the last {@link #update()} occurred
@@ -64,8 +70,14 @@ public interface PathChecksum extends Checksum {
 	 * will be returned.
 	 * 
 	 * @return Previous checksum as hex-string, never {@code null}
+	 * @throws IOException
+	 *             Thrown, if the necessary data could not be read for some
+	 *             reason.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the current checksum has been
+	 *             interrupted.
 	 */
-	String getPreviousHexValue();
+	String getPreviousHexValue() throws IOException, InterruptedException;
 
 	/**
 	 * Updates this checksum. To do this, the content of the path returned by
