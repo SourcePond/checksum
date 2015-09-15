@@ -66,7 +66,7 @@ public interface PathChecksum extends Checksum {
 
 	/**
 	 * Returns the previous checksum before the last {@link #update()} occurred
-	 * as hex-string. If {@link #update()} has never been called an empty string
+	 * as hex-string. If {@link #update()} has not been called more than once, an empty string
 	 * will be returned.
 	 * 
 	 * @return Previous checksum as hex-string, never {@code null}
