@@ -41,8 +41,9 @@ public interface Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason.
-	 * @throws Thrown,
-	 *             if the calculation of the checksum has been interrupted.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the checksum has been
+	 *             interrupted.
 	 */
 	byte[] getValue() throws IOException, InterruptedException;
 
@@ -54,6 +55,9 @@ public interface Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason.
+	 * @throws InterruptedException
+	 *             Thrown, if the calculation of the checksum has been
+	 *             interrupted.
 	 */
 	String getHexValue() throws IOException;
 }
