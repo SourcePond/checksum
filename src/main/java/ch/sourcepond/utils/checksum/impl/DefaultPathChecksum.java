@@ -148,7 +148,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		lock.lock();
 		try {
 			awaitCalculation();
-			return encodeHexString(value);
+			return encodeHexString(previousValue);
 		} finally {
 			lock.unlock();
 		}
