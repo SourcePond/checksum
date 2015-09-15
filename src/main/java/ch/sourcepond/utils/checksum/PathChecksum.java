@@ -17,17 +17,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * <p>
  * Extension of the {@link Checksum} interface. It allows to calculate the
- * checksum on the content of a {@link Path}. Furthermore, it allows to keep
- * track about changes on the content.
- * </p>
- * 
- * <p>
- * If the path is a directory, any contained data file will be digested.
- * Sub-directories will be scanned recursively. If the path is a regular file,
- * its content will be digested.
- * </p>
+ * checksum on the content of a {@link Path} (which can be a directory or a
+ * regular file). Furthermore, it allows to keep track about changes on the
+ * content.
  */
 public interface PathChecksum extends Checksum {
 

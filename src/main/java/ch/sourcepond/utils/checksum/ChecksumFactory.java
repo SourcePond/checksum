@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 
 /**
  * Factory to create new {@link Checksum} or {@link PathChecksum} instances.
@@ -29,8 +29,8 @@ public interface ChecksumFactory {
 	 * Creates a new immutable {@link Checksum} instance. The necessary data is
 	 * read from {@link InputStream} specified. The stream will <em>not</em> be
 	 * closed by this method. The calculation of the checksum will be performed
-	 * synchronously, i.e. this method blocks until the calculation process
-	 * finishes.
+	 * <em>synchronously</em>, i.e. this method blocks until the calculation
+	 * process finishes.
 	 * 
 	 * @param pInputStream
 	 *            The input-stream from where to read the data to be digested,
@@ -53,17 +53,72 @@ public interface ChecksumFactory {
 	Checksum create(InputStream pInputStream, String pAlgorithm) throws NoSuchAlgorithmException, IOException;
 
 	/**
+	 * <p>
+	 * Creates a new {@link PathChecksum} instance. The necessary data is read
+	 * from path specified. If the path is a directory, any contained data file
+	 * will be digested. Sub-directories will be scanned recursively. If the
+	 * path is a regular file, its content will be digested.
+	 * </p>
+	 * 
+	 * <p>
+	 * The calculation of the checksum will be performed <em>synchronously</em>,
+	 * i.e. this method blocks until the calculation process finishes.
+	 * </p>
+	 * 
 	 * @param pPath
+	 *            Path to the file or directory to be digested, must not be
+	 *            {@code null}.
 	 * @param pAlgorithm
-	 * @return
+	 *            The name of the algorithm requested. See the MessageDigest
+	 *            section in the <a href=
+	 *            "{@docRoot}/../technotes/guides/security/StandardNames.html#MessageDigest"
+	 *            > Java Cryptography Architecture Standard Algorithm Name
+	 *            Documentation</a> for information about standard algorithm
+	 *            names. Must not be {@code null}.
+	 * @return New {@link PathChecksum} instance, never {@code null}
+	 * @throws NoSuchAlgorithmException
+	 *             Thrown, if no provider supports a MessageDigestSpi
+	 *             implementation for the specified algorithm.
 	 * @throws IOException
+	 *             Thrown, if the data could not be read from the path
+	 *             specified.
 	 */
 	PathChecksum create(Path pPath, String pAlgorithm) throws NoSuchAlgorithmException, IOException;
 
 	/**
+	 * <p>
+	 * Creates a new {@link PathChecksum} instance. The necessary data is read
+	 * from path specified. If the path is a directory, any contained data file
+	 * will be digested. Sub-directories will be scanned recursively. If the
+	 * path is a regular file, its content will be digested.
+	 * </p>
+	 * 
+	 * <p>
+	 * The calculation of the checksum will be performed <em>asynchronously</em>
+	 * with the executor specified.
+	 * </p>
+	 * 
 	 * @param pPath
-	 * @return
+	 *            Path to the file or directory to be digested, must not be
+	 *            {@code null}.
+	 * @param pAlgorithm
+	 *            The name of the algorithm requested. See the MessageDigest
+	 *            section in the <a href=
+	 *            "{@docRoot}/../technotes/guides/security/StandardNames.html#MessageDigest"
+	 *            > Java Cryptography Architecture Standard Algorithm Name
+	 *            Documentation</a> for information about standard algorithm
+	 *            names. Must not be {@code null}.
+	 * @param pExecutor
+	 *            The executor to be used to calculate the checksum. Should also
+	 *            be used by {@link PathChecksum#update()}. Must not be
+	 *            {@code null}.
+	 * @return New {@link PathChecksum} instance, never {@code null}
+	 * @throws NoSuchAlgorithmException
+	 *             Thrown, if no provider supports a MessageDigestSpi
+	 *             implementation for the specified algorithm.
+	 * @throws IOException
+	 *             Thrown, if the data could not be read from the path
+	 *             specified.
 	 */
-	PathChecksum create(ExecutorService pCalculator, Path pPath, String pAlgorithm)
-			throws NoSuchAlgorithmException, IOException;
+	PathChecksum create(Path pPath, String pAlgorithm, Executor pExecutor) throws NoSuchAlgorithmException, IOException;
 }
