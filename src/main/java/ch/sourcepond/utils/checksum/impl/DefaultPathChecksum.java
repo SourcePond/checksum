@@ -32,7 +32,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	private static final byte[] INITIAL = new byte[0];
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
-	private final PathDigester fcd;
+	private final PathDigester digester;
 	private final Executor executor;
 	private IOException exception;
 	private byte[] previousValue = INITIAL;
@@ -44,7 +44,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * @param pPath
 	 */
 	DefaultPathChecksum(final PathDigester pDigester, final Executor pExecutor) {
-		fcd = pDigester;
+		digester = pDigester;
 		executor = pExecutor;
 	}
 
@@ -78,7 +78,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 */
 	@Override
 	public String getAlgorithm() {
-		return fcd.getAlgorithm();
+		return digester.getAlgorithm();
 	}
 
 	@Override
@@ -108,7 +108,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 */
 	@Override
 	public Path getPath() {
-		return fcd.getPath();
+		return digester.getPath();
 	}
 
 	@Override
@@ -177,7 +177,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	public void run() {
 		lock.lock();
 		try {
-			final byte[] newValue = fcd.updateDigest();
+			final byte[] newValue = digester.updateDigest();
 			previousValue = value;
 			value = newValue;
 		} catch (final IOException e) {

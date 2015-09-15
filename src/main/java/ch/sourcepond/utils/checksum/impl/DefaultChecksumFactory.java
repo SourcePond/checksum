@@ -68,7 +68,6 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 			final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
 			int read = din.read(buf);
 			while (read != -1) {
-				digest.update(buf, 0, read);
 				read = din.read(buf);
 			}
 		}
@@ -83,7 +82,8 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 * java.lang.String)
 	 */
 	@Override
-	public PathChecksum create(final Path pPath, final String pAlgorithm) throws NoSuchAlgorithmException, IOException {
+	public PathChecksum create(final Path pPath, final String pAlgorithm)
+			throws NoSuchAlgorithmException, IOException, InterruptedException {
 		return create(pPath, pAlgorithm, DIRECT_EXECUTOR);
 	}
 
@@ -96,7 +96,9 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 */
 	@Override
 	public PathChecksum create(final Path pPath, final String pAlgorithm, final Executor pExecutor)
-			throws NoSuchAlgorithmException, IOException {
-		return new DefaultPathChecksum(new PathDigester(pAlgorithm, pPath), pExecutor);
+			throws NoSuchAlgorithmException, IOException, InterruptedException {
+		final PathChecksum chsm = new DefaultPathChecksum(new PathDigester(pAlgorithm, pPath), pExecutor);
+		chsm.update();
+		return chsm;
 	}
 }

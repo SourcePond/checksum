@@ -25,6 +25,9 @@ import ch.sourcepond.utils.checksum.Checksum;
  */
 abstract class BaseChecksum implements Checksum {
 
+	/**
+	 * @return
+	 */
 	protected abstract byte[] getValueUnsynchronized();
 
 	/*

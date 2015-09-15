@@ -60,6 +60,7 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	PathDigester(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
 		algorithm = pAlgorithm;
 		path = pPath;
+		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 		digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
 	}
 
@@ -90,7 +91,7 @@ class PathDigester extends SimpleFileVisitor<Path> {
 				while (read != -1) {
 					tempBuffer.flip();
 					tempBuffer.get(tmp, 0, read);
-					tempDigest.update(tmp);
+					tempDigest.update(tmp, 0, read);
 					tempBuffer.clear();
 					read = ch.read(tempBuffer);
 				}
@@ -120,8 +121,7 @@ class PathDigester extends SimpleFileVisitor<Path> {
 		}
 
 		// Initialize the temporary hard reference to the tempBuffer; this must
-		// be
-		// set to null after the update has been performed.
+		// be set to null after the update has been performed.
 		tempBuffer = bufferRef.get();
 		if (tempBuffer == null) {
 			tempBuffer = allocateDirect(DEFAULT_BUFFER_SIZE);
