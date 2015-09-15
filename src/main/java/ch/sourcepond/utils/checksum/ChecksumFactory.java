@@ -61,8 +61,9 @@ public interface ChecksumFactory {
 	 * </p>
 	 * 
 	 * <p>
-	 * The calculation of the checksum will be performed <em>synchronously</em>,
-	 * i.e. this method blocks until the calculation process finishes.
+	 * The calculation of the checksum (see {@link PathChecksum#update()}) will
+	 * be performed <em>synchronously</em>, i.e. this method blocks until the
+	 * calculation process finishes.
 	 * </p>
 	 * 
 	 * @param pPath
@@ -98,8 +99,8 @@ public interface ChecksumFactory {
 	 * </p>
 	 * 
 	 * <p>
-	 * The calculation of the checksum will be performed <em>asynchronously</em>
-	 * with the executor specified.
+	 * The calculation of the checksum (see {@link PathChecksum#update()}) will
+	 * be performed <em>asynchronously</em> with the executor specified.
 	 * </p>
 	 * 
 	 * @param pPath
