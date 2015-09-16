@@ -30,6 +30,16 @@ abstract class BaseChecksum implements Checksum {
 	 */
 	protected abstract byte[] getValueUnsynchronized();
 
+	/**
+	 * @param pOriginal
+	 * @return
+	 */
+	protected final byte[] copyArray(final byte[] pOriginal) {
+		final byte[] copy = new byte[pOriginal.length];
+		arraycopy(pOriginal, 0, copy, 0, pOriginal.length);
+		return copy;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -37,10 +47,7 @@ abstract class BaseChecksum implements Checksum {
 	 */
 	@Override
 	public byte[] getValue() throws IOException, InterruptedException {
-		final byte[] original = getValueUnsynchronized();
-		final byte[] copy = new byte[original.length];
-		arraycopy(original, 0, copy, 0, original.length);
-		return copy;
+		return copyArray(getValueUnsynchronized());
 	}
 
 	/*

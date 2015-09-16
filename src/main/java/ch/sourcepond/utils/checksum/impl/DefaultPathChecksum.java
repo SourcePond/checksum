@@ -29,7 +29,7 @@ import ch.sourcepond.utils.checksum.PathChecksum;
  *
  */
 final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Runnable {
-	private static final byte[] INITIAL = new byte[0];
+	static final byte[] INITIAL = new byte[0];
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
 	private final PathDigester digester;
@@ -132,7 +132,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		lock.lock();
 		try {
 			awaitCalculation();
-			return previousValue;
+			return copyArray(previousValue);
 		} finally {
 			lock.unlock();
 		}
