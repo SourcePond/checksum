@@ -38,14 +38,12 @@ public interface Checksum {
 	 * further information.
 	 * 
 	 * @return The calculated checksum as byte array, never {@code null}
-	 * @throws IOException
+	 * @throws ChecksumException
 	 *             Thrown, if the necessary data could not read from its source
-	 *             for any reason.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the checksum has been
-	 *             interrupted.
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	byte[] getValue() throws IOException, InterruptedException;
+	byte[] getValue() throws ChecksumException;
 
 	/**
 	 * Calculates the checksum and returns the result as hex-string. See
@@ -55,9 +53,10 @@ public interface Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	String getHexValue() throws IOException, InterruptedException;
+	String getHexValue() throws ChecksumException;
 }

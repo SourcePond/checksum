@@ -80,15 +80,12 @@ public interface ChecksumFactory {
 	 * @throws NoSuchAlgorithmException
 	 *             Thrown, if no provider supports a MessageDigestSpi
 	 *             implementation for the specified algorithm.
-	 * @throws IOException
-	 *             Thrown, if the data could not be read from the path
-	 *             specified.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the current checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	PathChecksum create(Path pPath, String pAlgorithm)
-			throws NoSuchAlgorithmException, IOException, InterruptedException;
+	PathChecksum create(Path pPath, String pAlgorithm) throws NoSuchAlgorithmException, ChecksumException;
 
 	/**
 	 * <p>
@@ -121,13 +118,11 @@ public interface ChecksumFactory {
 	 * @throws NoSuchAlgorithmException
 	 *             Thrown, if no provider supports a MessageDigestSpi
 	 *             implementation for the specified algorithm.
-	 * @throws IOException
-	 *             Thrown, if the data could not be read from the path
-	 *             specified.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the current checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
 	PathChecksum create(Path pPath, String pAlgorithm, Executor pExecutor)
-			throws NoSuchAlgorithmException, IOException, InterruptedException;
+			throws NoSuchAlgorithmException, ChecksumException;
 }

@@ -40,14 +40,12 @@ public interface PathChecksum extends Checksum {
 	 * 
 	 * @return {@code true} if the current and previous checksum are equal,
 	 *         {@code false} otherwise.
-	 * @throws IOException
-	 *             Thrown, if the necessary data could not be read for some
-	 *             reason.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the current checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	boolean equalsPrevious() throws IOException, InterruptedException;
+	boolean equalsPrevious() throws ChecksumException;
 
 	/**
 	 * Returns the previous checksum before the last {@link #update()} occurred.
@@ -58,26 +56,28 @@ public interface PathChecksum extends Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not be read for some
 	 *             reason.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the current checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	byte[] getPreviousValue() throws IOException, InterruptedException;
+	byte[] getPreviousValue() throws ChecksumException;
 
 	/**
 	 * Returns the previous checksum before the last {@link #update()} occurred
-	 * as hex-string. If {@link #update()} has not been called more than once, an empty string
-	 * will be returned.
+	 * as hex-string. If {@link #update()} has not been called more than once,
+	 * an empty string will be returned.
 	 * 
 	 * @return Previous checksum as hex-string, never {@code null}
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not be read for some
 	 *             reason.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the current checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	String getPreviousHexValue() throws IOException, InterruptedException;
+	String getPreviousHexValue() throws ChecksumException;
 
 	/**
 	 * Updates this checksum. To do this, the content of the path returned by
@@ -90,9 +90,10 @@ public interface PathChecksum extends Checksum {
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not be read for some
 	 *             reason.
-	 * @throws InterruptedException
-	 *             Thrown, if the calculation of the current checksum has been
-	 *             interrupted.
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
 	 */
-	void update() throws IOException, InterruptedException;
+	void update() throws ChecksumException;
 }
