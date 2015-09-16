@@ -12,7 +12,7 @@ import org.junit.Test;
  * @param <T>
  */
 public abstract class BaseChecksumTest<T extends BaseChecksum> {
-	protected static final byte[] TEST_ARRAY = new byte[] { 1, 3, 3, 5 };
+	protected static final byte[] VALUE = new byte[] { 1, 3, 3, 5 };
 	protected T checksum;
 
 	/**
@@ -33,8 +33,8 @@ public abstract class BaseChecksumTest<T extends BaseChecksum> {
 	 */
 	@Test
 	public void verifyCopyArray() {
-		final byte[] copy = checksum.copyArray(TEST_ARRAY);
-		assertNotSame(TEST_ARRAY, copy);
-		assertArrayEquals(TEST_ARRAY, copy);
+		final byte[] copy = checksum.copyArray(VALUE);
+		assertNotSame(VALUE, copy);
+		assertArrayEquals(VALUE, copy);
 	}
 }

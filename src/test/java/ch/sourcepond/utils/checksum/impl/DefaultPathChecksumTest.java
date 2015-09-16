@@ -8,6 +8,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -53,6 +54,7 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	}
 
 	private static final String ANY_ALGORITHM = "anyAlgorith";
+	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
 	private final Path path = mock(Path.class);
 	private final PathDigester digester = mock(PathDigester.class);
 	private final ScheduledExecutorService delegate = newScheduledThreadPool(1);
@@ -136,13 +138,63 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	}
 
 	/**
+	 * 
+	 */
+	@Test
+	public void verifyGetHexValue() throws Exception {
+		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update();
+		assertEquals("01030305", checksum.getHexValue());
+		checksum.update();
+		assertEquals("62313532", checksum.getHexValue());
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void verifyGetPreviousHexValue() throws Exception {
+		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update();
+		checksum.update();
+		assertEquals("01030305", checksum.getPreviousHexValue());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyEqualsPrevious() throws Exception {
+		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE).thenReturn(VALUE).thenReturn(VALUE);
+		checksum.update();
+		assertFalse(checksum.equalsPrevious());
+		checksum.update();
+		assertFalse(checksum.equalsPrevious());
+		checksum.update();
+		assertFalse(checksum.equalsPrevious());
+		checksum.update();
+		assertTrue(checksum.equalsPrevious());
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	@Test
 	public void verifyGetValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(TEST_ARRAY);
+		when(digester.updateDigest()).thenReturn(VALUE);
 		checksum.update();
-		assertArrayEquals(TEST_ARRAY, checksum.getValue());
+		assertArrayEquals(VALUE, checksum.getValue());
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void verifyGetPreviousValue() throws Exception {
+		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update();
+		checksum.update();
+		assertArrayEquals(VALUE, checksum.getPreviousValue());
 	}
 
 	/**
