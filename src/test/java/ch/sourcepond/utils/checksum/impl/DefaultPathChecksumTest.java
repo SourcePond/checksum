@@ -53,7 +53,6 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 		}
 	}
 
-	private static final String ANY_ALGORITHM = "anyAlgorith";
 	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
 	private final Path path = mock(Path.class);
 	private final PathDigester digester = mock(PathDigester.class);
@@ -133,18 +132,10 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	 * 
 	 */
 	@Test
-	public void verifyGetAlgorithm() {
-		assertEquals(ANY_ALGORITHM, checksum.getAlgorithm());
-	}
-
-	/**
-	 * 
-	 */
-	@Test
 	public void verifyGetHexValue() throws Exception {
 		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
-		assertEquals("01030305", checksum.getHexValue());
+		assertEquals(HEX_VALUE, checksum.getHexValue());
 		checksum.update();
 		assertEquals("62313532", checksum.getHexValue());
 	}
@@ -157,7 +148,7 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
 		checksum.update();
-		assertEquals("01030305", checksum.getPreviousHexValue());
+		assertEquals(HEX_VALUE, checksum.getPreviousHexValue());
 	}
 
 	/**

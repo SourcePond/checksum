@@ -1,6 +1,7 @@
 package ch.sourcepond.utils.checksum.impl;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
 import org.junit.Before;
@@ -12,6 +13,8 @@ import org.junit.Test;
  * @param <T>
  */
 public abstract class BaseChecksumTest<T extends BaseChecksum> {
+	public static final String ANY_ALGORITHM = "anyAlgorith";
+	public static final String HEX_VALUE = "01030305";
 	protected static final byte[] VALUE = new byte[] { 1, 3, 3, 5 };
 	protected T checksum;
 
@@ -26,6 +29,32 @@ public abstract class BaseChecksumTest<T extends BaseChecksum> {
 	@Before
 	public void setup() {
 		checksum = createChecksum();
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void verifyGetAlgorithm() {
+		assertEquals(ANY_ALGORITHM, checksum.getAlgorithm());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyGetValueCopy() throws Exception {
+		final byte[] value = checksum.getValue();
+		assertNotSame(VALUE, value);
+		assertArrayEquals(VALUE, value);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyGetSimpleHexValue() throws Exception {
+		assertEquals(HEX_VALUE, checksum.getHexValue());
 	}
 
 	/**
