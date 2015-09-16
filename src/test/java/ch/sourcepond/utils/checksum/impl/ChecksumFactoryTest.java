@@ -1,13 +1,14 @@
 package ch.sourcepond.utils.checksum.impl;
 
+import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.copy;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
@@ -32,8 +33,8 @@ public abstract class ChecksumFactoryTest {
 	private static final String TEST_CONTENT_FILE_NAME = "content.txt";
 	private static final String FIRST_CONTENT_FILE_NAME = "first_content.txt";
 	private static final String SECOND_CONTENT_FILE_NAME = "second_content.txt";
-	private static final Path TEST_FILE = FileSystems.getDefault().getPath(SystemUtils.USER_DIR, "target",
-			"test-classes", TEST_CONTENT_FILE_NAME);
+	private static final Path TEST_FILE = getDefault().getPath(SystemUtils.USER_DIR, "target", "test-classes",
+			TEST_CONTENT_FILE_NAME);
 	private ChecksumFactory factory;
 
 	/**
@@ -76,7 +77,7 @@ public abstract class ChecksumFactoryTest {
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void verifyCreatePathChecksum() throws Exception {
+	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
 		final PathChecksum chsm = factory.create(TEST_FILE, ALGORITHM);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
@@ -94,7 +95,7 @@ public abstract class ChecksumFactoryTest {
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void verifyCreatePathChecksumWithExecutor() throws Exception {
+	public void verifyCreateFileChecksumWithExecutor() throws Exception {
 		final ExecutorService executor = Executors.newFixedThreadPool(1);
 		try {
 			copyContent(FIRST_CONTENT_FILE_NAME);
@@ -109,5 +110,14 @@ public abstract class ChecksumFactoryTest {
 		} finally {
 			executor.shutdown();
 		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyDirectoryChecksum() throws Exception {
+		final PathChecksum chsm = factory.create(getDefault().getPath(USER_DIR, "src", "test", "resources"), ALGORITHM);
+		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }

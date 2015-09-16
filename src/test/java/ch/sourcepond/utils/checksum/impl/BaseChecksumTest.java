@@ -40,24 +40,6 @@ public abstract class BaseChecksumTest<T extends BaseChecksum> {
 	}
 
 	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void verifyGetValueCopy() throws Exception {
-		final byte[] value = checksum.getValue();
-		assertNotSame(VALUE, value);
-		assertArrayEquals(VALUE, value);
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	@Test
-	public void verifyGetSimpleHexValue() throws Exception {
-		assertEquals(HEX_VALUE, checksum.getHexValue());
-	}
-
-	/**
 	 * 
 	 */
 	@Test
