@@ -31,7 +31,7 @@ public abstract class ChecksumFactoryTest {
 	private static final String SECOND_EXPECTED_HASH = "da821a59243b5f99e0d14c1e93b9e00b8e9632b60a07cc8168b78128773dfa31";
 	private static final String ALGORITHM = "SHA-256";
 	private static final String TEST_CONTENT_FILE_NAME = "content.txt";
-	private static final String FIRST_CONTENT_FILE_NAME = "first_content.txt";
+	static final String FIRST_CONTENT_FILE_NAME = "first_content.txt";
 	private static final String SECOND_CONTENT_FILE_NAME = "second_content.txt";
 	private static final Path TEST_FILE = getDefault().getPath(SystemUtils.USER_DIR, "target", "test-classes",
 			TEST_CONTENT_FILE_NAME);

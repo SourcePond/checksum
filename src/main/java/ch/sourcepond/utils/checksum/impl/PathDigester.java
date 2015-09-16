@@ -115,7 +115,6 @@ class PathDigester extends SimpleFileVisitor<Path> {
 			} catch (final NoSuchAlgorithmException e) {
 				// This can never happen because it has already been validated
 				// during construction that the algorithm is available.
-				throw new IllegalStateException(e.getMessage(), e);
 			}
 			digestRef = new WeakReference<MessageDigest>(tempDigest);
 		}
