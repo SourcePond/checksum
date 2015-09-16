@@ -26,7 +26,7 @@ import ch.sourcepond.utils.checksum.PathChecksum;
  *
  */
 public abstract class ChecksumFactoryTest {
-	private static final String FIRST_EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
+	static final String FIRST_EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
 	private static final String SECOND_EXPECTED_HASH = "da821a59243b5f99e0d14c1e93b9e00b8e9632b60a07cc8168b78128773dfa31";
 	private static final String ALGORITHM = "SHA-256";
 	private static final String TEST_CONTENT_FILE_NAME = "content.txt";
@@ -64,7 +64,7 @@ public abstract class ChecksumFactoryTest {
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void verifyCreateChecksumFromStream() throws NoSuchAlgorithmException, IOException, InterruptedException {
+	public void verifyCreateChecksumFromStream() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
 		final Checksum chsm = factory.create(getClass().getResourceAsStream("/" + FIRST_CONTENT_FILE_NAME), ALGORITHM);
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
@@ -76,7 +76,7 @@ public abstract class ChecksumFactoryTest {
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void verifyCreatePathChecksum() throws NoSuchAlgorithmException, IOException, InterruptedException {
+	public void verifyCreatePathChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
 		final PathChecksum chsm = factory.create(TEST_FILE, ALGORITHM);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
@@ -94,8 +94,7 @@ public abstract class ChecksumFactoryTest {
 	 * @throws InterruptedException
 	 */
 	@Test
-	public void verifyCreatePathChecksumWithExecutor()
-			throws NoSuchAlgorithmException, IOException, InterruptedException {
+	public void verifyCreatePathChecksumWithExecutor() throws Exception {
 		final ExecutorService executor = Executors.newFixedThreadPool(1);
 		try {
 			copyContent(FIRST_CONTENT_FILE_NAME);

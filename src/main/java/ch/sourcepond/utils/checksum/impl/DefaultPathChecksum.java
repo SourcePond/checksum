@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.utils.checksum.impl;
 
+import static java.lang.Thread.currentThread;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import ch.sourcepond.utils.checksum.ChecksumException;
 import ch.sourcepond.utils.checksum.PathChecksum;
 
 /**
@@ -34,7 +36,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	private final Condition calculationDone = lock.newCondition();
 	private final PathDigester digester;
 	private final Executor executor;
-	private IOException exception;
+	private Throwable throwable;
 	private byte[] previousValue = INITIAL;
 	private byte[] value = INITIAL;
 	private boolean awaitCalculation;
@@ -63,13 +65,24 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private void awaitCalculation() throws IOException, InterruptedException {
-		while (awaitCalculation) {
-			calculationDone.await();
+	private void awaitCalculation() throws ChecksumException {
+		try {
+			while (awaitCalculation) {
+				calculationDone.await();
+			}
+		} catch (final InterruptedException e) {
+			currentThread().interrupt();
+			throw new ChecksumException(e.getMessage(), e);
 		}
 
-		if (exception != null) {
-			throw exception;
+		if (throwable != null) {
+
+			// Only throw an ordinary throwable if the caught throwable is NOT
+			// an error.
+			if (!(throwable instanceof Error)) {
+				throw new ChecksumException(throwable.getMessage(), throwable);
+			}
+			throw new Error(throwable.getMessage(), throwable);
 		}
 	}
 
@@ -81,8 +94,13 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		return digester.getAlgorithm();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksum#getValue()
+	 */
 	@Override
-	public byte[] getValue() throws IOException, InterruptedException {
+	public byte[] getValue() throws ChecksumException {
 		lock.lock();
 		try {
 			awaitCalculation();
@@ -92,8 +110,13 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksum#getHexValue()
+	 */
 	@Override
-	public String getHexValue() throws IOException, InterruptedException {
+	public String getHexValue() throws ChecksumException {
 		lock.lock();
 		try {
 			awaitCalculation();
@@ -111,8 +134,13 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		return digester.getPath();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.sourcepond.utils.checksum.PathChecksum#equalsPrevious()
+	 */
 	@Override
-	public boolean equalsPrevious() throws IOException, InterruptedException {
+	public boolean equalsPrevious() throws ChecksumException {
 		lock.lock();
 		try {
 			awaitCalculation();
@@ -128,7 +156,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * @see ch.sourcepond.utils.checksum.PathChecksum#getPreviousValue()
 	 */
 	@Override
-	public byte[] getPreviousValue() throws IOException, InterruptedException {
+	public byte[] getPreviousValue() throws ChecksumException {
 		lock.lock();
 		try {
 			awaitCalculation();
@@ -144,7 +172,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * @see ch.sourcepond.utils.checksum.PathChecksum#getPreviousHexValue()
 	 */
 	@Override
-	public String getPreviousHexValue() throws IOException, InterruptedException {
+	public String getPreviousHexValue() throws ChecksumException {
 		lock.lock();
 		try {
 			awaitCalculation();
@@ -160,7 +188,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * @see ch.sourcepond.utils.checksum.PathChecksum#update()
 	 */
 	@Override
-	public void update() throws IOException, InterruptedException {
+	public void update() throws ChecksumException {
 		lock.lock();
 		try {
 			// If a previous update is running we need to wait until it's done
@@ -173,6 +201,11 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		executor.execute(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Runnable#run()
+	 */
 	@Override
 	public void run() {
 		lock.lock();
@@ -180,8 +213,8 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 			final byte[] newValue = digester.updateDigest();
 			previousValue = value;
 			value = newValue;
-		} catch (final IOException e) {
-			exception = e;
+		} catch (final Throwable e) {
+			throwable = e;
 		} finally {
 			awaitCalculation = false;
 			calculationDone.signalAll();

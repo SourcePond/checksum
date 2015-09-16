@@ -16,9 +16,8 @@ package ch.sourcepond.utils.checksum.impl;
 import static java.lang.System.arraycopy;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
-import java.io.IOException;
-
 import ch.sourcepond.utils.checksum.Checksum;
+import ch.sourcepond.utils.checksum.ChecksumException;
 
 /**
  *
@@ -46,7 +45,7 @@ abstract class BaseChecksum implements Checksum {
 	 * @see ch.sourcepond.utils.checksum.Checksum#getValue()
 	 */
 	@Override
-	public byte[] getValue() throws IOException, InterruptedException {
+	public byte[] getValue() throws ChecksumException {
 		return copyArray(getValueUnsynchronized());
 	}
 
@@ -56,7 +55,7 @@ abstract class BaseChecksum implements Checksum {
 	 * @see ch.sourcepond.utils.checksum.Checksum#getHexValue()
 	 */
 	@Override
-	public String getHexValue() throws IOException, InterruptedException {
+	public String getHexValue() throws ChecksumException {
 		return encodeHexString(getValueUnsynchronized());
 	}
 }

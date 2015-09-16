@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import ch.sourcepond.utils.checksum.Checksum;
+import ch.sourcepond.utils.checksum.ChecksumException;
 import ch.sourcepond.utils.checksum.ChecksumFactory;
 import ch.sourcepond.utils.checksum.PathChecksum;
 
@@ -83,7 +84,7 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 */
 	@Override
 	public PathChecksum create(final Path pPath, final String pAlgorithm)
-			throws NoSuchAlgorithmException, IOException, InterruptedException {
+			throws NoSuchAlgorithmException, ChecksumException {
 		return create(pPath, pAlgorithm, DIRECT_EXECUTOR);
 	}
 
@@ -96,7 +97,7 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 */
 	@Override
 	public PathChecksum create(final Path pPath, final String pAlgorithm, final Executor pExecutor)
-			throws NoSuchAlgorithmException, IOException, InterruptedException {
+			throws NoSuchAlgorithmException, ChecksumException {
 		final PathChecksum chsm = new DefaultPathChecksum(new PathDigester(pAlgorithm, pPath), pExecutor);
 		chsm.update();
 		return chsm;

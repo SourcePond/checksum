@@ -82,7 +82,7 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	 * @param pChannel
 	 * @throws IOException
 	 */
-	void updateDigest(final Path pPath) throws IOException {
+	private void updateDigest(final Path pPath) throws IOException {
 		try (final FileChannel ch = open(path, READ)) {
 			final FileLock fl = ch.lock(0, MAX_VALUE, true);
 			try {
