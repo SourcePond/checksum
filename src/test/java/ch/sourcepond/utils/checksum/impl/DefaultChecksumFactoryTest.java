@@ -1,5 +1,9 @@
 package ch.sourcepond.utils.checksum.impl;
 
+import java.io.InputStream;
+
+import org.junit.Test;
+
 import ch.sourcepond.utils.checksum.ChecksumFactory;
 
 /**
@@ -16,6 +20,14 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	@Override
 	protected ChecksumFactory getFactory() {
 		return new DefaultChecksumFactory();
+	}
+
+	/**
+	 * 
+	 */
+	@Test(expected = NullPointerException.class)
+	public void verifyCreateNullInputStream() throws Exception {
+		factory.create((InputStream) null, ALGORITHM);
 	}
 
 }

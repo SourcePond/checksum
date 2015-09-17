@@ -14,6 +14,8 @@ limitations under the License.*/
 package ch.sourcepond.utils.checksum.impl;
 
 import static java.security.MessageDigest.getInstance;
+import static org.apache.commons.lang3.Validate.notBlank;
+import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +66,9 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	@Override
 	public Checksum create(final InputStream pInputStream, final String pAlgorithm)
 			throws NoSuchAlgorithmException, IOException {
+		notNull(pInputStream, "InputStream is null!");
+		notBlank(pAlgorithm, "Algorithm is null or blank!");
+
 		final MessageDigest digest = getInstance(pAlgorithm);
 		try (final DigestInputStream din = new DigestInputStream(pInputStream, digest)) {
 			final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];

@@ -29,13 +29,13 @@ import ch.sourcepond.utils.checksum.PathChecksum;
 public abstract class ChecksumFactoryTest {
 	static final String FIRST_EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
 	private static final String SECOND_EXPECTED_HASH = "da821a59243b5f99e0d14c1e93b9e00b8e9632b60a07cc8168b78128773dfa31";
-	private static final String ALGORITHM = "SHA-256";
+	static final String ALGORITHM = "SHA-256";
 	private static final String TEST_CONTENT_FILE_NAME = "content.txt";
 	static final String FIRST_CONTENT_FILE_NAME = "first_content.txt";
 	private static final String SECOND_CONTENT_FILE_NAME = "second_content.txt";
 	private static final Path TEST_FILE = getDefault().getPath(SystemUtils.USER_DIR, "target", "test-classes",
 			TEST_CONTENT_FILE_NAME);
-	private ChecksumFactory factory;
+	protected ChecksumFactory factory;
 
 	/**
 	 * 
