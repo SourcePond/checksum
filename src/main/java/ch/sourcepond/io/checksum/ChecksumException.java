@@ -1,4 +1,4 @@
-package ch.sourcepond.utils.checksum;
+package ch.sourcepond.io.checksum;
 
 /**
  * @author rolandhauser
