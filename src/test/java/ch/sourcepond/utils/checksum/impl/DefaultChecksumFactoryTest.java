@@ -3,6 +3,7 @@ package ch.sourcepond.utils.checksum.impl;
 import static org.mockito.Mockito.mock;
 
 import java.io.InputStream;
+import java.nio.file.Path;
 
 import org.junit.Test;
 
@@ -46,6 +47,30 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void verifyCreateBlankAlgorithm() throws Exception {
 		factory.create(mock(InputStream.class), "  ");
+	}
+
+	/**
+	 * 
+	 */
+	@Test(expected = NullPointerException.class)
+	public void verifyCreateNullPath() throws Exception {
+		factory.create((Path) null, ALGORITHM);
+	}
+
+	/**
+	 * 
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void verifyCreateWithPathBlankAlgorithm() throws Exception {
+		factory.create(mock(Path.class), "  ");
+	}
+
+	/**
+	 * 
+	 */
+	@Test(expected = NullPointerException.class)
+	public void verifyCreateNullExecutor() throws Exception {
+		factory.create(mock(Path.class), ALGORITHM, null);
 	}
 
 }
