@@ -1,7 +1,7 @@
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.utils.checksum.impl.ChecksumFactoryTest.FIRST_CONTENT_FILE_NAME;
-import static ch.sourcepond.utils.checksum.impl.ChecksumFactoryTest.FIRST_EXPECTED_HASH;
+import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_CONTENT_FILE_NAME;
+import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_EXPECTED_HASH;
 import static java.nio.file.FileSystems.getDefault;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
@@ -11,6 +11,8 @@ import java.nio.file.Path;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.sourcepond.io.checksum.impl.PathDigester;
 
 /**
  * @author rolandhauser

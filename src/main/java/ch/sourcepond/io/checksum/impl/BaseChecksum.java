@@ -11,13 +11,13 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static java.lang.System.arraycopy;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
-import ch.sourcepond.utils.checksum.Checksum;
-import ch.sourcepond.utils.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.Checksum;
+import ch.sourcepond.io.checksum.ChecksumException;
 
 /**
  *
@@ -42,7 +42,7 @@ abstract class BaseChecksum implements Checksum {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.Checksum#getValue()
+	 * @see ch.sourcepond.io.checksum.Checksum#getValue()
 	 */
 	@Override
 	public byte[] getValue() throws ChecksumException {
@@ -52,7 +52,7 @@ abstract class BaseChecksum implements Checksum {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.Checksum#getHexValue()
+	 * @see ch.sourcepond.io.checksum.Checksum#getHexValue()
 	 */
 	@Override
 	public String getHexValue() throws ChecksumException {

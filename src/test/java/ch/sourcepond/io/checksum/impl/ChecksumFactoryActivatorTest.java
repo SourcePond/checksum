@@ -1,4 +1,4 @@
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -7,7 +7,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
-import ch.sourcepond.utils.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator;
 
 /**
  * @author rolandhauser

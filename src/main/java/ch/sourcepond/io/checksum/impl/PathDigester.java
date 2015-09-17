@@ -11,9 +11,9 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.utils.checksum.impl.DefaultChecksumFactory.DEFAULT_BUFFER_SIZE;
+import static ch.sourcepond.io.checksum.impl.DefaultChecksumFactory.DEFAULT_BUFFER_SIZE;
 import static java.lang.Long.MAX_VALUE;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.channels.FileChannel.open;

@@ -6,7 +6,7 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>ch.sourcepond.utils</groupId>
+	<groupId>ch.sourcepond.io</groupId>
 	<artifactId>checksum-impl</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<inceptionYear>2015</inceptionYear>
@@ -20,7 +20,7 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>ch.sourcepond.utils</groupId>
+				<groupId>ch.sourcepond.io</groupId>
 				<artifactId>checksum-api</artifactId>
 				<version>${checksum-api.version}</version>
 			</dependency>
@@ -29,7 +29,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>ch.sourcepond.utils</groupId>
+			<groupId>ch.sourcepond.io</groupId>
 			<artifactId>checksum-api</artifactId>
 		</dependency>
 		<dependency>
@@ -66,7 +66,7 @@
 						<!-- Ignore JSR330 annotations; in OSGi we use a BundleActivator to 
 							export the MdcWrapper as service. -->
 						<Import-Package>!javax.inject.*,*</Import-Package>
-						<Bundle-Activator>ch.sourcepond.utils.checksum.impl.ChecksumFactoryActivator</Bundle-Activator>
+						<Bundle-Activator>ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

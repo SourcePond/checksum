@@ -1,4 +1,4 @@
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.copy;
@@ -18,9 +18,9 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.sourcepond.utils.checksum.Checksum;
-import ch.sourcepond.utils.checksum.ChecksumFactory;
-import ch.sourcepond.utils.checksum.PathChecksum;
+import ch.sourcepond.io.checksum.Checksum;
+import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.PathChecksum;
 
 /**
  * @author rolandhauser

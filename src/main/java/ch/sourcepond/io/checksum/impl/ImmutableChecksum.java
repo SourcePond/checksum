@@ -11,7 +11,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 /**
  *
@@ -32,7 +32,7 @@ final class ImmutableChecksum extends BaseChecksum {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.Checksum#getAlgorithm()
+	 * @see ch.sourcepond.io.checksum.Checksum#getAlgorithm()
 	 */
 	@Override
 	public String getAlgorithm() {
@@ -43,7 +43,7 @@ final class ImmutableChecksum extends BaseChecksum {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * ch.sourcepond.utils.checksum.impl.BaseChecksum#getValueUnsynchronized()
+	 * ch.sourcepond.io.checksum.impl.BaseChecksum#getValueUnsynchronized()
 	 */
 	@Override
 	protected byte[] getValueUnsynchronized() {

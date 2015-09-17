@@ -1,4 +1,4 @@
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static org.mockito.Mockito.mock;
 
@@ -7,7 +7,8 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 
-import ch.sourcepond.utils.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.impl.DefaultChecksumFactory;
 
 /**
  * @author rolandhauser
@@ -18,7 +19,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.impl.ChecksumFactoryTest#getFactory()
+	 * @see ch.sourcepond.io.checksum.impl.ChecksumFactoryTest#getFactory()
 	 */
 	@Override
 	protected ChecksumFactory getFactory() {

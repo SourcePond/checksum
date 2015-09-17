@@ -11,7 +11,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static java.security.MessageDigest.getInstance;
 import static org.apache.commons.lang3.Validate.notBlank;
@@ -28,10 +28,10 @@ import java.util.concurrent.Executor;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import ch.sourcepond.utils.checksum.Checksum;
-import ch.sourcepond.utils.checksum.ChecksumException;
-import ch.sourcepond.utils.checksum.ChecksumFactory;
-import ch.sourcepond.utils.checksum.PathChecksum;
+import ch.sourcepond.io.checksum.Checksum;
+import ch.sourcepond.io.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.PathChecksum;
 
 /**
  * Default implementation of the {@link ChecksumFactory} interface.
@@ -60,7 +60,7 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * ch.sourcepond.utils.checksum.ChecksumFactory#create(java.io.InputStream,
+	 * ch.sourcepond.io.checksum.ChecksumFactory#create(java.io.InputStream,
 	 * java.lang.String)
 	 */
 	@Override
@@ -84,7 +84,7 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * ch.sourcepond.utils.checksum.ChecksumFactory#create(java.nio.file.Path,
+	 * ch.sourcepond.io.checksum.ChecksumFactory#create(java.nio.file.Path,
 	 * java.lang.String)
 	 */
 	@Override
@@ -97,7 +97,7 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * ch.sourcepond.utils.checksum.ChecksumFactory#create(java.nio.file.Path,
+	 * ch.sourcepond.io.checksum.ChecksumFactory#create(java.nio.file.Path,
 	 * java.lang.String, java.util.concurrent.Executor)
 	 */
 	@Override

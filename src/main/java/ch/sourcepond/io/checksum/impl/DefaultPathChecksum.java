@@ -11,7 +11,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
@@ -24,8 +24,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ch.sourcepond.utils.checksum.ChecksumException;
-import ch.sourcepond.utils.checksum.PathChecksum;
+import ch.sourcepond.io.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.PathChecksum;
 
 /**
  *
@@ -53,7 +53,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksum#
+	 * @see ch.sourcepond.io.checksum.impl.BaseChecksum#
 	 * getValueUnsynchronized()
 	 */
 	@Override
@@ -97,7 +97,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksum#getValue()
+	 * @see ch.sourcepond.io.checksum.impl.BaseChecksum#getValue()
 	 */
 	@Override
 	public byte[] getValue() throws ChecksumException {
@@ -113,7 +113,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksum#getHexValue()
+	 * @see ch.sourcepond.io.checksum.impl.BaseChecksum#getHexValue()
 	 */
 	@Override
 	public String getHexValue() throws ChecksumException {
@@ -137,7 +137,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.PathChecksum#equalsPrevious()
+	 * @see ch.sourcepond.io.checksum.PathChecksum#equalsPrevious()
 	 */
 	@Override
 	public boolean equalsPrevious() throws ChecksumException {
@@ -153,7 +153,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.PathChecksum#getPreviousValue()
+	 * @see ch.sourcepond.io.checksum.PathChecksum#getPreviousValue()
 	 */
 	@Override
 	public byte[] getPreviousValue() throws ChecksumException {
@@ -169,7 +169,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.PathChecksum#getPreviousHexValue()
+	 * @see ch.sourcepond.io.checksum.PathChecksum#getPreviousHexValue()
 	 */
 	@Override
 	public String getPreviousHexValue() throws ChecksumException {
@@ -185,7 +185,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.PathChecksum#update()
+	 * @see ch.sourcepond.io.checksum.PathChecksum#update()
 	 */
 	@Override
 	public void update() throws ChecksumException {

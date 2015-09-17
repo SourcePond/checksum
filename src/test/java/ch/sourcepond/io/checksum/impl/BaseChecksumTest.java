@@ -1,4 +1,4 @@
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotSame;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.sourcepond.io.checksum.impl.BaseChecksum;
 
 /**
  * @author rolandhauser

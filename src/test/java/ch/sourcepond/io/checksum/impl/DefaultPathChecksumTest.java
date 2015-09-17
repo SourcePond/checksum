@@ -1,6 +1,6 @@
-package ch.sourcepond.utils.checksum.impl;
+package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.utils.checksum.impl.DefaultPathChecksum.INITIAL;
+import static ch.sourcepond.io.checksum.impl.DefaultPathChecksum.INITIAL;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -24,7 +24,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.sourcepond.utils.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.impl.DefaultPathChecksum;
+import ch.sourcepond.io.checksum.impl.PathDigester;
 
 /**
  * @author rolandhauser
@@ -70,7 +72,7 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksumTest#setup()
+	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#setup()
 	 */
 	@Override
 	@Before
@@ -256,7 +258,7 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.utils.checksum.impl.BaseChecksumTest#createChecksum()
+	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#createChecksum()
 	 */
 	@Override
 	protected DefaultPathChecksum createChecksum() {
