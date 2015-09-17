@@ -103,6 +103,9 @@ public class DefaultChecksumFactory implements ChecksumFactory {
 	@Override
 	public PathChecksum create(final Path pPath, final String pAlgorithm, final Executor pExecutor)
 			throws NoSuchAlgorithmException, ChecksumException {
+		notNull(pPath, "Path is null!");
+		notBlank(pAlgorithm, "Algorithm is null or blank!");
+		notNull(pExecutor, "Executor is null!");
 		final PathChecksum chsm = new DefaultPathChecksum(new PathDigester(pAlgorithm, pPath), pExecutor);
 		chsm.update();
 		return chsm;
