@@ -129,7 +129,7 @@ final class DefaultUpdatablePathChecksum extends BaseChecksum implements Updatab
 	 * @return
 	 */
 	@Override
-	public Path getPath() {
+	public Path getSource() {
 		return digester.getPath();
 	}
 

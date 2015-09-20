@@ -92,8 +92,8 @@ public class DefaultUpdatablePathChecksumTest extends BaseChecksumTest<DefaultUp
 	 * 
 	 */
 	@Test
-	public void verifyGetPath() {
-		assertEquals(path, checksum.getPath());
+	public void verifyGetSource() {
+		assertEquals(path, checksum.getSource());
 	}
 
 	/**
