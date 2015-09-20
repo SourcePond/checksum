@@ -7,8 +7,6 @@ import static org.junit.Assert.assertNotSame;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.sourcepond.io.checksum.impl.BaseChecksum;
-
 /**
  * @author rolandhauser
  *
@@ -23,13 +21,13 @@ public abstract class BaseChecksumTest<T extends BaseChecksum> {
 	/**
 	 * @return
 	 */
-	protected abstract T createChecksum();
+	protected abstract T createChecksum() throws Exception;
 
 	/**
 	 * 
 	 */
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
 		checksum = createChecksum();
 	}
 

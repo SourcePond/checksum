@@ -7,8 +7,7 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 
-import ch.sourcepond.io.checksum.ChecksumFactory;
-import ch.sourcepond.io.checksum.impl.DefaultChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 
 /**
  * @author rolandhauser
@@ -22,7 +21,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 * @see ch.sourcepond.io.checksum.impl.ChecksumFactoryTest#getFactory()
 	 */
 	@Override
-	protected ChecksumFactory getFactory() {
+	protected ChecksumBuilderFactory getBuilderFactory() {
 		return new DefaultChecksumFactory();
 	}
 
@@ -30,24 +29,16 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 * 
 	 */
 	@Test(expected = NullPointerException.class)
-	public void verifyCreateNullInputStream() throws Exception {
-		factory.create((InputStream) null, ALGORITHM);
+	public void verifyCreateOneTimeNullInputStream() throws Exception {
+		builder.create((InputStream) null);
 	}
 
 	/**
 	 * 
 	 */
 	@Test(expected = NullPointerException.class)
-	public void verifyCreateNullAlgorithm() throws Exception {
-		factory.create(mock(InputStream.class), null);
-	}
-
-	/**
-	 * 
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void verifyCreateBlankAlgorithm() throws Exception {
-		factory.create(mock(InputStream.class), "  ");
+	public void verifyCreateOneTimeNullExecutor() throws Exception {
+		builder.create(mock(InputStream.class), null);
 	}
 
 	/**
@@ -55,15 +46,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 */
 	@Test(expected = NullPointerException.class)
 	public void verifyCreateNullPath() throws Exception {
-		factory.create((Path) null, ALGORITHM);
-	}
-
-	/**
-	 * 
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void verifyCreateWithPathBlankAlgorithm() throws Exception {
-		factory.create(mock(Path.class), "  ");
+		builder.create((Path) null);
 	}
 
 	/**
@@ -71,7 +54,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 */
 	@Test(expected = NullPointerException.class)
 	public void verifyCreateNullExecutor() throws Exception {
-		factory.create(mock(Path.class), ALGORITHM, null);
+		builder.create(mock(Path.class), null);
 	}
 
 }

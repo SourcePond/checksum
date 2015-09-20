@@ -16,13 +16,13 @@ package ch.sourcepond.io.checksum.impl;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 
 /**
  *
  */
 public class ChecksumFactoryActivator implements BundleActivator {
-	private final ChecksumFactory factory;
+	private final ChecksumBuilderFactory factory;
 
 	/**
 	 * 
@@ -34,7 +34,7 @@ public class ChecksumFactoryActivator implements BundleActivator {
 	/**
 	 * @param pFactory
 	 */
-	ChecksumFactoryActivator(final ChecksumFactory pFactory) {
+	ChecksumFactoryActivator(final ChecksumBuilderFactory pFactory) {
 		factory = pFactory;
 	}
 
@@ -46,7 +46,7 @@ public class ChecksumFactoryActivator implements BundleActivator {
 	 */
 	@Override
 	public void start(final BundleContext context) throws Exception {
-		context.registerService(ChecksumFactory.class, factory, null);
+		context.registerService(ChecksumBuilderFactory.class, factory, null);
 	}
 
 	/*

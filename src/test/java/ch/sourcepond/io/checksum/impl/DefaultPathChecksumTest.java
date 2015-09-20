@@ -1,6 +1,6 @@
 package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.DefaultPathChecksum.INITIAL;
+import static ch.sourcepond.io.checksum.impl.BaseChecksum.INITIAL;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -25,8 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.sourcepond.io.checksum.ChecksumException;
-import ch.sourcepond.io.checksum.impl.DefaultPathChecksum;
-import ch.sourcepond.io.checksum.impl.PathDigester;
 
 /**
  * @author rolandhauser
@@ -76,7 +74,7 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	 */
 	@Override
 	@Before
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		when(digester.getAlgorithm()).thenReturn(ANY_ALGORITHM);
 		when(digester.getPath()).thenReturn(path);

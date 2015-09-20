@@ -3,20 +3,25 @@ package ch.sourcepond.io.checksum.impl;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.concurrent.Future;
 
 import org.junit.Test;
-
-import ch.sourcepond.io.checksum.impl.ImmutableChecksum;
 
 /**
  * @author rolandhauser
  *
  */
-public class ImmutableChecksumTest extends BaseChecksumTest<ImmutableChecksum> {
+public class ImmutableChecksumTest extends BaseChecksumTest<OneTimeChecksum> {
 
+	@SuppressWarnings("unchecked")
 	@Override
-	protected ImmutableChecksum createChecksum() {
-		return new ImmutableChecksum(VALUE, ANY_ALGORITHM);
+	protected OneTimeChecksum createChecksum() throws Exception {
+		final Future<byte[]> future = mock(Future.class);
+		when(future.get()).thenReturn(VALUE);
+		return new OneTimeChecksum(future, ANY_ALGORITHM);
 	}
 
 	/**

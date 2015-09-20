@@ -31,7 +31,6 @@ import ch.sourcepond.io.checksum.PathChecksum;
  *
  */
 final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Runnable {
-	static final byte[] INITIAL = new byte[0];
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
 	private final PathDigester digester;
@@ -57,7 +56,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * getValueUnsynchronized()
 	 */
 	@Override
-	protected byte[] getValueUnsynchronized() {
+	protected byte[] evaluateValue() {
 		return value;
 	}
 
@@ -211,8 +210,10 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 		lock.lock();
 		try {
 			final byte[] newValue = digester.updateDigest();
-			previousValue = value;
-			value = newValue;
+			if (newValue != null) {
+				previousValue = value;
+				value = newValue;
+			}
 		} catch (final Throwable e) {
 			throwable = e;
 		} finally {
@@ -220,5 +221,10 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 			calculationDone.signalAll();
 			lock.unlock();
 		}
+	}
+
+	@Override
+	public void cancel() {
+		digester.cancel();
 	}
 }

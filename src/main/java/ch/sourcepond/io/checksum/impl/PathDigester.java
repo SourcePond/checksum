@@ -13,10 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.DefaultChecksumFactory.DEFAULT_BUFFER_SIZE;
+import static ch.sourcepond.io.checksum.impl.DefaultChecksumBuilder.DEFAULT_BUFFER_SIZE;
 import static java.lang.Long.MAX_VALUE;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.channels.FileChannel.open;
+import static java.nio.file.FileVisitResult.TERMINATE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.READ;
@@ -35,7 +36,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * This class is <em>not</em> thread-safe and must by synchronized externally.
+ * This class is <em>not</em> thread-safe and must by synchronized externally
+ * (except of {@link #cancel()}).
  *
  */
 class PathDigester extends SimpleFileVisitor<Path> {
@@ -51,6 +53,9 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	// update they will be set to null.
 	private ByteBuffer tempBuffer;
 	private MessageDigest tempDigest;
+
+	// Cancel flag
+	private volatile boolean cancelled;
 
 	/**
 	 * @param pBuffers
@@ -88,7 +93,7 @@ class PathDigester extends SimpleFileVisitor<Path> {
 			try {
 				final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
 				int read = ch.read(tempBuffer);
-				while (read != -1) {
+				while (!cancelled && read != -1) {
 					tempBuffer.flip();
 					tempBuffer.get(tmp, 0, read);
 					tempDigest.update(tmp, 0, read);
@@ -134,8 +139,13 @@ class PathDigester extends SimpleFileVisitor<Path> {
 				updateDigest(path);
 			}
 
-			return tempDigest.digest();
+			byte[] res = null;
+			if (!cancelled) {
+				res = tempDigest.digest();
+			}
+			return res;
 		} finally {
+			cancelled = false;
 			tempDigest = null;
 			tempBuffer = null;
 		}
@@ -149,7 +159,17 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	 */
 	@Override
 	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-		updateDigest(file);
-		return super.visitFile(file, attrs);
+		if (!cancelled) {
+			updateDigest(file);
+			return super.visitFile(file, attrs);
+		}
+		return TERMINATE;
+	}
+
+	/**
+	 * 
+	 */
+	void cancel() {
+		cancelled = true;
 	}
 }

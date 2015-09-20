@@ -23,11 +23,12 @@ import ch.sourcepond.io.checksum.ChecksumException;
  *
  */
 abstract class BaseChecksum implements Checksum {
+	static final byte[] INITIAL = new byte[0];
 
 	/**
 	 * @return
 	 */
-	protected abstract byte[] getValueUnsynchronized();
+	protected abstract byte[] evaluateValue() throws ChecksumException;
 
 	/**
 	 * @param pOriginal
@@ -46,7 +47,7 @@ abstract class BaseChecksum implements Checksum {
 	 */
 	@Override
 	public byte[] getValue() throws ChecksumException {
-		return copyArray(getValueUnsynchronized());
+		return copyArray(evaluateValue());
 	}
 
 	/*
@@ -56,6 +57,6 @@ abstract class BaseChecksum implements Checksum {
 	 */
 	@Override
 	public String getHexValue() throws ChecksumException {
-		return encodeHexString(getValueUnsynchronized());
+		return encodeHexString(evaluateValue());
 	}
 }

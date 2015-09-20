@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
-import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 import ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator;
 
 /**
@@ -16,7 +16,7 @@ import ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator;
  */
 public class ChecksumFactoryActivatorTest {
 	private final BundleContext context = mock(BundleContext.class);
-	private final ChecksumFactory factory = mock(ChecksumFactory.class);
+	private final ChecksumBuilderFactory factory = mock(ChecksumBuilderFactory.class);
 	private final ChecksumFactoryActivator activator = new ChecksumFactoryActivator(factory);
 
 	/**
@@ -34,7 +34,7 @@ public class ChecksumFactoryActivatorTest {
 	@Test
 	public void verifyStart() throws Exception {
 		activator.start(context);
-		verify(context).registerService(ChecksumFactory.class, factory, null);
+		verify(context).registerService(ChecksumBuilderFactory.class, factory, null);
 	}
 
 	/**

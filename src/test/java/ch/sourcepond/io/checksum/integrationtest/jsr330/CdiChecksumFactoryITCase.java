@@ -6,7 +6,7 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
-import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 import ch.sourcepond.io.checksum.impl.ChecksumFactoryTest;
 import ch.sourcepond.io.checksum.impl.DefaultChecksumFactory;
 
@@ -22,15 +22,15 @@ public class CdiChecksumFactoryITCase extends ChecksumFactoryTest {
 	 * @see ch.sourcepond.io.checksum.impl.ChecksumFactoryTest#getFactory()
 	 */
 	@Override
-	protected ChecksumFactory getFactory() {
+	protected ChecksumBuilderFactory getBuilderFactory() {
 		final Injector injector = createInjector(new Module() {
 
 			@Override
 			public void configure(final Binder binder) {
-				binder.bind(ChecksumFactory.class).to(DefaultChecksumFactory.class);
+				binder.bind(ChecksumBuilderFactory.class).to(DefaultChecksumFactory.class);
 			}
 		});
-		return injector.getInstance(ChecksumFactory.class);
+		return injector.getInstance(ChecksumBuilderFactory.class);
 	}
 
 }

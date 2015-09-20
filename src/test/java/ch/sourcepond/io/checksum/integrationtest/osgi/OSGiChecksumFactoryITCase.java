@@ -13,7 +13,7 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
-import ch.sourcepond.io.checksum.ChecksumFactory;
+import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 import ch.sourcepond.io.checksum.impl.ChecksumFactoryTest;
 
 /**
@@ -27,7 +27,7 @@ public class OSGiChecksumFactoryITCase extends ChecksumFactoryTest {
 	 * 
 	 */
 	@Inject
-	private ChecksumFactory factory;
+	private ChecksumBuilderFactory factory;
 
 	/*
 	 * (non-Javadoc)
@@ -35,7 +35,7 @@ public class OSGiChecksumFactoryITCase extends ChecksumFactoryTest {
 	 * @see ch.sourcepond.io.checksum.impl.ChecksumFactoryTest#getFactory()
 	 */
 	@Override
-	protected ChecksumFactory getFactory() {
+	protected ChecksumBuilderFactory getBuilderFactory() {
 		return factory;
 	}
 
