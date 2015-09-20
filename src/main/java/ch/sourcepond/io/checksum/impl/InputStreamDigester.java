@@ -16,8 +16,8 @@ import org.slf4j.Logger;
  * @author rolandhauser
  *
  */
-class OneTimeCalculation implements Callable<byte[]> {
-	private static final Logger LOG = getLogger(OneTimeCalculation.class);
+class InputStreamDigester implements Callable<byte[]> {
+	private static final Logger LOG = getLogger(InputStreamDigester.class);
 	private final InputStream source;
 	private final String algorithm;
 	private volatile boolean cancelled;
@@ -26,7 +26,7 @@ class OneTimeCalculation implements Callable<byte[]> {
 	 * @param pSource
 	 * @param pAlgorithm
 	 */
-	OneTimeCalculation(final InputStream pSource, final String pAlgorithm) {
+	InputStreamDigester(final InputStream pSource, final String pAlgorithm) {
 		source = pSource;
 		algorithm = pAlgorithm;
 	}

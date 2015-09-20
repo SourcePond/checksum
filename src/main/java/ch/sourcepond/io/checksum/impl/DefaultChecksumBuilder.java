@@ -67,7 +67,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	public Checksum create(final InputStream pInputStream, final ExecutorService pExecutor) throws IOException {
 		notNull(pInputStream, "InputStream is null!");
 		notBlank(algorithm, "Algorithm is null or blank!");
-		return new OneTimeChecksum(pExecutor.submit(new OneTimeCalculation(pInputStream, algorithm)), algorithm);
+		return new OneTimeChecksum(pExecutor.submit(new InputStreamDigester(pInputStream, algorithm)), algorithm);
 	}
 
 	/*
@@ -94,7 +94,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 		notNull(pPath, "Path is null!");
 		notNull(pExecutor, "Executor is null!");
 		try {
-			final UpdatableChecksum<Path> chsm = new DefaultUpdatablePathChecksum(new PathDigester(algorithm, pPath),
+			final UpdatableChecksum<Path> chsm = new UpdatablePathChecksum(new PathDigester(algorithm, pPath),
 					pExecutor);
 			chsm.update();
 			return chsm;
