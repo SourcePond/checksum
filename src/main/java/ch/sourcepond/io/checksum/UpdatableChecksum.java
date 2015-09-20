@@ -25,12 +25,12 @@ import java.nio.file.Path;
 public interface UpdatableChecksum extends Checksum {
 
 	/**
-	 * Returns the path which is digested by this checksum. The path can be a
-	 * directory or a regular file.
+	 * Returns the source from where the data is fetched for calculating this
+	 * checksum.
 	 * 
-	 * @return Digested path, never {@code null}.
+	 * @return Data source, never {@code null}.
 	 */
-	Path getPath();
+	Path getSource();
 
 	/**
 	 * Checks whether the current checksum, i.e. the checksum <em>after</em> the
@@ -81,11 +81,11 @@ public interface UpdatableChecksum extends Checksum {
 
 	/**
 	 * Updates this checksum. To do this, the content of the path returned by
-	 * {@link #getPath()} will be read and digested. After the new checksum has
-	 * been calculated, the old checksum will be saved and can later be accessed
-	 * through {@link #getPreviousValue()} or {@link #getPreviousHexValue()}.
-	 * The newly calculated checksum can be accessed through {@link #getValue()}
-	 * or {@link #getHexValue()}.
+	 * {@link #getSource()} will be read and digested. After the new checksum
+	 * has been calculated, the old checksum will be saved and can later be
+	 * accessed through {@link #getPreviousValue()} or
+	 * {@link #getPreviousHexValue()}. The newly calculated checksum can be
+	 * accessed through {@link #getValue()} or {@link #getHexValue()}.
 	 * 
 	 * @throws IOException
 	 *             Thrown, if the necessary data could not be read for some
