@@ -16,7 +16,7 @@ package ch.sourcepond.io.checksum;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Factory to create new {@link Checksum} or {@link PathChecksum} instances.
+ * Factory to create new {@link Checksum} or {@link UpdatableChecksum} instances.
  *
  */
 public interface ChecksumBuilderFactory {

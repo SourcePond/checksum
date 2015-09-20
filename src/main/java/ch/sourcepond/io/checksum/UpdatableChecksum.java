@@ -22,7 +22,7 @@ import java.nio.file.Path;
  * regular file). Furthermore, it allows to keep track about changes on the
  * content.
  */
-public interface PathChecksum extends Checksum {
+public interface UpdatableChecksum extends Checksum {
 
 	/**
 	 * Returns the path which is digested by this checksum. The path can be a

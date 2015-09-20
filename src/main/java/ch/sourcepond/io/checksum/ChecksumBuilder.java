@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Builder to create new {@link Checksum} or {@link PathChecksum} with a
+ * Builder to create new {@link Checksum} or {@link UpdatableChecksum} with a
  * specific hashing algorithm .
  */
 public interface ChecksumBuilder {
@@ -62,14 +62,14 @@ public interface ChecksumBuilder {
 
 	/**
 	 * <p>
-	 * Creates a new {@link PathChecksum} instance. The necessary data is read
+	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is read
 	 * from path specified. If the path is a directory, any contained data file
 	 * will be digested. Sub-directories will be scanned recursively. If the
 	 * path is a regular file, its content will be digested.
 	 * </p>
 	 * 
 	 * <p>
-	 * The calculation of the checksum (see {@link PathChecksum#update()}) will
+	 * The calculation of the checksum (see {@link UpdatableChecksum#update()}) will
 	 * be performed <em>synchronously</em>, i.e. this method blocks until the
 	 * calculation process finishes.
 	 * </p>
@@ -77,24 +77,24 @@ public interface ChecksumBuilder {
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
-	 * @return New {@link PathChecksum} instance, never {@code null}
+	 * @return New {@link UpdatableChecksum} instance, never {@code null}
 	 * @throws ChecksumException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	PathChecksum create(Path pPath) throws ChecksumException;
+	UpdatableChecksum create(Path pPath) throws ChecksumException;
 
 	/**
 	 * <p>
-	 * Creates a new {@link PathChecksum} instance. The necessary data is read
+	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is read
 	 * from path specified. If the path is a directory, any contained data file
 	 * will be digested. Sub-directories will be scanned recursively. If the
 	 * path is a regular file, its content will be digested.
 	 * </p>
 	 * 
 	 * <p>
-	 * The calculation of the checksum (see {@link PathChecksum#update()}) will
+	 * The calculation of the checksum (see {@link UpdatableChecksum#update()}) will
 	 * be performed <em>asynchronously</em> with the executor specified.
 	 * </p>
 	 * 
@@ -103,13 +103,13 @@ public interface ChecksumBuilder {
 	 *            {@code null}.
 	 * @param pExecutor
 	 *            The executor to be used to calculate the checksum. Should also
-	 *            be used by {@link PathChecksum#update()}. Must not be
+	 *            be used by {@link UpdatableChecksum#update()}. Must not be
 	 *            {@code null}.
-	 * @return New {@link PathChecksum} instance, never {@code null}
+	 * @return New {@link UpdatableChecksum} instance, never {@code null}
 	 * @throws ChecksumException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	PathChecksum create(Path pPath, ExecutorService pExecutor) throws ChecksumException;
+	UpdatableChecksum create(Path pPath, ExecutorService pExecutor) throws ChecksumException;
 }
