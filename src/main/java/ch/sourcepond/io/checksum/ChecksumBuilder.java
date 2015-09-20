@@ -16,14 +16,13 @@ package ch.sourcepond.io.checksum;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 /**
- * Factory to create new {@link Checksum} or {@link PathChecksum} instances.
- *
+ * Builder to create new {@link Checksum} or {@link PathChecksum} with a
+ * specific hashing algorithm .
  */
-public interface ChecksumFactory {
+public interface ChecksumBuilder {
 
 	/**
 	 * Creates a new immutable {@link Checksum} instance. The necessary data is
@@ -35,22 +34,31 @@ public interface ChecksumFactory {
 	 * @param pInputStream
 	 *            The input-stream from where to read the data to be digested,
 	 *            must not be {@code null}.
-	 * @param pAlgorithm
-	 *            The name of the algorithm requested. See the MessageDigest
-	 *            section in the <a href=
-	 *            "{@docRoot}/../technotes/guides/security/StandardNames.html#MessageDigest"
-	 *            > Java Cryptography Architecture Standard Algorithm Name
-	 *            Documentation</a> for information about standard algorithm
-	 *            names. Must not be {@code null}
 	 * @return New {@link Checksum} instance, never {@code null}.
-	 * @throws NoSuchAlgorithmException
-	 *             Thrown, if no provider supports a MessageDigestSpi
-	 *             implementation for the specified algorithm.
 	 * @throws IOException
 	 *             Thrown, if the data could not be read from the input-stream
 	 *             specified.
 	 */
-	Checksum create(InputStream pInputStream, String pAlgorithm) throws NoSuchAlgorithmException, IOException;
+	Checksum create(InputStream pInputStream) throws IOException;
+
+	/**
+	 * Creates a new immutable {@link Checksum} instance. The necessary data is
+	 * read from {@link InputStream} specified. This method will close the
+	 * stream when the calculation is done. The calculation of the checksum will
+	 * be performed <em>asynchronously</em> with the executor specified.
+	 * 
+	 * @param pInputStream
+	 *            The input-stream from where to read the data to be digested,
+	 *            must not be {@code null}.
+	 * @param pExecutor
+	 *            The executor to be used to calculate the checksum; must not be
+	 *            {@code null}.
+	 * @return New {@link Checksum} instance, never {@code null}.
+	 * @throws IOException
+	 *             Thrown, if the data could not be read from the input-stream
+	 *             specified.
+	 */
+	Checksum create(InputStream pInputStream, ExecutorService pExecutor) throws IOException;
 
 	/**
 	 * <p>
@@ -69,23 +77,13 @@ public interface ChecksumFactory {
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
-	 * @param pAlgorithm
-	 *            The name of the algorithm requested. See the MessageDigest
-	 *            section in the <a href=
-	 *            "{@docRoot}/../technotes/guides/security/StandardNames.html#MessageDigest"
-	 *            > Java Cryptography Architecture Standard Algorithm Name
-	 *            Documentation</a> for information about standard algorithm
-	 *            names. Must not be {@code null}.
 	 * @return New {@link PathChecksum} instance, never {@code null}
-	 * @throws NoSuchAlgorithmException
-	 *             Thrown, if no provider supports a MessageDigestSpi
-	 *             implementation for the specified algorithm.
 	 * @throws ChecksumException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	PathChecksum create(Path pPath, String pAlgorithm) throws NoSuchAlgorithmException, ChecksumException;
+	PathChecksum create(Path pPath) throws ChecksumException;
 
 	/**
 	 * <p>
@@ -103,26 +101,15 @@ public interface ChecksumFactory {
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
-	 * @param pAlgorithm
-	 *            The name of the algorithm requested. See the MessageDigest
-	 *            section in the <a href=
-	 *            "{@docRoot}/../technotes/guides/security/StandardNames.html#MessageDigest"
-	 *            > Java Cryptography Architecture Standard Algorithm Name
-	 *            Documentation</a> for information about standard algorithm
-	 *            names. Must not be {@code null}.
 	 * @param pExecutor
 	 *            The executor to be used to calculate the checksum. Should also
 	 *            be used by {@link PathChecksum#update()}. Must not be
 	 *            {@code null}.
 	 * @return New {@link PathChecksum} instance, never {@code null}
-	 * @throws NoSuchAlgorithmException
-	 *             Thrown, if no provider supports a MessageDigestSpi
-	 *             implementation for the specified algorithm.
 	 * @throws ChecksumException
 	 *             Thrown, if the necessary data could not read from its source
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	PathChecksum create(Path pPath, String pAlgorithm, Executor pExecutor)
-			throws NoSuchAlgorithmException, ChecksumException;
+	PathChecksum create(Path pPath, ExecutorService pExecutor) throws ChecksumException;
 }

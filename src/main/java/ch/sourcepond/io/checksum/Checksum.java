@@ -24,6 +24,14 @@ import java.security.MessageDigest;
 public interface Checksum {
 
 	/**
+	 * Cancels any ongoing calculation on this checksum object. If a calculation
+	 * is ongoing, it will be cancelled, and, this object will remain in the
+	 * state before the calculation has been started. If no calculation is
+	 * running, nothing happens.
+	 */
+	void cancel();
+
+	/**
 	 * Returns the algorithm name used to calculate this checksum.
 	 * 
 	 * @return Algorithm name, never {@code null}
