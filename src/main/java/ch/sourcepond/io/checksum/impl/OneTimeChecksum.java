@@ -22,8 +22,8 @@ import ch.sourcepond.io.checksum.ChecksumException;
  *
  */
 final class OneTimeChecksum extends BaseChecksum {
-	private volatile Future<byte[]> future;
-	private volatile OneTimeCalculation calculation;
+	private Future<byte[]> future;
+	private OneTimeCalculation calculation;
 	private volatile byte[] value;
 	private final String algorithm;
 
