@@ -107,13 +107,13 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	}
 
 	@Override
-	public UpdatableChecksum<Path> create(final URL pUrl) throws ChecksumException {
+	public UpdatableChecksum<URL> create(final URL pUrl) throws ChecksumException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UpdatableChecksum<Path> create(final URL pUrl, final ExecutorService pExecutor) throws ChecksumException {
+	public UpdatableChecksum<URL> create(final URL pUrl, final ExecutorService pExecutor) throws ChecksumException {
 		// TODO Auto-generated method stub
 		return null;
 	}
