@@ -134,7 +134,7 @@ public interface ChecksumBuilder {
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	UpdatableChecksum<Path> create(URL pUrl) throws ChecksumException;
+	UpdatableChecksum<URL> create(URL pUrl) throws ChecksumException;
 
 	/**
 	 * <p>
@@ -159,5 +159,5 @@ public interface ChecksumBuilder {
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	UpdatableChecksum<Path> create(URL pUrl, ExecutorService pExecutor) throws ChecksumException;
+	UpdatableChecksum<URL> create(URL pUrl, ExecutorService pExecutor) throws ChecksumException;
 }
