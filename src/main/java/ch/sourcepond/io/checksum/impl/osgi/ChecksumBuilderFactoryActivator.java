@@ -11,31 +11,32 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.osgi;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
+import ch.sourcepond.io.checksum.impl.DefaultChecksumFactory;
 import ch.sourcepond.io.checksum.impl.digest.DefaultDigestFactory;
 
 /**
  *
  */
-public class ChecksumFactoryActivator implements BundleActivator {
+public class ChecksumBuilderFactoryActivator implements BundleActivator {
 	private final ChecksumBuilderFactory factory;
 
 	/**
 	 * 
 	 */
-	public ChecksumFactoryActivator() {
+	public ChecksumBuilderFactoryActivator() {
 		this(new DefaultChecksumFactory(new DefaultDigestFactory()));
 	}
 
 	/**
 	 * @param pFactory
 	 */
-	ChecksumFactoryActivator(final ChecksumBuilderFactory pFactory) {
+	ChecksumBuilderFactoryActivator(final ChecksumBuilderFactory pFactory) {
 		factory = pFactory;
 	}
 

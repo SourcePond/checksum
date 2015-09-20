@@ -66,7 +66,7 @@
 						<!-- Ignore JSR330 annotations; in OSGi we use a BundleActivator to 
 							export the MdcWrapper as service. -->
 						<Import-Package>!javax.inject.*,*</Import-Package>
-						<Bundle-Activator>ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator</Bundle-Activator>
+						<Bundle-Activator>ch.sourcepond.io.checksum.impl.osgi.ChecksumBuilderFactoryActivator</Bundle-Activator>
 					</instructions>
 				</configuration>
 			</plugin>

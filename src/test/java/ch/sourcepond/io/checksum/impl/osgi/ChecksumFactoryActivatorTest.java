@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.osgi;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
-import ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator;
+import ch.sourcepond.io.checksum.impl.osgi.ChecksumBuilderFactoryActivator;
 
 /**
  * @author rolandhauser
@@ -17,7 +17,7 @@ import ch.sourcepond.io.checksum.impl.ChecksumFactoryActivator;
 public class ChecksumFactoryActivatorTest {
 	private final BundleContext context = mock(BundleContext.class);
 	private final ChecksumBuilderFactory factory = mock(ChecksumBuilderFactory.class);
-	private final ChecksumFactoryActivator activator = new ChecksumFactoryActivator(factory);
+	private final ChecksumBuilderFactoryActivator activator = new ChecksumBuilderFactoryActivator(factory);
 
 	/**
 	 * 
@@ -25,7 +25,7 @@ public class ChecksumFactoryActivatorTest {
 	@Test
 	public void verifyDefaultConstructor() {
 		// Should not cause an exception
-		new ChecksumFactoryActivator();
+		new ChecksumBuilderFactoryActivator();
 	}
 
 	/**
