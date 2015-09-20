@@ -30,7 +30,7 @@ import ch.sourcepond.io.checksum.UpdatableChecksum;
 /**
  *
  */
-final class DefaultUpdatablePathChecksum extends BaseChecksum implements UpdatableChecksum, Runnable {
+final class DefaultUpdatablePathChecksum extends BaseChecksum implements UpdatableChecksum<Path>, Runnable {
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
 	private final PathDigester digester;

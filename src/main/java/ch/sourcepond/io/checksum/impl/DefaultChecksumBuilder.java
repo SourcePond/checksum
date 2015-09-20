@@ -54,9 +54,8 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.io.InputStream,
-	 * java.lang.String)
+	 * @see ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.io.
+	 * InputStream, java.lang.String)
 	 */
 	@Override
 	public Checksum create(final InputStream pInputStream) throws IOException {
@@ -73,26 +72,29 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.nio.file.Path,
-	 * java.lang.String)
+	 * @see
+	 * ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.nio.file.
+	 * Path, java.lang.String)
 	 */
 	@Override
-	public UpdatableChecksum create(final Path pPath) throws ChecksumException {
+	public UpdatableChecksum<Path> create(final Path pPath) throws ChecksumException {
 		return create(pPath, newDirectExecutorService());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.nio.file.Path,
-	 * java.lang.String, java.util.concurrent.Executor)
+	 * @see
+	 * ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.nio.file.
+	 * Path, java.lang.String, java.util.concurrent.Executor)
 	 */
 	@Override
-	public UpdatableChecksum create(final Path pPath, final ExecutorService pExecutor) throws ChecksumException {
+	public UpdatableChecksum<Path> create(final Path pPath, final ExecutorService pExecutor) throws ChecksumException {
 		notNull(pPath, "Path is null!");
 		notNull(pExecutor, "Executor is null!");
 		try {
-			final UpdatableChecksum chsm = new DefaultUpdatablePathChecksum(new PathDigester(algorithm, pPath), pExecutor);
+			final UpdatableChecksum<Path> chsm = new DefaultUpdatablePathChecksum(new PathDigester(algorithm, pPath),
+					pExecutor);
 			chsm.update();
 			return chsm;
 		} catch (final NoSuchAlgorithmException e) {

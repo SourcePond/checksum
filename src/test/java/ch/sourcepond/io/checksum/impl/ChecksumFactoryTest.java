@@ -82,7 +82,7 @@ public abstract class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final UpdatableChecksum chsm = builder.create(TEST_FILE);
+		final UpdatableChecksum<Path> chsm = builder.create(TEST_FILE);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -102,7 +102,7 @@ public abstract class ChecksumFactoryTest {
 		final ExecutorService executor = Executors.newFixedThreadPool(1);
 		try {
 			copyContent(FIRST_CONTENT_FILE_NAME);
-			final UpdatableChecksum chsm = builder.create(TEST_FILE, executor);
+			final UpdatableChecksum<Path> chsm = builder.create(TEST_FILE, executor);
 			assertEquals(EMPTY, chsm.getPreviousHexValue());
 			assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -120,7 +120,7 @@ public abstract class ChecksumFactoryTest {
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final UpdatableChecksum chsm = builder.create(getDefault().getPath(USER_DIR, "src", "test", "resources"));
+		final UpdatableChecksum<Path> chsm = builder.create(getDefault().getPath(USER_DIR, "src", "test", "resources"));
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }
