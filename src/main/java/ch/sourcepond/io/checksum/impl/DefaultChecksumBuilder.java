@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.Validate.notNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
@@ -102,5 +103,17 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 			// algorithm exists during construction of this builder.
 			throw new IllegalStateException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public UpdatableChecksum<Path> create(final URL pUrl) throws ChecksumException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UpdatableChecksum<Path> create(final URL pUrl, final ExecutorService pExecutor) throws ChecksumException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
