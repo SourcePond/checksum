@@ -15,6 +15,7 @@ package ch.sourcepond.io.checksum;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
@@ -63,9 +64,9 @@ public interface ChecksumBuilder {
 	/**
 	 * <p>
 	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
-	 * read from path specified. If the path is a directory, any contained data
-	 * file will be digested. Sub-directories will be scanned recursively. If
-	 * the path is a regular file, its content will be digested.
+	 * read from the path specified. If the path is a directory, any contained
+	 * data file will be digested. Sub-directories will be scanned recursively.
+	 * If the path is a regular file, its content will be digested.
 	 * </p>
 	 * 
 	 * <p>
@@ -88,9 +89,9 @@ public interface ChecksumBuilder {
 	/**
 	 * <p>
 	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
-	 * read from path specified. If the path is a directory, any contained data
-	 * file will be digested. Sub-directories will be scanned recursively. If
-	 * the path is a regular file, its content will be digested.
+	 * read from the path specified. If the path is a directory, any contained
+	 * data file will be digested. Sub-directories will be scanned recursively.
+	 * If the path is a regular file, its content will be digested.
 	 * </p>
 	 * 
 	 * <p>
@@ -112,4 +113,51 @@ public interface ChecksumBuilder {
 	 *             or another unexpected exception has occurred.
 	 */
 	UpdatableChecksum<Path> create(Path pPath, ExecutorService pExecutor) throws ChecksumException;
+
+	/**
+	 * <p>
+	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
+	 * read from the url specified.
+	 * </p>
+	 * 
+	 * <p>
+	 * The calculation of the checksum (see {@link UpdatableChecksum#update()})
+	 * will be performed <em>synchronously</em>, i.e. this method blocks until
+	 * the calculation process finishes.
+	 * </p>
+	 * 
+	 * @param pUrl
+	 *            Url of the content to be digested, must not be {@code null}.
+	 * @return New {@link UpdatableChecksum} instance, never {@code null}
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
+	 */
+	UpdatableChecksum<Path> create(URL pUrl) throws ChecksumException;
+
+	/**
+	 * <p>
+	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
+	 * read from the url specified.
+	 * </p>
+	 * 
+	 * <p>
+	 * The calculation of the checksum (see {@link UpdatableChecksum#update()})
+	 * will be performed <em>asynchronously</em> with the executor specified.
+	 * </p>
+	 * 
+	 * @param pUrl
+	 *            Url of the content to be digested, must not be {@code null}.
+	 * @param pExecutor
+	 *            The executor to be used to calculate the checksum. Should also
+	 *            be used by {@link UpdatableChecksum#update()}. Must not be
+	 *            {@code null}.
+	 * @return New {@link UpdatableChecksum} instance, never {@code null}
+	 * @throws ChecksumException
+	 *             Thrown, if the necessary data could not read from its source
+	 *             for any reason, the calculating thread has been interrupted,
+	 *             or another unexpected exception has occurred.
+	 */
+	UpdatableChecksum<Path> create(URL pUrl, ExecutorService pExecutor) throws ChecksumException;
 }
