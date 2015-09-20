@@ -45,7 +45,7 @@ public class OSGiChecksumFactoryITCase extends ChecksumFactoryTest {
 	 */
 	@Configuration
 	public Option[] config() throws Exception {
-		return options(mavenBundle("ch.sourcepond.utils", "checksum-api").versionAsInProject(),
+		return options(mavenBundle("ch.sourcepond.io", "checksum-api").versionAsInProject(),
 				mavenBundle("commons-codec", "commons-codec").versionAsInProject(), defaultOptions());
 	}
 }
