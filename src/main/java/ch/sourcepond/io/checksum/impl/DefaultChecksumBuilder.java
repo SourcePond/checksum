@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import ch.sourcepond.io.checksum.Checksum;
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumException;
-import ch.sourcepond.io.checksum.PathChecksum;
+import ch.sourcepond.io.checksum.UpdatableChecksum;
 
 /**
  * Default implementation of the {@link ChecksumBuilder} interface.
@@ -77,7 +77,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 * java.lang.String)
 	 */
 	@Override
-	public PathChecksum create(final Path pPath) throws ChecksumException {
+	public UpdatableChecksum create(final Path pPath) throws ChecksumException {
 		return create(pPath, newDirectExecutorService());
 	}
 
@@ -88,11 +88,11 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 * java.lang.String, java.util.concurrent.Executor)
 	 */
 	@Override
-	public PathChecksum create(final Path pPath, final ExecutorService pExecutor) throws ChecksumException {
+	public UpdatableChecksum create(final Path pPath, final ExecutorService pExecutor) throws ChecksumException {
 		notNull(pPath, "Path is null!");
 		notNull(pExecutor, "Executor is null!");
 		try {
-			final PathChecksum chsm = new DefaultPathChecksum(new PathDigester(algorithm, pPath), pExecutor);
+			final UpdatableChecksum chsm = new DefaultUpdatablePathChecksum(new PathDigester(algorithm, pPath), pExecutor);
 			chsm.update();
 			return chsm;
 		} catch (final NoSuchAlgorithmException e) {

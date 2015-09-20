@@ -30,7 +30,7 @@ import ch.sourcepond.io.checksum.ChecksumException;
  * @author rolandhauser
  *
  */
-public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksum> {
+public class DefaultUpdatablePathChecksumTest extends BaseChecksumTest<DefaultUpdatablePathChecksum> {
 
 	/**
 	 * @author rolandhauser
@@ -259,7 +259,7 @@ public class DefaultPathChecksumTest extends BaseChecksumTest<DefaultPathChecksu
 	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#createChecksum()
 	 */
 	@Override
-	protected DefaultPathChecksum createChecksum() {
-		return new DefaultPathChecksum(digester, executor);
+	protected DefaultUpdatablePathChecksum createChecksum() {
+		return new DefaultUpdatablePathChecksum(digester, executor);
 	}
 }

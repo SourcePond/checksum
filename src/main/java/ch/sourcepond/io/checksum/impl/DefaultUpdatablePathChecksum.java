@@ -25,12 +25,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import ch.sourcepond.io.checksum.ChecksumException;
-import ch.sourcepond.io.checksum.PathChecksum;
+import ch.sourcepond.io.checksum.UpdatableChecksum;
 
 /**
  *
  */
-final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Runnable {
+final class DefaultUpdatablePathChecksum extends BaseChecksum implements UpdatableChecksum, Runnable {
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
 	private final PathDigester digester;
@@ -44,7 +44,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	 * @param pDigest
 	 * @param pPath
 	 */
-	DefaultPathChecksum(final PathDigester pDigester, final Executor pExecutor) {
+	DefaultUpdatablePathChecksum(final PathDigester pDigester, final Executor pExecutor) {
 		digester = pDigester;
 		executor = pExecutor;
 	}
@@ -136,7 +136,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.PathChecksum#equalsPrevious()
+	 * @see ch.sourcepond.io.checksum.UpdatableChecksum#equalsPrevious()
 	 */
 	@Override
 	public boolean equalsPrevious() throws ChecksumException {
@@ -152,7 +152,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.PathChecksum#getPreviousValue()
+	 * @see ch.sourcepond.io.checksum.UpdatableChecksum#getPreviousValue()
 	 */
 	@Override
 	public byte[] getPreviousValue() throws ChecksumException {
@@ -168,7 +168,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.PathChecksum#getPreviousHexValue()
+	 * @see ch.sourcepond.io.checksum.UpdatableChecksum#getPreviousHexValue()
 	 */
 	@Override
 	public String getPreviousHexValue() throws ChecksumException {
@@ -184,7 +184,7 @@ final class DefaultPathChecksum extends BaseChecksum implements PathChecksum, Ru
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.PathChecksum#update()
+	 * @see ch.sourcepond.io.checksum.UpdatableChecksum#update()
 	 */
 	@Override
 	public void update() throws ChecksumException {
