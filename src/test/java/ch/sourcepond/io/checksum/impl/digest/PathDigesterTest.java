@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.digest;
 
 import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_CONTENT_FILE_NAME;
 import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_EXPECTED_HASH;
@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.sourcepond.io.checksum.impl.PathDigester;
+import ch.sourcepond.io.checksum.impl.digest.PathDigest;
 
 /**
  * @author rolandhauser
@@ -21,14 +21,14 @@ import ch.sourcepond.io.checksum.impl.PathDigester;
 public class PathDigesterTest {
 	private static final String ALGORITHM = "SHA-256";
 	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", FIRST_CONTENT_FILE_NAME);
-	private PathDigester digester;
+	private PathDigest digester;
 
 	/**
 	 * 
 	 */
 	@Before
 	public void setup() throws Exception {
-		digester = new PathDigester(ALGORITHM, file);
+		digester = new PathDigest(ALGORITHM, file);
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import org.junit.Test;
 
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
+import ch.sourcepond.io.checksum.impl.digest.DefaultDigestFactory;
 
 /**
  * @author rolandhauser
@@ -22,7 +23,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 */
 	@Override
 	protected ChecksumBuilderFactory getBuilderFactory() {
-		return new DefaultChecksumFactory();
+		return new DefaultChecksumFactory(new DefaultDigestFactory());
 	}
 
 	/**

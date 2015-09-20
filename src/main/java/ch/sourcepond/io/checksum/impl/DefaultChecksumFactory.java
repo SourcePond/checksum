@@ -15,11 +15,13 @@ package ch.sourcepond.io.checksum.impl;
 
 import java.security.NoSuchAlgorithmException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
+import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
 
 /**
  * Default implementation of the {@link ChecksumBuilderFactory} interface.
@@ -28,14 +30,28 @@ import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 @Named
 @Singleton
 public class DefaultChecksumFactory implements ChecksumBuilderFactory {
+	/**
+	 * 
+	 */
+	public static final int DEFAULT_BUFFER_SIZE = 8192;
+	private final DigestFactory digestFactory;
+
+	/**
+	 * @param pDigestFactory
+	 */
+	@Inject
+	public DefaultChecksumFactory(final DigestFactory pDigestFactory) {
+		digestFactory = pDigestFactory;
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.lang.String)
+	 * @see
+	 * ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.lang.String)
 	 */
 	@Override
 	public ChecksumBuilder create(final String pAlgorithm) throws NoSuchAlgorithmException {
-		return new DefaultChecksumBuilder(pAlgorithm);
+		return new DefaultChecksumBuilder(digestFactory, pAlgorithm);
 	}
 }

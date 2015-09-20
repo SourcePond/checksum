@@ -11,9 +11,9 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.digest;
 
-import static ch.sourcepond.io.checksum.impl.DefaultChecksumBuilder.DEFAULT_BUFFER_SIZE;
+import static ch.sourcepond.io.checksum.impl.DefaultChecksumFactory.DEFAULT_BUFFER_SIZE;
 import static java.lang.Long.MAX_VALUE;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.channels.FileChannel.open;
@@ -40,7 +40,7 @@ import java.security.NoSuchAlgorithmException;
  * (except of {@link #cancel()}).
  *
  */
-class PathDigester extends SimpleFileVisitor<Path> {
+class PathDigest extends SimpleFileVisitor<Path>implements Digest<Path> {
 	private final String algorithm;
 	private final Path path;
 
@@ -62,7 +62,7 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	 * @param pDigest
 	 * @throws NoSuchAlgorithmException
 	 */
-	PathDigester(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
+	PathDigest(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
 		algorithm = pAlgorithm;
 		path = pPath;
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
@@ -72,14 +72,16 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	/**
 	 * @return
 	 */
-	Path getPath() {
+	@Override
+	public Path getSource() {
 		return path;
 	}
 
 	/**
 	 * @return
 	 */
-	String getAlgorithm() {
+	@Override
+	public String getAlgorithm() {
 		return algorithm;
 	}
 
@@ -110,7 +112,8 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	 * @param pChannel
 	 * @throws IOException
 	 */
-	byte[] updateDigest() throws IOException {
+	@Override
+	public byte[] updateDigest() throws IOException {
 		// Initialize the temporary hard reference to the digester; this must be
 		// set to null after the update has been performed.
 		tempDigest = digestRef.get();
@@ -169,7 +172,8 @@ class PathDigester extends SimpleFileVisitor<Path> {
 	/**
 	 * 
 	 */
-	void cancel() {
+	@Override
+	public void cancel() {
 		cancelled = true;
 	}
 }

@@ -29,26 +29,25 @@ import ch.sourcepond.io.checksum.Checksum;
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumException;
 import ch.sourcepond.io.checksum.UpdatableChecksum;
+import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
 
 /**
  * Default implementation of the {@link ChecksumBuilder} interface.
  * 
  */
 final class DefaultChecksumBuilder implements ChecksumBuilder {
-	/**
-	 * 
-	 */
-	static final int DEFAULT_BUFFER_SIZE = 8192;
-
+	private final DigestFactory digestFactory;
 	private final String algorithm;
 
 	/**
 	 * @param pAlgorithm
 	 * @throws NoSuchAlgorithmException
 	 */
-	DefaultChecksumBuilder(final String pAlgorithm) throws NoSuchAlgorithmException {
+	DefaultChecksumBuilder(final DigestFactory pDigestFactory, final String pAlgorithm)
+			throws NoSuchAlgorithmException {
 		// Verify, that the algorithm exists
 		getInstance(pAlgorithm);
+		digestFactory = pDigestFactory;
 		algorithm = pAlgorithm;
 	}
 
@@ -94,8 +93,8 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 		notNull(pPath, "Path is null!");
 		notNull(pExecutor, "Executor is null!");
 		try {
-			final UpdatableChecksum<Path> chsm = new UpdatablePathChecksum(new PathDigester(algorithm, pPath),
-					pExecutor);
+			final UpdatableChecksum<Path> chsm = new UpdatablePathChecksum(
+					digestFactory.newPathDigest(algorithm, pPath), pExecutor);
 			chsm.update();
 			return chsm;
 		} catch (final NoSuchAlgorithmException e) {

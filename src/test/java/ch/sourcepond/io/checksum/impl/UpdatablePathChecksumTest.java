@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ch.sourcepond.io.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.impl.digest.Digest;
 
 /**
  * @author rolandhauser
@@ -55,7 +56,7 @@ public class UpdatablePathChecksumTest extends BaseChecksumTest<UpdatablePathChe
 
 	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
 	private final Path path = mock(Path.class);
-	private final PathDigester digester = mock(PathDigester.class);
+	private final Digest<Path> digester = mock(Digest.class);
 	private final ScheduledExecutorService delegate = newScheduledThreadPool(1);
 	private final Executor executor = new Executor() {
 
@@ -77,7 +78,7 @@ public class UpdatablePathChecksumTest extends BaseChecksumTest<UpdatablePathChe
 	public void setup() throws Exception {
 		super.setup();
 		when(digester.getAlgorithm()).thenReturn(ANY_ALGORITHM);
-		when(digester.getPath()).thenReturn(path);
+		when(digester.getSource()).thenReturn(path);
 	}
 
 	/**
