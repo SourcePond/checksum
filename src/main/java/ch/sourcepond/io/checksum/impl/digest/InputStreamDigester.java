@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.digest;
 
 import static ch.sourcepond.io.checksum.impl.DefaultChecksumFactory.DEFAULT_BUFFER_SIZE;
 import static java.security.MessageDigest.getInstance;
@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 
@@ -16,7 +15,7 @@ import org.slf4j.Logger;
  * @author rolandhauser
  *
  */
-class InputStreamDigester implements Callable<byte[]> {
+class InputStreamDigester implements ImmutableDigest {
 	private static final Logger LOG = getLogger(InputStreamDigester.class);
 	private final InputStream source;
 	private final String algorithm;
@@ -34,7 +33,8 @@ class InputStreamDigester implements Callable<byte[]> {
 	/**
 	 * 
 	 */
-	void cancel() {
+	@Override
+	public void cancel() {
 		cancelled = true;
 	}
 
@@ -62,6 +62,16 @@ class InputStreamDigester implements Callable<byte[]> {
 			// algorithm exists during construction of this builder.
 			throw new IllegalStateException(e.getMessage(), e);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.sourcepond.io.checksum.impl.digest.Digest#getAlgorithm()
+	 */
+	@Override
+	public String getAlgorithm() {
+		return algorithm;
 	}
 
 }

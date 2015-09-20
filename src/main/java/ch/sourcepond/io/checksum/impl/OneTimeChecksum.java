@@ -17,23 +17,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import ch.sourcepond.io.checksum.ChecksumException;
+import ch.sourcepond.io.checksum.impl.digest.Digest;
 
 /**
  *
  */
 final class OneTimeChecksum extends BaseChecksum {
-	private Future<byte[]> future;
-	private InputStreamDigester calculation;
-	private volatile byte[] value;
-	private final String algorithm;
+	private final Digest digest;
+	private final Future<byte[]> future;
 
 	/**
 	 * @param pValue
 	 * @param pAlgorithm
 	 */
-	OneTimeChecksum(final Future<byte[]> pFuture, final String pAlgorithm) {
+	OneTimeChecksum(final Digest pDigest, final Future<byte[]> pFuture) {
+		digest = pDigest;
 		future = pFuture;
-		algorithm = pAlgorithm;
 	}
 
 	/*
@@ -43,7 +42,7 @@ final class OneTimeChecksum extends BaseChecksum {
 	 */
 	@Override
 	public String getAlgorithm() {
-		return algorithm;
+		return digest.getAlgorithm();
 	}
 
 	/*
@@ -53,32 +52,21 @@ final class OneTimeChecksum extends BaseChecksum {
 	 */
 	@Override
 	protected byte[] evaluateValue() throws ChecksumException {
-		if (value == null) {
-			synchronized (this) {
-				if (value == null) {
-					try {
-						value = future.get();
-						if (value == null) {
-							value = INITIAL;
-						}
-					} catch (InterruptedException | ExecutionException e) {
-						throw new ChecksumException(e.getMessage(), e);
-					}
-					future = null;
-					calculation = null;
-				}
+		try {
+			byte[] rc = future.get();
+			if (rc == null) {
+				rc = INITIAL;
 			}
+			return rc;
+		} catch (InterruptedException | ExecutionException e) {
+			throw new ChecksumException(e.getMessage(), e);
 		}
-		return value;
 	}
 
 	@Override
-	public synchronized void cancel() {
-		if (calculation != null) {
-			calculation.cancel();
-			value = INITIAL;
-			calculation = null;
-			future = null;
+	public void cancel() {
+		if (digest != null) {
+			digest.cancel();
 		}
 	}
 }

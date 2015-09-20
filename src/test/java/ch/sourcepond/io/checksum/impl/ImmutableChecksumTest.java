@@ -10,6 +10,8 @@ import java.util.concurrent.Future;
 
 import org.junit.Test;
 
+import ch.sourcepond.io.checksum.impl.digest.Digest;
+
 /**
  * @author rolandhauser
  *
@@ -21,7 +23,9 @@ public class ImmutableChecksumTest extends BaseChecksumTest<OneTimeChecksum> {
 	protected OneTimeChecksum createChecksum() throws Exception {
 		final Future<byte[]> future = mock(Future.class);
 		when(future.get()).thenReturn(VALUE);
-		return new OneTimeChecksum(future, ANY_ALGORITHM);
+		final Digest digest = mock(Digest.class);
+		when(digest.getAlgorithm()).thenReturn(ANY_ALGORITHM);
+		return new OneTimeChecksum(digest, future);
 	}
 
 	/**

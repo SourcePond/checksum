@@ -30,6 +30,7 @@ import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumException;
 import ch.sourcepond.io.checksum.UpdatableChecksum;
 import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
+import ch.sourcepond.io.checksum.impl.digest.ImmutableDigest;
 
 /**
  * Default implementation of the {@link ChecksumBuilder} interface.
@@ -66,7 +67,8 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	public Checksum create(final InputStream pInputStream, final ExecutorService pExecutor) throws IOException {
 		notNull(pInputStream, "InputStream is null!");
 		notBlank(algorithm, "Algorithm is null or blank!");
-		return new OneTimeChecksum(pExecutor.submit(new InputStreamDigester(pInputStream, algorithm)), algorithm);
+		final ImmutableDigest digest = digestFactory.newDigestTask(algorithm, pInputStream);
+		return new OneTimeChecksum(digest, pExecutor.submit(digest));
 	}
 
 	/*
@@ -93,8 +95,8 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 		notNull(pPath, "Path is null!");
 		notNull(pExecutor, "Executor is null!");
 		try {
-			final UpdatableChecksum<Path> chsm = new UpdatablePathChecksum(
-					digestFactory.newPathDigest(algorithm, pPath), pExecutor);
+			final UpdatableChecksum<Path> chsm = new UpdatablePathChecksum(digestFactory.newDigest(algorithm, pPath),
+					pExecutor);
 			chsm.update();
 			return chsm;
 		} catch (final NoSuchAlgorithmException e) {

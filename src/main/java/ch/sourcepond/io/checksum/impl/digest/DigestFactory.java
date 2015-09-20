@@ -1,5 +1,6 @@
 package ch.sourcepond.io.checksum.impl.digest;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -12,11 +13,18 @@ public interface DigestFactory {
 
 	/**
 	 * @param pAlgorithm
+	 * @param pSource
+	 * @return
+	 */
+	ImmutableDigest newDigestTask(String pAlgorithm, InputStream pSource);
+
+	/**
+	 * @param pAlgorithm
 	 * @param pPath
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	Digest<Path> newPathDigest(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
+	UpdatableDigest<Path> newDigest(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
 
 	/**
 	 * @param pAlgorithm
@@ -24,5 +32,5 @@ public interface DigestFactory {
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	Digest<URL> newUrlDigest(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
+	UpdatableDigest<URL> newDigest(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
 }

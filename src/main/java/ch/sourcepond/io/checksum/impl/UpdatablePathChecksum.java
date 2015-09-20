@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import ch.sourcepond.io.checksum.ChecksumException;
 import ch.sourcepond.io.checksum.UpdatableChecksum;
-import ch.sourcepond.io.checksum.impl.digest.Digest;
+import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
 
 /**
  *
@@ -34,7 +34,7 @@ import ch.sourcepond.io.checksum.impl.digest.Digest;
 final class UpdatablePathChecksum extends BaseChecksum implements UpdatableChecksum<Path>, Runnable {
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
-	private final Digest<Path> digester;
+	private final UpdatableDigest<Path> digester;
 	private final Executor executor;
 	private Throwable throwable;
 	private byte[] previousValue = INITIAL;
@@ -45,7 +45,7 @@ final class UpdatablePathChecksum extends BaseChecksum implements UpdatableCheck
 	 * @param pDigest
 	 * @param pPath
 	 */
-	UpdatablePathChecksum(final Digest<Path> pDigester, final Executor pExecutor) {
+	UpdatablePathChecksum(final UpdatableDigest<Path> pDigester, final Executor pExecutor) {
 		digester = pDigester;
 		executor = pExecutor;
 	}

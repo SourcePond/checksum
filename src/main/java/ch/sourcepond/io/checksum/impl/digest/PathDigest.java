@@ -40,7 +40,7 @@ import java.security.NoSuchAlgorithmException;
  * (except of {@link #cancel()}).
  *
  */
-class PathDigest extends SimpleFileVisitor<Path>implements Digest<Path> {
+class PathDigest extends SimpleFileVisitor<Path>implements UpdatableDigest<Path> {
 	private final String algorithm;
 	private final Path path;
 
