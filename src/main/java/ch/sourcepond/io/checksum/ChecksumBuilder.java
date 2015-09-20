@@ -62,16 +62,16 @@ public interface ChecksumBuilder {
 
 	/**
 	 * <p>
-	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is read
-	 * from path specified. If the path is a directory, any contained data file
-	 * will be digested. Sub-directories will be scanned recursively. If the
-	 * path is a regular file, its content will be digested.
+	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
+	 * read from path specified. If the path is a directory, any contained data
+	 * file will be digested. Sub-directories will be scanned recursively. If
+	 * the path is a regular file, its content will be digested.
 	 * </p>
 	 * 
 	 * <p>
-	 * The calculation of the checksum (see {@link UpdatableChecksum#update()}) will
-	 * be performed <em>synchronously</em>, i.e. this method blocks until the
-	 * calculation process finishes.
+	 * The calculation of the checksum (see {@link UpdatableChecksum#update()})
+	 * will be performed <em>synchronously</em>, i.e. this method blocks until
+	 * the calculation process finishes.
 	 * </p>
 	 * 
 	 * @param pPath
@@ -83,19 +83,19 @@ public interface ChecksumBuilder {
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	UpdatableChecksum create(Path pPath) throws ChecksumException;
+	UpdatableChecksum<Path> create(Path pPath) throws ChecksumException;
 
 	/**
 	 * <p>
-	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is read
-	 * from path specified. If the path is a directory, any contained data file
-	 * will be digested. Sub-directories will be scanned recursively. If the
-	 * path is a regular file, its content will be digested.
+	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
+	 * read from path specified. If the path is a directory, any contained data
+	 * file will be digested. Sub-directories will be scanned recursively. If
+	 * the path is a regular file, its content will be digested.
 	 * </p>
 	 * 
 	 * <p>
-	 * The calculation of the checksum (see {@link UpdatableChecksum#update()}) will
-	 * be performed <em>asynchronously</em> with the executor specified.
+	 * The calculation of the checksum (see {@link UpdatableChecksum#update()})
+	 * will be performed <em>asynchronously</em> with the executor specified.
 	 * </p>
 	 * 
 	 * @param pPath
@@ -111,5 +111,5 @@ public interface ChecksumBuilder {
 	 *             for any reason, the calculating thread has been interrupted,
 	 *             or another unexpected exception has occurred.
 	 */
-	UpdatableChecksum create(Path pPath, ExecutorService pExecutor) throws ChecksumException;
+	UpdatableChecksum<Path> create(Path pPath, ExecutorService pExecutor) throws ChecksumException;
 }

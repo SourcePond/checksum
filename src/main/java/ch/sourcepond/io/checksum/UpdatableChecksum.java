@@ -21,8 +21,11 @@ import java.nio.file.Path;
  * checksum on the content of a {@link Path} (which can be a directory or a
  * regular file). Furthermore, it allows to keep track about changes on the
  * content.
+ * 
+ * @param <T>
+ *            Type of the source object which provides the data to be digested.
  */
-public interface UpdatableChecksum extends Checksum {
+public interface UpdatableChecksum<T> extends Checksum {
 
 	/**
 	 * Returns the source from where the data is fetched for calculating this
@@ -30,7 +33,7 @@ public interface UpdatableChecksum extends Checksum {
 	 * 
 	 * @return Data source, never {@code null}.
 	 */
-	Path getSource();
+	T getSource();
 
 	/**
 	 * Checks whether the current checksum, i.e. the checksum <em>after</em> the
