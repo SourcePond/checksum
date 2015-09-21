@@ -23,7 +23,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 */
 	@Override
 	protected ChecksumBuilderFactory getBuilderFactory() {
-		return new DefaultChecksumFactory(new DefaultDigestFactory());
+		return new DefaultChecksumBuilderFactory(new DefaultDigestFactory());
 	}
 
 	/**

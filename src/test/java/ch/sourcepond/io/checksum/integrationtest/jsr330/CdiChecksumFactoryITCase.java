@@ -8,7 +8,7 @@ import com.google.inject.Module;
 
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 import ch.sourcepond.io.checksum.impl.ChecksumFactoryTest;
-import ch.sourcepond.io.checksum.impl.DefaultChecksumFactory;
+import ch.sourcepond.io.checksum.impl.DefaultChecksumBuilderFactory;
 
 /**
  * @author rolandhauser
@@ -27,7 +27,7 @@ public class CdiChecksumFactoryITCase extends ChecksumFactoryTest {
 
 			@Override
 			public void configure(final Binder binder) {
-				binder.bind(ChecksumBuilderFactory.class).to(DefaultChecksumFactory.class);
+				binder.bind(ChecksumBuilderFactory.class).to(DefaultChecksumBuilderFactory.class);
 			}
 		});
 		return injector.getInstance(ChecksumBuilderFactory.class);

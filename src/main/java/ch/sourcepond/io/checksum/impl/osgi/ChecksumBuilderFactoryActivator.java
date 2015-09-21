@@ -17,7 +17,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
-import ch.sourcepond.io.checksum.impl.DefaultChecksumFactory;
+import ch.sourcepond.io.checksum.impl.DefaultChecksumBuilderFactory;
 import ch.sourcepond.io.checksum.impl.digest.DefaultDigestFactory;
 
 /**
@@ -30,7 +30,7 @@ public class ChecksumBuilderFactoryActivator implements BundleActivator {
 	 * 
 	 */
 	public ChecksumBuilderFactoryActivator() {
-		this(new DefaultChecksumFactory(new DefaultDigestFactory()));
+		this(new DefaultChecksumBuilderFactory(new DefaultDigestFactory()));
 	}
 
 	/**

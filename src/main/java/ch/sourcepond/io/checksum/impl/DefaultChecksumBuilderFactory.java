@@ -30,7 +30,7 @@ import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
  */
 @Named
 @Singleton
-public class DefaultChecksumFactory implements ChecksumBuilderFactory {
+public class DefaultChecksumBuilderFactory implements ChecksumBuilderFactory {
 	/**
 	 * 
 	 */
@@ -41,7 +41,7 @@ public class DefaultChecksumFactory implements ChecksumBuilderFactory {
 	 * @param pDigestFactory
 	 */
 	@Inject
-	public DefaultChecksumFactory(final DigestFactory pDigestFactory) {
+	public DefaultChecksumBuilderFactory(final DigestFactory pDigestFactory) {
 		digestFactory = pDigestFactory;
 	}
 

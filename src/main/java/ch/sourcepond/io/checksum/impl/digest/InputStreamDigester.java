@@ -1,6 +1,6 @@
 package ch.sourcepond.io.checksum.impl.digest;
 
-import static ch.sourcepond.io.checksum.impl.DefaultChecksumFactory.DEFAULT_BUFFER_SIZE;
+import static ch.sourcepond.io.checksum.impl.DefaultChecksumBuilderFactory.DEFAULT_BUFFER_SIZE;
 import static java.security.MessageDigest.getInstance;
 import static org.slf4j.LoggerFactory.getLogger;
 
