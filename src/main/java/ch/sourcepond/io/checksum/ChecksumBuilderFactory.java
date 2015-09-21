@@ -14,9 +14,11 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutorService;
 
 /**
- * Factory to create new {@link Checksum} or {@link UpdatableChecksum} instances.
+ * Factory to create new {@link Checksum} or {@link UpdatableChecksum}
+ * instances.
  *
  */
 public interface ChecksumBuilderFactory {
@@ -45,6 +47,9 @@ public interface ChecksumBuilderFactory {
 	 * Creates a new {@link ChecksumBuilder} with the hashing algorithm
 	 * specified.
 	 * 
+	 * @param pExecutor
+	 *            The executor to be used to perform checksum calculations. Must
+	 *            not be {@code null}.
 	 * @param pAlgorithm
 	 *            The name of the algorithm requested. See the MessageDigest
 	 *            section in the <a href=
@@ -58,5 +63,5 @@ public interface ChecksumBuilderFactory {
 	 *             implementation for the specified algorithm.
 	 * 
 	 */
-	ChecksumBuilder create(String pAlgorithm) throws NoSuchAlgorithmException;
+	ChecksumBuilder create(ExecutorService pExecutor, String pAlgorithm) throws NoSuchAlgorithmException;
 }
