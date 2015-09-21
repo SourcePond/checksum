@@ -20,8 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.common.util.concurrent.MoreExecutors;
-
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
 import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
@@ -38,33 +36,24 @@ public class DefaultChecksumFactory implements ChecksumBuilderFactory {
 	 */
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
 	private final DigestFactory digestFactory;
-	private final ExecutorService defaultExecutor;
 
 	/**
 	 * @param pDigestFactory
 	 */
 	@Inject
 	public DefaultChecksumFactory(final DigestFactory pDigestFactory) {
-		this(pDigestFactory, MoreExecutors.newDirectExecutorService());
-	}
-
-	/**
-	 * @param pDigestFactory
-	 */
-	@Inject
-	public DefaultChecksumFactory(final DigestFactory pDigestFactory, final ExecutorService pDefaultExecutor) {
 		digestFactory = pDigestFactory;
-		defaultExecutor = pDefaultExecutor;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.lang.String)
+	 * @see ch.sourcepond.io.checksum.ChecksumBuilderFactory#create(java.util.
+	 * concurrent.ExecutorService, java.lang.String)
 	 */
 	@Override
-	public ChecksumBuilder create(final String pAlgorithm) throws NoSuchAlgorithmException {
-		return new DefaultChecksumBuilder(digestFactory, defaultExecutor, pAlgorithm);
+	public ChecksumBuilder create(final ExecutorService pExecutor, final String pAlgorithm)
+			throws NoSuchAlgorithmException {
+		return new DefaultChecksumBuilder(digestFactory, pExecutor, pAlgorithm);
 	}
 }

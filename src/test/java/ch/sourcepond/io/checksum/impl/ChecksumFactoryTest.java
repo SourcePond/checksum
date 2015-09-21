@@ -3,6 +3,7 @@ package ch.sourcepond.io.checksum.impl;
 import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.copy;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,6 +38,7 @@ public abstract class ChecksumFactoryTest {
 	private static final String SECOND_CONTENT_FILE_NAME = "second_content.txt";
 	private static final Path TEST_FILE = getDefault().getPath(SystemUtils.USER_DIR, "target", "test-classes",
 			TEST_CONTENT_FILE_NAME);
+	private final ExecutorService executor = newFixedThreadPool(1);
 	protected ChecksumBuilderFactory factory;
 	protected ChecksumBuilder builder;
 
@@ -45,7 +48,15 @@ public abstract class ChecksumFactoryTest {
 	@Before
 	public void setup() throws Exception {
 		factory = getBuilderFactory();
-		builder = factory.create(ALGORITHM);
+		builder = factory.create(executor, ALGORITHM);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+		executor.shutdown();
 	}
 
 	/**
