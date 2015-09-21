@@ -31,7 +31,7 @@ import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
  * @author rolandhauser
  *
  */
-public class UpdatablePathChecksumTest extends BaseChecksumTest<DefaultUpdatableChecksum> {
+public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdatableChecksum<Path>> {
 
 	/**
 	 * @author rolandhauser
@@ -56,6 +56,7 @@ public class UpdatablePathChecksumTest extends BaseChecksumTest<DefaultUpdatable
 
 	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
 	private final Path path = mock(Path.class);
+	@SuppressWarnings("unchecked")
 	private final UpdatableDigest<Path> digester = mock(UpdatableDigest.class);
 	private final ScheduledExecutorService delegate = newScheduledThreadPool(1);
 	private final Executor executor = new Executor() {
@@ -260,7 +261,7 @@ public class UpdatablePathChecksumTest extends BaseChecksumTest<DefaultUpdatable
 	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#createChecksum()
 	 */
 	@Override
-	protected DefaultUpdatableChecksum createChecksum() {
-		return new DefaultUpdatableChecksum(digester, executor);
+	protected DefaultUpdatableChecksum<Path> createChecksum() {
+		return new DefaultUpdatableChecksum<Path>(digester, executor);
 	}
 }
