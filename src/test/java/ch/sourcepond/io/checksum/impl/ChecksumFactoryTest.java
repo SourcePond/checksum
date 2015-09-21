@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
@@ -101,29 +100,6 @@ public abstract class ChecksumFactoryTest {
 		chsm.update();
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getPreviousHexValue());
 		assertEquals(SECOND_EXPECTED_HASH, chsm.getHexValue());
-	}
-
-	/**
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	@Test
-	public void verifyCreateFileChecksumWithExecutor() throws Exception {
-		final ExecutorService executor = Executors.newFixedThreadPool(1);
-		try {
-			copyContent(FIRST_CONTENT_FILE_NAME);
-			final UpdatableChecksum<Path> chsm = builder.create(TEST_FILE, executor);
-			assertEquals(EMPTY, chsm.getPreviousHexValue());
-			assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
-
-			copyContent(SECOND_CONTENT_FILE_NAME);
-			chsm.update();
-			assertEquals(FIRST_EXPECTED_HASH, chsm.getPreviousHexValue());
-			assertEquals(SECOND_EXPECTED_HASH, chsm.getHexValue());
-		} finally {
-			executor.shutdown();
-		}
 	}
 
 	/**

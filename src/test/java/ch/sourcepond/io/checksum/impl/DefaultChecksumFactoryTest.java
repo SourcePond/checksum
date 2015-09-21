@@ -1,7 +1,5 @@
 package ch.sourcepond.io.checksum.impl;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.InputStream;
 import java.nio.file.Path;
 
@@ -38,24 +36,7 @@ public class DefaultChecksumFactoryTest extends ChecksumFactoryTest {
 	 * 
 	 */
 	@Test(expected = NullPointerException.class)
-	public void verifyCreateOneTimeNullExecutor() throws Exception {
-		builder.create(mock(InputStream.class), null);
-	}
-
-	/**
-	 * 
-	 */
-	@Test(expected = NullPointerException.class)
 	public void verifyCreateNullPath() throws Exception {
 		builder.create((Path) null);
 	}
-
-	/**
-	 * 
-	 */
-	@Test(expected = NullPointerException.class)
-	public void verifyCreateNullExecutor() throws Exception {
-		builder.create(mock(Path.class), null);
-	}
-
 }
