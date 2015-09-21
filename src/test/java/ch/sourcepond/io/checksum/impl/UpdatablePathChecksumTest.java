@@ -31,7 +31,7 @@ import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
  * @author rolandhauser
  *
  */
-public class UpdatablePathChecksumTest extends BaseChecksumTest<UpdatablePathChecksum> {
+public class UpdatablePathChecksumTest extends BaseChecksumTest<DefaultUpdatableChecksum> {
 
 	/**
 	 * @author rolandhauser
@@ -260,7 +260,7 @@ public class UpdatablePathChecksumTest extends BaseChecksumTest<UpdatablePathChe
 	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#createChecksum()
 	 */
 	@Override
-	protected UpdatablePathChecksum createChecksum() {
-		return new UpdatablePathChecksum(digester, executor);
+	protected DefaultUpdatableChecksum createChecksum() {
+		return new DefaultUpdatableChecksum(digester, executor);
 	}
 }

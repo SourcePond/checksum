@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorService;
 import static java.security.MessageDigest.getInstance;
 import static org.apache.commons.lang3.Validate.notBlank;
 import static org.apache.commons.lang3.Validate.notNull;
@@ -31,12 +30,14 @@ import ch.sourcepond.io.checksum.ChecksumException;
 import ch.sourcepond.io.checksum.UpdatableChecksum;
 import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
 import ch.sourcepond.io.checksum.impl.digest.ImmutableDigest;
+import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
 
 /**
  * Default implementation of the {@link ChecksumBuilder} interface.
  * 
  */
 final class DefaultChecksumBuilder implements ChecksumBuilder {
+	private final ExecutorService defaultExecutor;
 	private final DigestFactory digestFactory;
 	private final String algorithm;
 
@@ -44,11 +45,12 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 * @param pAlgorithm
 	 * @throws NoSuchAlgorithmException
 	 */
-	DefaultChecksumBuilder(final DigestFactory pDigestFactory, final String pAlgorithm)
-			throws NoSuchAlgorithmException {
+	DefaultChecksumBuilder(final DigestFactory pDigestFactory, final ExecutorService pDefaultExecutor,
+			final String pAlgorithm) throws NoSuchAlgorithmException {
 		// Verify, that the algorithm exists
 		getInstance(pAlgorithm);
 		digestFactory = pDigestFactory;
+		defaultExecutor = pDefaultExecutor;
 		algorithm = pAlgorithm;
 	}
 
@@ -60,15 +62,38 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 */
 	@Override
 	public Checksum create(final InputStream pInputStream) throws IOException {
-		return create(pInputStream, newDirectExecutorService());
+		return create(pInputStream, defaultExecutor);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.sourcepond.io.checksum.ChecksumBuilder#create(java.io.InputStream,
+	 * java.util.concurrent.ExecutorService)
+	 */
 	@Override
 	public Checksum create(final InputStream pInputStream, final ExecutorService pExecutor) throws IOException {
 		notNull(pInputStream, "InputStream is null!");
 		notBlank(algorithm, "Algorithm is null or blank!");
 		final ImmutableDigest digest = digestFactory.newDigestTask(algorithm, pInputStream);
 		return new OneTimeChecksum(digest, pExecutor.submit(digest));
+	}
+
+	/**
+	 * @param pSource
+	 * @param pDigest
+	 * @param pExecutor
+	 * @return
+	 * @throws ChecksumException
+	 */
+	private <T> UpdatableChecksum<T> createChecksum(final T pSource, final UpdatableDigest<T> pDigest,
+			final ExecutorService pExecutor) throws ChecksumException {
+		notNull(pSource, "Source is null!");
+		notNull(pExecutor, "Executor is null!");
+		final UpdatableChecksum<T> chsm = new DefaultUpdatableChecksum<>(pDigest, pExecutor);
+		chsm.update();
+		return chsm;
 	}
 
 	/*
@@ -80,7 +105,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 */
 	@Override
 	public UpdatableChecksum<Path> create(final Path pPath) throws ChecksumException {
-		return create(pPath, newDirectExecutorService());
+		return create(pPath, defaultExecutor);
 	}
 
 	/*
@@ -92,13 +117,8 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 */
 	@Override
 	public UpdatableChecksum<Path> create(final Path pPath, final ExecutorService pExecutor) throws ChecksumException {
-		notNull(pPath, "Path is null!");
-		notNull(pExecutor, "Executor is null!");
 		try {
-			final UpdatableChecksum<Path> chsm = new UpdatablePathChecksum(digestFactory.newDigest(algorithm, pPath),
-					pExecutor);
-			chsm.update();
-			return chsm;
+			return createChecksum(pPath, digestFactory.newDigest(algorithm, pPath), pExecutor);
 		} catch (final NoSuchAlgorithmException e) {
 			// This should never happen because it has been verified that the
 			// algorithm exists during construction of this builder.
@@ -106,15 +126,36 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 		}
 	}
 
+	/**
+	 * @param pUrl
+	 * @return
+	 * @throws ChecksumException
+	 */
 	@Override
 	public UpdatableChecksum<URL> create(final URL pUrl) throws ChecksumException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return createChecksum(pUrl, digestFactory.newDigest(algorithm, pUrl), defaultExecutor);
+		} catch (final NoSuchAlgorithmException e) {
+			// This should never happen because it has been verified that the
+			// algorithm exists during construction of this builder.
+			throw new IllegalStateException(e.getMessage(), e);
+		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ch.sourcepond.io.checksum.ChecksumBuilder#create(java.net.URL,
+	 * java.util.concurrent.ExecutorService)
+	 */
 	@Override
 	public UpdatableChecksum<URL> create(final URL pUrl, final ExecutorService pExecutor) throws ChecksumException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return createChecksum(pUrl, digestFactory.newDigest(algorithm, pUrl), pExecutor);
+		} catch (final NoSuchAlgorithmException e) {
+			// This should never happen because it has been verified that the
+			// algorithm exists during construction of this builder.
+			throw new IllegalStateException(e.getMessage(), e);
+		}
 	}
 }

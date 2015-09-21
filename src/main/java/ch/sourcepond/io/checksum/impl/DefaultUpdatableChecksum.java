@@ -17,7 +17,6 @@ import static java.lang.Thread.currentThread;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Condition;
@@ -31,10 +30,10 @@ import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
 /**
  *
  */
-final class UpdatablePathChecksum extends BaseChecksum implements UpdatableChecksum<Path>, Runnable {
+final class DefaultUpdatableChecksum<T> extends BaseChecksum implements UpdatableChecksum<T>, Runnable {
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
-	private final UpdatableDigest<Path> digester;
+	private final UpdatableDigest<T> digester;
 	private final Executor executor;
 	private Throwable throwable;
 	private byte[] previousValue = INITIAL;
@@ -45,7 +44,7 @@ final class UpdatablePathChecksum extends BaseChecksum implements UpdatableCheck
 	 * @param pDigest
 	 * @param pPath
 	 */
-	UpdatablePathChecksum(final UpdatableDigest<Path> pDigester, final Executor pExecutor) {
+	DefaultUpdatableChecksum(final UpdatableDigest<T> pDigester, final Executor pExecutor) {
 		digester = pDigester;
 		executor = pExecutor;
 	}
@@ -130,7 +129,7 @@ final class UpdatablePathChecksum extends BaseChecksum implements UpdatableCheck
 	 * @return
 	 */
 	@Override
-	public Path getSource() {
+	public T getSource() {
 		return digester.getSource();
 	}
 
