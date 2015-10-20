@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>ch.sourcepond</groupId>
+		<artifactId>bundle</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.sourcepond.io</groupId>
+	<artifactId>checksum-impl</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<inceptionYear>2015</inceptionYear>
+	<packaging>bundle</packaging>
+	<description>Provides an implementation for the checksum-api bundle.</description>
+
+	<properties>
+		<checksum-api.version>1.0.0-SNAPSHOT</checksum-api.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>ch.sourcepond.io</groupId>
+				<artifactId>checksum-api</artifactId>
+				<version>${checksum-api.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>ch.sourcepond.io</groupId>
+			<artifactId>checksum-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+	</dependencies>
+</project>
