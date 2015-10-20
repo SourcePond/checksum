@@ -16,9 +16,10 @@ package ch.sourcepond.io.checksum.impl;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import org.ops4j.pax.cdi.api.OsgiServiceProvider;
 
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
@@ -28,8 +29,9 @@ import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
  * Default implementation of the {@link ChecksumBuilderFactory} interface.
  *
  */
-@Named
-@Singleton
+@Typed(ChecksumBuilderFactory.class) // Necessary to make this component work
+										// with Eclipse Sisu
+@OsgiServiceProvider
 public class DefaultChecksumBuilderFactory implements ChecksumBuilderFactory {
 	/**
 	 * 

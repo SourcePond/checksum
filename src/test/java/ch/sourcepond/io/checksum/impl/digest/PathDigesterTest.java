@@ -3,16 +3,14 @@ package ch.sourcepond.io.checksum.impl.digest;
 import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_CONTENT_FILE_NAME;
 import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_EXPECTED_HASH;
 import static java.nio.file.FileSystems.getDefault;
+import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
-import static shaded.org.apache.commons.codec.binary.Hex.encodeHexString;
 
 import java.nio.file.Path;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import ch.sourcepond.io.checksum.impl.digest.PathDigest;
 
 /**
  * @author rolandhauser
