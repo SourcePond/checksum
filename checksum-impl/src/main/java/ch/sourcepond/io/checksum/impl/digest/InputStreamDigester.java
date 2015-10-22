@@ -37,15 +37,16 @@ public class InputStreamDigester extends Digest<InputStream> implements Callable
 		cancelled = true;
 	}
 
-	/**
-	 * @param pSource
-	 * @return
-	 * @throws IOException
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.concurrent.Callable#call()
 	 */
-	byte[] digest(final InputStream pSource) throws IOException {
+	@Override
+	public byte[] call() throws IOException {
 		try {
 			final MessageDigest digest = getInstance(getAlgorithm());
-			try (final DigestInputStream din = new DigestInputStream(pSource, digest)) {
+			try (final DigestInputStream din = new DigestInputStream(getSource(), digest)) {
 				final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
 				int read = din.read(buf);
 				while (!cancelled && read != -1) {
@@ -63,10 +64,5 @@ public class InputStreamDigester extends Digest<InputStream> implements Callable
 			// algorithm exists during construction of this builder.
 			throw new IllegalStateException(e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public byte[] call() throws IOException {
-		return digest(getSource());
 	}
 }

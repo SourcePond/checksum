@@ -8,16 +8,16 @@ import java.net.URL;
  *
  */
 final class UrlDigest extends UpdatableDigest<URL> {
-	private final InputStreamDigester digester;
+	private volatile InputStreamDigester digester;
 
-	UrlDigest(final String pAlgorithm, final URL pSource, final InputStreamDigester pDigester) {
+	UrlDigest(final String pAlgorithm, final URL pSource) {
 		super(pAlgorithm, pSource);
-		digester = pDigester;
 	}
 
 	@Override
 	public byte[] updateDigest() throws IOException {
-		return digester.digest(getSource().openStream());
+		digester = new InputStreamDigester(getAlgorithm(), getSource().openStream());
+		return digester.call();
 	}
 
 	@Override
