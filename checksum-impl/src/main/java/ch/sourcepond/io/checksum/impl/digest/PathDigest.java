@@ -29,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -40,7 +41,26 @@ import java.security.NoSuchAlgorithmException;
  * (except of {@link #cancel()}).
  *
  */
-class PathDigest extends SimpleFileVisitor<Path>implements UpdatableDigest<Path> {
+class PathDigest implements UpdatableDigest<Path> {
+	/**
+	 * Visitor to scan a directory structure for files to be digested.
+	 */
+	private final FileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+		/**
+		 * @param file
+		 * @param attrs
+		 * @return
+		 * @throws IOException
+		 */
+		@Override
+		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+			if (!cancelled) {
+				updateDigest(file);
+				return super.visitFile(file, attrs);
+			}
+			return TERMINATE;
+		}
+	};
 	private final String algorithm;
 	private final Path path;
 
@@ -137,7 +157,7 @@ class PathDigest extends SimpleFileVisitor<Path>implements UpdatableDigest<Path>
 
 		try {
 			if (isDirectory(path)) {
-				walkFileTree(path, this);
+				walkFileTree(path, visitor);
 			} else {
 				updateDigest(path);
 			}
@@ -152,21 +172,6 @@ class PathDigest extends SimpleFileVisitor<Path>implements UpdatableDigest<Path>
 			tempDigest = null;
 			tempBuffer = null;
 		}
-	}
-
-	/**
-	 * @param file
-	 * @param attrs
-	 * @return
-	 * @throws IOException
-	 */
-	@Override
-	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-		if (!cancelled) {
-			updateDigest(file);
-			return super.visitFile(file, attrs);
-		}
-		return TERMINATE;
 	}
 
 	/**
