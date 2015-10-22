@@ -2,6 +2,7 @@ package ch.sourcepond.io.checksum.impl;
 
 import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.copy;
+import static java.nio.file.Files.newInputStream;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -64,10 +65,19 @@ public abstract class ChecksumFactoryTest {
 	protected abstract ChecksumBuilderFactory getBuilderFactory();
 
 	/**
+	 * @param pTestContentFileName
+	 * @return
+	 * @throws IOException
+	 */
+	private InputStream asStream(final String pTestContentFileName) throws IOException {
+		return newInputStream(resolveResourcesDirectory().resolve(pTestContentFileName));
+	}
+
+	/**
 	 * 
 	 */
 	private void copyContent(final String pTestContentFileName) throws IOException {
-		try (final InputStream in = getClass().getResourceAsStream("/" + pTestContentFileName)) {
+		try (final InputStream in = asStream(pTestContentFileName)) {
 			copy(in, TEST_FILE, REPLACE_EXISTING);
 		}
 	}
@@ -80,7 +90,7 @@ public abstract class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateChecksumFromStream() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = builder.create(getClass().getResourceAsStream("/" + FIRST_CONTENT_FILE_NAME));
+		final Checksum chsm = builder.create(asStream(FIRST_CONTENT_FILE_NAME));
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 	}
 
@@ -103,11 +113,26 @@ public abstract class ChecksumFactoryTest {
 	}
 
 	/**
+	 * @return
+	 */
+	private Path resolveResourcesDirectory() {
+		return getResourceRootPath().resolve("src").resolve("test").resolve("resources");
+	}
+
+	/**
+	 * @param pFs
+	 * @return
+	 */
+	protected Path getResourceRootPath() {
+		return getDefault().getPath(USER_DIR);
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final UpdatableChecksum<Path> chsm = builder.create(getDefault().getPath(USER_DIR, "src", "test", "resources"));
+		final UpdatableChecksum<Path> chsm = builder.create(resolveResourcesDirectory());
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }
