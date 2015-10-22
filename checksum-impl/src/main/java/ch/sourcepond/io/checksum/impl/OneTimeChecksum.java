@@ -13,22 +13,25 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumException;
 import ch.sourcepond.io.checksum.impl.digest.Digest;
 
 /**
- *
+ * Default implementation for a one-time checksum created through
+ * {@link ChecksumBuilder#create(java.io.InputStream)}.
  */
 final class OneTimeChecksum extends BaseChecksum {
 	private final Digest digest;
 	private final Future<byte[]> future;
 
 	/**
-	 * @param pValue
-	 * @param pAlgorithm
+	 * @param pDigest
+	 * @param pFuture
 	 */
 	OneTimeChecksum(final Digest pDigest, final Future<byte[]> pFuture) {
 		digest = pDigest;
@@ -58,15 +61,13 @@ final class OneTimeChecksum extends BaseChecksum {
 				rc = INITIAL;
 			}
 			return rc;
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (CancellationException | InterruptedException | ExecutionException e) {
 			throw new ChecksumException(e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public void cancel() {
-		if (digest != null) {
-			digest.cancel();
-		}
+		digest.cancel();
 	}
 }

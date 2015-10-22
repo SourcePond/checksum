@@ -23,16 +23,23 @@ import ch.sourcepond.io.checksum.ChecksumException;
  *
  */
 abstract class BaseChecksum implements Checksum {
+	// Initial checksum value
 	static final byte[] INITIAL = new byte[0];
 
 	/**
-	 * @return
+	 * Evaluates the current checksum value. How this is done is implementation
+	 * dependent.
+	 * 
+	 * @return Checksum as array, never {@code null}
 	 */
 	protected abstract byte[] evaluateValue() throws ChecksumException;
 
 	/**
+	 * Creates a copy of the array specified.
+	 * 
 	 * @param pOriginal
-	 * @return
+	 *            Original array, must not be {@code null}
+	 * @return Copied array, never {@code null}
 	 */
 	protected final byte[] copyArray(final byte[] pOriginal) {
 		final byte[] copy = new byte[pOriginal.length];
