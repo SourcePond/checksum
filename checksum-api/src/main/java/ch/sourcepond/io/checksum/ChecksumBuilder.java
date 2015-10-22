@@ -20,22 +20,20 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Builder to create new {@link Checksum} or {@link UpdatableChecksum} with a
- * specific hashing algorithm .
+ * Builder to create new {@link Checksum} or {@link UpdatableChecksum} objects
+ * with a specific hashing algorithm. In any case, the calculation of a checksum
+ * created by this builder will be performed <em>asynchronously</em>. Therefore,
+ * any calculation task will use the executor specified trough
+ * {@link ChecksumBuilderFactory#create(ExecutorService, String)} which created
+ * this builder instance.
  */
 public interface ChecksumBuilder {
 
 	/**
 	 * <p>
-	 * Creates a new immutable {@link Checksum} instance. The necessary data is
-	 * read from {@link InputStream} specified. This method will close the
+	 * Creates a new immutable {@link Checksum} instance. The data necessary is
+	 * read from the {@link InputStream} specified. This method will close the
 	 * stream when the calculation is done.
-	 * </p>
-	 *
-	 * <p>
-	 * The calculation of the checksum will be performed <em>asynchronously</em>
-	 * with the executor specified trough
-	 * {@link ChecksumBuilderFactory#create(ExecutorService, String)}.
 	 * </p>
 	 * 
 	 * @param pInputStream
@@ -56,12 +54,6 @@ public interface ChecksumBuilder {
 	 * If the path is a regular file, its content will be digested.
 	 * </p>
 	 * 
-	 * <p>
-	 * The calculation of the checksum (see {@link UpdatableChecksum#update()})
-	 * will be performed <em>asynchronously</em> with the executor specified
-	 * trough {@link ChecksumBuilderFactory#create(ExecutorService, String)}.
-	 * </p>
-	 * 
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
@@ -77,12 +69,6 @@ public interface ChecksumBuilder {
 	 * <p>
 	 * Creates a new {@link UpdatableChecksum} instance. The necessary data is
 	 * read from the url specified.
-	 * </p>
-	 * 
-	 * <p>
-	 * The calculation of the checksum (see {@link UpdatableChecksum#update()})
-	 * will be performed <em>asynchronously</em> with the executor specified
-	 * trough {@link ChecksumBuilderFactory#create(ExecutorService, String)}.
 	 * </p>
 	 * 
 	 * @param pUrl
