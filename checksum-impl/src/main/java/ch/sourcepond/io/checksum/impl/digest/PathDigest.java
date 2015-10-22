@@ -41,7 +41,7 @@ import java.security.NoSuchAlgorithmException;
  * (except of {@link #cancel()}).
  *
  */
-class PathDigest implements UpdatableDigest<Path> {
+class PathDigest extends UpdatableDigest<Path> {
 	/**
 	 * Visitor to scan a directory structure for files to be digested.
 	 */
@@ -61,8 +61,6 @@ class PathDigest implements UpdatableDigest<Path> {
 			return TERMINATE;
 		}
 	};
-	private final String algorithm;
-	private final Path path;
 
 	// To safe as much system resources as possible, we do not hold hard
 	// references to the digester/tempBuffer.
@@ -83,26 +81,9 @@ class PathDigest implements UpdatableDigest<Path> {
 	 * @throws NoSuchAlgorithmException
 	 */
 	PathDigest(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
-		algorithm = pAlgorithm;
-		path = pPath;
+		super(pAlgorithm, pPath);
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 		digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
-	}
-
-	/**
-	 * @return
-	 */
-	@Override
-	public Path getSource() {
-		return path;
-	}
-
-	/**
-	 * @return
-	 */
-	@Override
-	public String getAlgorithm() {
-		return algorithm;
 	}
 
 	/**
@@ -156,10 +137,10 @@ class PathDigest implements UpdatableDigest<Path> {
 		}
 
 		try {
-			if (isDirectory(path)) {
-				walkFileTree(path, visitor);
+			if (isDirectory(getSource())) {
+				walkFileTree(getSource(), visitor);
 			} else {
-				updateDigest(path);
+				updateDigest(getSource());
 			}
 
 			byte[] res = null;

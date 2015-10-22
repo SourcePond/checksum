@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 
@@ -15,10 +16,9 @@ import org.slf4j.Logger;
  * @author rolandhauser
  *
  */
-class InputStreamDigester implements ImmutableDigest {
+public class InputStreamDigester extends Digest implements Callable<byte[]> {
 	private static final Logger LOG = getLogger(InputStreamDigester.class);
 	private final InputStream source;
-	private final String algorithm;
 	private volatile boolean cancelled;
 
 	/**
@@ -26,8 +26,8 @@ class InputStreamDigester implements ImmutableDigest {
 	 * @param pAlgorithm
 	 */
 	InputStreamDigester(final InputStream pSource, final String pAlgorithm) {
+		super(pAlgorithm);
 		source = pSource;
-		algorithm = pAlgorithm;
 	}
 
 	/**
@@ -41,7 +41,7 @@ class InputStreamDigester implements ImmutableDigest {
 	@Override
 	public byte[] call() throws Exception {
 		try {
-			final MessageDigest digest = getInstance(algorithm);
+			final MessageDigest digest = getInstance(getAlgorithm());
 			try (final DigestInputStream din = new DigestInputStream(source, digest)) {
 				final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
 				int read = din.read(buf);
@@ -63,15 +63,4 @@ class InputStreamDigester implements ImmutableDigest {
 			throw new IllegalStateException(e.getMessage(), e);
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ch.sourcepond.io.checksum.impl.digest.Digest#getAlgorithm()
-	 */
-	@Override
-	public String getAlgorithm() {
-		return algorithm;
-	}
-
 }

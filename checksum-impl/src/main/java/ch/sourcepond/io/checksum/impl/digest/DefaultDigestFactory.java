@@ -24,7 +24,7 @@ public class DefaultDigestFactory implements DigestFactory {
 	 * lang.String, java.io.InputStream)
 	 */
 	@Override
-	public ImmutableDigest newDigestTask(final String pAlgorithm, final InputStream pSource) {
+	public InputStreamDigester newDigestTask(final String pAlgorithm, final InputStream pSource) {
 		return new InputStreamDigester(pSource, pAlgorithm);
 	}
 

@@ -29,7 +29,7 @@ import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumException;
 import ch.sourcepond.io.checksum.UpdatableChecksum;
 import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
-import ch.sourcepond.io.checksum.impl.digest.ImmutableDigest;
+import ch.sourcepond.io.checksum.impl.digest.InputStreamDigester;
 import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
 
 /**
@@ -65,7 +65,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	public Checksum create(final InputStream pInputStream) throws IOException {
 		notNull(pInputStream, "InputStream is null!");
 		notBlank(algorithm, "Algorithm is null or blank!");
-		final ImmutableDigest digest = digestFactory.newDigestTask(algorithm, pInputStream);
+		final InputStreamDigester digest = digestFactory.newDigestTask(algorithm, pInputStream);
 		return new OneTimeChecksum(digest, defaultExecutor.submit(digest));
 	}
 

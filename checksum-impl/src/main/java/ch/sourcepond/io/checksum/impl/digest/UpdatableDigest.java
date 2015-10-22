@@ -7,16 +7,27 @@ import java.io.IOException;
  *
  * @param <T>
  */
-public interface UpdatableDigest<T> extends Digest {
+public abstract class UpdatableDigest<T> extends Digest {
+	private final T source;
+
+	/**
+	 * @param pAlgorithm
+	 */
+	UpdatableDigest(final String pAlgorithm, final T pSource) {
+		super(pAlgorithm);
+		source = pSource;
+	}
 
 	/**
 	 * @return
 	 */
-	T getSource();
+	public T getSource() {
+		return source;
+	}
 
 	/**
 	 * @param pChannel
 	 * @throws IOException
 	 */
-	byte[] updateDigest() throws IOException;
+	public abstract byte[] updateDigest() throws IOException;
 }

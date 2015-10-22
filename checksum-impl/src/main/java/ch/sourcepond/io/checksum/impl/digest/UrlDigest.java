@@ -7,18 +7,10 @@ import java.net.URL;
  * @author rolandhauser
  *
  */
-final class UrlDigest implements UpdatableDigest<URL> {
+final class UrlDigest extends UpdatableDigest<URL> {
 
-	@Override
-	public URL getSource() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getAlgorithm() {
-		// TODO Auto-generated method stub
-		return null;
+	UrlDigest(final String pAlgorithm, final URL pSource) {
+		super(pAlgorithm, pSource);
 	}
 
 	@Override

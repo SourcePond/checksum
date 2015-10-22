@@ -4,15 +4,25 @@ package ch.sourcepond.io.checksum.impl.digest;
  * @author rolandhauser
  *
  */
-public interface Digest {
+public abstract class Digest {
+	private final String algorithm;
+
+	/**
+	 * @param pAlgorithm
+	 */
+	Digest(final String pAlgorithm) {
+		algorithm = pAlgorithm;
+	}
 
 	/**
 	 * 
 	 */
-	void cancel();
+	public abstract void cancel();
 
 	/**
 	 * @return
 	 */
-	String getAlgorithm();
+	public String getAlgorithm() {
+		return algorithm;
+	}
 }
