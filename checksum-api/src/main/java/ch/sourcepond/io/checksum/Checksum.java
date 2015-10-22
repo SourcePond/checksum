@@ -43,7 +43,9 @@ public interface Checksum {
 	 * of the array depends on the used hashing algorithm. See
 	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/
 	 * StandardNames.html#MessageDigest">MessageDigest Algorithms</a> for
-	 * further information.
+	 * further information. If the calculation of this checksum has been
+	 * cancelled through {@link #cancel()} before it was done, this method
+	 * returns an empty array.
 	 * 
 	 * @return The calculated checksum as byte array, never {@code null}
 	 * @throws ChecksumException
@@ -55,7 +57,9 @@ public interface Checksum {
 
 	/**
 	 * Calculates the checksum and returns the result as hex-string. See
-	 * {@link #getValue()} for further information.
+	 * {@link #getValue()} for further information. If the calculation of this
+	 * checksum has been cancelled through {@link #cancel()} before it was done,
+	 * this method returns an empty string.
 	 * 
 	 * @return The calculated checksum as hex-string, never {@code null}
 	 * @throws IOException
