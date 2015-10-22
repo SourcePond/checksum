@@ -17,8 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Factory to create new {@link Checksum} or {@link UpdatableChecksum}
- * instances.
+ * Factory to create new {@link ChecksumBuilder} instances. This interface is
+ * the entry-point to use the checksum API.
  *
  */
 public interface ChecksumBuilderFactory {
@@ -44,12 +44,12 @@ public interface ChecksumBuilderFactory {
 	String SHA512 = "SHA-512";
 
 	/**
-	 * Creates a new {@link ChecksumBuilder} with the hashing algorithm
-	 * specified.
+	 * Creates a new {@link ChecksumBuilder} with the executor-service and
+	 * hashing algorithm specified.
 	 * 
 	 * @param pExecutor
-	 *            The executor to be used to perform checksum calculations. Must
-	 *            not be {@code null}.
+	 *            The executor to be used to perform any checksum calculation.
+	 *            Must not be {@code null}.
 	 * @param pAlgorithm
 	 *            The name of the algorithm requested. See the MessageDigest
 	 *            section in the <a href=
