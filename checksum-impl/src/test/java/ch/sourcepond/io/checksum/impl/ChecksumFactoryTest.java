@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutorService;
@@ -103,6 +104,24 @@ public abstract class ChecksumFactoryTest {
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
 		final UpdatableChecksum<Path> chsm = builder.create(TEST_FILE);
+		assertEquals(EMPTY, chsm.getPreviousHexValue());
+		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
+
+		copyContent(SECOND_CONTENT_FILE_NAME);
+		chsm.update();
+		assertEquals(FIRST_EXPECTED_HASH, chsm.getPreviousHexValue());
+		assertEquals(SECOND_EXPECTED_HASH, chsm.getHexValue());
+	}
+
+	/**
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	@Test
+	public void verifyCreateUrlChecksum() throws Exception {
+		copyContent(FIRST_CONTENT_FILE_NAME);
+		final UpdatableChecksum<URL> chsm = builder.create(TEST_FILE.toUri().toURL());
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 

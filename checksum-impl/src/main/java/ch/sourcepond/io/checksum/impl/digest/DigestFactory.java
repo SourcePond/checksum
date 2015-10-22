@@ -16,7 +16,7 @@ public interface DigestFactory {
 	 * @param pSource
 	 * @return
 	 */
-	InputStreamDigester newDigestTask(String pAlgorithm, InputStream pSource);
+	InputStreamDigest newDigestTask(String pAlgorithm, InputStream pSource);
 
 	/**
 	 * @param pAlgorithm

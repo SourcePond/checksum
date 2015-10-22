@@ -5,12 +5,14 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
  * @author rolandhauser
  *
  */
+@Named // Necessary to make this component work with Eclipse Sisu
 @Singleton
 public class DefaultDigestFactory implements DigestFactory {
 
@@ -22,8 +24,8 @@ public class DefaultDigestFactory implements DigestFactory {
 	 * lang.String, java.io.InputStream)
 	 */
 	@Override
-	public InputStreamDigester newDigestTask(final String pAlgorithm, final InputStream pSource) {
-		return new InputStreamDigester(pAlgorithm, pSource);
+	public InputStreamDigest newDigestTask(final String pAlgorithm, final InputStream pSource) {
+		return new InputStreamDigest(pAlgorithm, pSource);
 	}
 
 	/*

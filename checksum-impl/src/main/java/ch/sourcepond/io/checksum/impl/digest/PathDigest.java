@@ -14,20 +14,15 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.digest;
 
 import static ch.sourcepond.io.checksum.impl.DefaultChecksumBuilderFactory.DEFAULT_BUFFER_SIZE;
-import static java.lang.Long.MAX_VALUE;
+import static ch.sourcepond.io.checksum.impl.digest.DigestHelper.performUpdate;
 import static java.nio.ByteBuffer.allocateDirect;
-import static java.nio.channels.FileChannel.open;
 import static java.nio.file.FileVisitResult.TERMINATE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
-import static java.nio.file.StandardOpenOption.READ;
-import static java.security.MessageDigest.getInstance;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
@@ -54,8 +49,8 @@ class PathDigest extends UpdatableDigest<Path> {
 		 */
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-			if (!cancelled) {
-				updateDigest(file);
+			if (!isCancelled()) {
+				performUpdate(tempDigest, PathDigest.this, file, tempBuffer);
 				return super.visitFile(file, attrs);
 			}
 			return TERMINATE;
@@ -63,17 +58,13 @@ class PathDigest extends UpdatableDigest<Path> {
 	};
 
 	// To safe as much system resources as possible, we do not hold hard
-	// references to the digester/tempBuffer.
+	// references to the tempBuffer.
 	private WeakReference<ByteBuffer> bufferRef;
-	private WeakReference<MessageDigest> digestRef;
 
 	// These fields will be initialized when an update is performed. After the
 	// update they will be set to null.
 	private ByteBuffer tempBuffer;
 	private MessageDigest tempDigest;
-
-	// Cancel flag
-	private volatile boolean cancelled;
 
 	/**
 	 * @param pBuffers
@@ -83,30 +74,6 @@ class PathDigest extends UpdatableDigest<Path> {
 	PathDigest(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
 		super(pAlgorithm, pPath);
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
-		digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
-	}
-
-	/**
-	 * @param pChannel
-	 * @throws IOException
-	 */
-	private void updateDigest(final Path pPath) throws IOException {
-		try (final FileChannel ch = open(pPath, READ)) {
-			final FileLock fl = ch.lock(0, MAX_VALUE, true);
-			try {
-				final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
-				int read = ch.read(tempBuffer);
-				while (!cancelled && read != -1) {
-					tempBuffer.flip();
-					tempBuffer.get(tmp, 0, read);
-					tempDigest.update(tmp, 0, read);
-					tempBuffer.clear();
-					read = ch.read(tempBuffer);
-				}
-			} finally {
-				fl.release();
-			}
-		}
 	}
 
 	/**
@@ -117,16 +84,7 @@ class PathDigest extends UpdatableDigest<Path> {
 	public byte[] updateDigest() throws IOException {
 		// Initialize the temporary hard reference to the digester; this must be
 		// set to null after the update has been performed.
-		tempDigest = digestRef.get();
-		if (tempDigest == null) {
-			try {
-				tempDigest = getInstance(getAlgorithm());
-			} catch (final NoSuchAlgorithmException e) {
-				// This can never happen because it has already been validated
-				// during construction that the algorithm is available.
-			}
-			digestRef = new WeakReference<MessageDigest>(tempDigest);
-		}
+		tempDigest = getDigest();
 
 		// Initialize the temporary hard reference to the tempBuffer; this must
 		// be set to null after the update has been performed.
@@ -140,26 +98,18 @@ class PathDigest extends UpdatableDigest<Path> {
 			if (isDirectory(getSource())) {
 				walkFileTree(getSource(), visitor);
 			} else {
-				updateDigest(getSource());
+				performUpdate(tempDigest, this, getSource(), tempBuffer);
 			}
 
 			byte[] res = null;
-			if (!cancelled) {
+			if (!isCancelled()) {
 				res = tempDigest.digest();
 			}
 			return res;
 		} finally {
-			cancelled = false;
+			setCancelled(false);
 			tempDigest = null;
 			tempBuffer = null;
 		}
-	}
-
-	/**
-	 * 
-	 */
-	@Override
-	public void cancel() {
-		cancelled = true;
 	}
 }
