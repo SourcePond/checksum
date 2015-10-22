@@ -7,22 +7,13 @@ import java.io.IOException;
  *
  * @param <T>
  */
-public abstract class UpdatableDigest<T> extends Digest {
-	private final T source;
+public abstract class UpdatableDigest<T> extends Digest<T> {
 
 	/**
 	 * @param pAlgorithm
 	 */
 	UpdatableDigest(final String pAlgorithm, final T pSource) {
-		super(pAlgorithm);
-		source = pSource;
-	}
-
-	/**
-	 * @return
-	 */
-	public T getSource() {
-		return source;
+		super(pAlgorithm, pSource);
 	}
 
 	/**

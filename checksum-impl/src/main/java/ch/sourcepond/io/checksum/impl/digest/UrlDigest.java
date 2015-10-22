@@ -8,21 +8,20 @@ import java.net.URL;
  *
  */
 final class UrlDigest extends UpdatableDigest<URL> {
+	private final InputStreamDigester digester;
 
-	UrlDigest(final String pAlgorithm, final URL pSource) {
+	UrlDigest(final String pAlgorithm, final URL pSource, final InputStreamDigester pDigester) {
 		super(pAlgorithm, pSource);
+		digester = pDigester;
 	}
 
 	@Override
 	public byte[] updateDigest() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return digester.digest(getSource().openStream());
 	}
 
 	@Override
 	public void cancel() {
-		// TODO Auto-generated method stub
-
+		digester.cancel();
 	}
-
 }

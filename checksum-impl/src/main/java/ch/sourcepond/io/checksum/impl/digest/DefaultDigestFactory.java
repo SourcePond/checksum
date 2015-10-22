@@ -25,7 +25,7 @@ public class DefaultDigestFactory implements DigestFactory {
 	 */
 	@Override
 	public InputStreamDigester newDigestTask(final String pAlgorithm, final InputStream pSource) {
-		return new InputStreamDigester(pSource, pAlgorithm);
+		return new InputStreamDigester(pAlgorithm, pSource);
 	}
 
 	/*
