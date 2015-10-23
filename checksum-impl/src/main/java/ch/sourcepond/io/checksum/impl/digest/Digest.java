@@ -30,21 +30,21 @@ public abstract class Digest<T> implements Cancellable {
 	 * @see ch.sourcepond.io.checksum.impl.digest.Cancellable#isCancelled()
 	 */
 	@Override
-	public boolean isCancelled() {
+	public final boolean isCancelled() {
 		return cancelled;
 	}
 
 	/**
 	 * @param pCancelled
 	 */
-	protected void setCancelled(final boolean pCancelled) {
+	protected final void setCancelled(final boolean pCancelled) {
 		cancelled = pCancelled;
 	}
 
 	/**
 	 * 
 	 */
-	public void cancel() {
+	public final void cancel() {
 		setCancelled(true);
 	}
 

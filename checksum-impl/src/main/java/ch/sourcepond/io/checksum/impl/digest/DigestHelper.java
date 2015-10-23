@@ -55,7 +55,7 @@ final class DigestHelper {
 	public static void performUpdate(MessageDigest digest, final Cancellable pCancellable, final Path pPath,
 			ByteBuffer buffer) throws IOException {
 		try (final FileChannel ch = open(pPath, READ)) {
-			final FileLock fl = ch.lock(0, MAX_VALUE, true);
+			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
 			try {
 				final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
 				int read = ch.read(buffer);
@@ -65,6 +65,10 @@ final class DigestHelper {
 					digest.update(tmp, 0, read);
 					buffer.clear();
 					read = ch.read(buffer);
+				}
+
+				if (pCancellable.isCancelled()) {
+					LOG.info("Checksum calculation cancelled by user.");
 				}
 			} finally {
 				fl.release();
