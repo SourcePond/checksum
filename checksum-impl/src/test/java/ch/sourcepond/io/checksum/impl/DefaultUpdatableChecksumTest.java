@@ -99,6 +99,15 @@ public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdata
 	}
 
 	/**
+	 * 
+	 */
+	@Test
+	public void verifyCancel() {
+		checksum.cancel();
+		assertTrue(digester.isCancelled());
+	}
+
+	/**
 	 * @throws Exception
 	 */
 	@Test
