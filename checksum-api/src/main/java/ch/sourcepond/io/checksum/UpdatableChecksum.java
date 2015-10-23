@@ -14,13 +14,13 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * Extension of the {@link Checksum} interface. It allows to calculate the
- * checksum on the content of a {@link Path} (which can be a directory or a
- * regular file). Furthermore, it allows to keep track about changes on the
- * content.
+ * checksum based on the content of a specific source. See {@code create}
+ * methods on interface {@link ChecksumBuilder} for supported source types.
+ * Furthermore, it provides the ability to update the checksum in case the
+ * source content has been changed (see {@link #update()}).
  * 
  * @param <T>
  *            Type of the source object which provides the data to be digested.
