@@ -21,9 +21,15 @@ public abstract class UpdatableDigest<T> extends Digest<T> implements Cancellabl
 	 * @param pAlgorithm
 	 * @throws NoSuchAlgorithmException
 	 */
-	UpdatableDigest(final String pAlgorithm, final T pSource) throws NoSuchAlgorithmException {
+	UpdatableDigest(final String pAlgorithm, final T pSource) {
 		super(pAlgorithm, pSource);
-		digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
+		try {
+			digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
+		} catch (NoSuchAlgorithmException e) {
+			// This can never happen because it has already been validated
+			// during construction of the build that the algorithm is available.
+			throw new InstantiationError(e.getMessage());
+		}
 	}
 
 	/**

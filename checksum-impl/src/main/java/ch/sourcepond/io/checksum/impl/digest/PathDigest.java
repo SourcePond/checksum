@@ -71,7 +71,7 @@ class PathDigest extends UpdatableDigest<Path> {
 	 * @param pDigest
 	 * @throws NoSuchAlgorithmException
 	 */
-	PathDigest(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
+	PathDigest(final String pAlgorithm, final Path pPath) {
 		super(pAlgorithm, pPath);
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}

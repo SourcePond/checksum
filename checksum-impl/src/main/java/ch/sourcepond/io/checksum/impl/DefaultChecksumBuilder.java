@@ -93,13 +93,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 */
 	@Override
 	public UpdatableChecksum<Path> create(final Path pPath) throws ChecksumException {
-		try {
-			return createChecksum(pPath, digestFactory.newDigest(algorithm, pPath));
-		} catch (final NoSuchAlgorithmException e) {
-			// This should never happen because it has been verified that the
-			// algorithm exists during construction of this builder.
-			throw new IllegalStateException(e.getMessage(), e);
-		}
+		return createChecksum(pPath, digestFactory.newDigest(algorithm, pPath));
 	}
 
 	/**
@@ -109,12 +103,6 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 */
 	@Override
 	public UpdatableChecksum<URL> create(final URL pUrl) throws ChecksumException {
-		try {
-			return createChecksum(pUrl, digestFactory.newDigest(algorithm, pUrl));
-		} catch (final NoSuchAlgorithmException e) {
-			// This should never happen because it has been verified that the
-			// algorithm exists during construction of this builder.
-			throw new IllegalStateException(e.getMessage(), e);
-		}
+		return createChecksum(pUrl, digestFactory.newDigest(algorithm, pUrl));
 	}
 }

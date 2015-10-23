@@ -24,7 +24,7 @@ public interface DigestFactory {
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	UpdatableDigest<Path> newDigest(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
+	UpdatableDigest<Path> newDigest(String pAlgorithm, Path pPath);
 
 	/**
 	 * @param pAlgorithm
@@ -32,5 +32,5 @@ public interface DigestFactory {
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	UpdatableDigest<URL> newDigest(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
+	UpdatableDigest<URL> newDigest(String pAlgorithm, URL pUrl);
 }

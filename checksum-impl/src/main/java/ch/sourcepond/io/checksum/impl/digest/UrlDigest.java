@@ -17,7 +17,7 @@ final class UrlDigest extends UpdatableDigest<URL> {
 	 * @param pSource
 	 * @throws NoSuchAlgorithmException
 	 */
-	UrlDigest(final String pAlgorithm, final URL pSource) throws NoSuchAlgorithmException {
+	UrlDigest(final String pAlgorithm, final URL pSource) {
 		super(pAlgorithm, pSource);
 	}
 

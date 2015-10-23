@@ -3,7 +3,6 @@ package ch.sourcepond.io.checksum.impl.digest;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -36,7 +35,7 @@ public class DefaultDigestFactory implements DigestFactory {
 	 * lang.String, java.nio.file.Path)
 	 */
 	@Override
-	public UpdatableDigest<Path> newDigest(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
+	public UpdatableDigest<Path> newDigest(final String pAlgorithm, final Path pPath) {
 		return new PathDigest(pAlgorithm, pPath);
 	}
 
@@ -48,7 +47,7 @@ public class DefaultDigestFactory implements DigestFactory {
 	 * lang.String, java.net.URL)
 	 */
 	@Override
-	public UpdatableDigest<URL> newDigest(final String pAlgorithm, final URL pUrl) throws NoSuchAlgorithmException {
+	public UpdatableDigest<URL> newDigest(final String pAlgorithm, final URL pUrl) {
 		return new UrlDigest(pAlgorithm, pUrl);
 	}
 }
