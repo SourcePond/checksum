@@ -37,7 +37,7 @@ import org.junit.Test;
 import ch.sourcepond.io.checksum.Checksum;
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
-import ch.sourcepond.io.checksum.UpdatableChecksum;
+import ch.sourcepond.io.checksum.Checksum;
 
 /**
  * @author rolandhauser
@@ -116,7 +116,7 @@ public abstract class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final UpdatableChecksum<Path> chsm = builder.create(TEST_FILE);
+		final Checksum<Path> chsm = builder.create(TEST_FILE);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -134,7 +134,7 @@ public abstract class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateUrlChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final UpdatableChecksum<URL> chsm = builder.create(TEST_FILE.toUri().toURL());
+		final Checksum<URL> chsm = builder.create(TEST_FILE.toUri().toURL());
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -164,7 +164,7 @@ public abstract class ChecksumFactoryTest {
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final UpdatableChecksum<Path> chsm = builder.create(resolveResourcesDirectory());
+		final Checksum<Path> chsm = builder.create(resolveResourcesDirectory());
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }

@@ -15,7 +15,7 @@ package ch.sourcepond.io.checksum;
 
 /**
  * This exception is thrown if any operation during calculating a
- * {@link Checksum} or {@link UpdatableChecksum} fails for some reason.
+ * {@link Checksum} or {@link Checksum} fails for some reason.
  *
  */
 public class ChecksumException extends Exception {

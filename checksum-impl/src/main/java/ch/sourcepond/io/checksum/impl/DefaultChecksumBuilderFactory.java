@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 
+import org.ops4j.pax.cdi.api.OsgiService;
 import org.ops4j.pax.cdi.api.OsgiServiceProvider;
 
 import ch.sourcepond.io.checksum.ChecksumBuilder;
@@ -37,13 +38,17 @@ public class DefaultChecksumBuilderFactory implements ChecksumBuilderFactory {
 	 * 
 	 */
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
+	private final ExecutorService calculationExecutor;
 	private final DigestFactory digestFactory;
 
 	/**
 	 * @param pDigestFactory
 	 */
 	@Inject
-	public DefaultChecksumBuilderFactory(final DigestFactory pDigestFactory) {
+	public DefaultChecksumBuilderFactory(
+			@OsgiService(filter = "(|(checksum.calculationExecutor=true)(commonExecutor=true))") final ExecutorService pCalculationExecutor,
+			final DigestFactory pDigestFactory) {
+		calculationExecutor = pCalculationExecutor;
 		digestFactory = pDigestFactory;
 	}
 
@@ -54,8 +59,7 @@ public class DefaultChecksumBuilderFactory implements ChecksumBuilderFactory {
 	 * concurrent.ExecutorService, java.lang.String)
 	 */
 	@Override
-	public ChecksumBuilder create(final ExecutorService pExecutor, final String pAlgorithm)
-			throws NoSuchAlgorithmException {
-		return new DefaultChecksumBuilder(digestFactory, pExecutor, pAlgorithm);
+	public ChecksumBuilder create(final String pAlgorithm) throws NoSuchAlgorithmException {
+		return new DefaultChecksumBuilder(digestFactory, calculationExecutor, pAlgorithm);
 	}
 }

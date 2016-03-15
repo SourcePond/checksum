@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import ch.sourcepond.io.checksum.Checksum;
 import ch.sourcepond.io.checksum.ChecksumBuilder;
 import ch.sourcepond.io.checksum.ChecksumException;
-import ch.sourcepond.io.checksum.UpdatableChecksum;
+import ch.sourcepond.io.checksum.Checksum;
 import ch.sourcepond.io.checksum.impl.digest.DigestFactory;
 import ch.sourcepond.io.checksum.impl.digest.InputStreamDigest;
 import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
@@ -76,10 +76,10 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 * @return
 	 * @throws ChecksumException
 	 */
-	private <T> UpdatableChecksum<T> createChecksum(final T pSource, final UpdatableDigest<T> pDigest)
+	private <T> Checksum<T> createChecksum(final T pSource, final UpdatableDigest<T> pDigest)
 			throws ChecksumException {
 		notNull(pSource, "Source is null!");
-		final UpdatableChecksum<T> chsm = new DefaultUpdatableChecksum<>(pDigest, defaultExecutor);
+		final Checksum<T> chsm = new DefaultUpdatableChecksum<>(pDigest, defaultExecutor);
 		chsm.update();
 		return chsm;
 	}
@@ -92,7 +92,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 * Path, java.lang.String, java.util.concurrent.Executor)
 	 */
 	@Override
-	public UpdatableChecksum<Path> create(final Path pPath) throws ChecksumException {
+	public Checksum<Path> create(final Path pPath) throws ChecksumException {
 		return createChecksum(pPath, digestFactory.newDigest(algorithm, pPath));
 	}
 
@@ -102,7 +102,7 @@ final class DefaultChecksumBuilder implements ChecksumBuilder {
 	 * @throws ChecksumException
 	 */
 	@Override
-	public UpdatableChecksum<URL> create(final URL pUrl) throws ChecksumException {
+	public Checksum<URL> create(final URL pUrl) throws ChecksumException {
 		return createChecksum(pUrl, digestFactory.newDigest(algorithm, pUrl));
 	}
 }

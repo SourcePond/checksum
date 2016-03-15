@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>ch.sourcepond</groupId>
 		<artifactId>bundle</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>0.2.1-SNAPSHOT</version>
 		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -34,6 +34,11 @@
 			<artifactId>checksum-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>co.paralleluniverse</groupId>
+			<artifactId>quasar-core</artifactId>
+			<classifier>jdk8</classifier>
+		</dependency>
+		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 		</dependency>
@@ -42,4 +47,16 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<Require-Capability>checksum;filter="(|(objectClass=person)(objectClass=user))"</Require-Capability>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

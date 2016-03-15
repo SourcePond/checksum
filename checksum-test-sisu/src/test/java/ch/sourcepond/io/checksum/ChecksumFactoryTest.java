@@ -14,7 +14,7 @@ public class ChecksumFactoryTest extends ChecksumFactoryIntegrationTest {
 	 * 
 	 */
 	@Inject
-	private ChecksumBuilderFactory factory;
+	private ChecksumFactory factory;
 
 	/*
 	 * (non-Javadoc)
@@ -22,7 +22,7 @@ public class ChecksumFactoryTest extends ChecksumFactoryIntegrationTest {
 	 * @see ch.sourcepond.io.checksum.impl.ChecksumFactoryTest#getFactory()
 	 */
 	@Override
-	protected ChecksumBuilderFactory getBuilderFactory() {
+	protected ChecksumFactory getBuilderFactory() {
 		return factory;
 	}
 }

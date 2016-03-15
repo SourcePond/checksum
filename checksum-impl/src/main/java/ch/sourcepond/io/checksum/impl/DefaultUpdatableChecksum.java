@@ -24,13 +24,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import ch.sourcepond.io.checksum.ChecksumException;
-import ch.sourcepond.io.checksum.UpdatableChecksum;
+import ch.sourcepond.io.checksum.Checksum;
 import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
 
 /**
  *
  */
-final class DefaultUpdatableChecksum<T> extends BaseChecksum implements UpdatableChecksum<T>, Runnable {
+final class DefaultUpdatableChecksum<T> extends BaseChecksum implements Checksum<T>, Runnable {
 	private final Lock lock = new ReentrantLock();
 	private final Condition calculationDone = lock.newCondition();
 	private final UpdatableDigest<T> digester;
