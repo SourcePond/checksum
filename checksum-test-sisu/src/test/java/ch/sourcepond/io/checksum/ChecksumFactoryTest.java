@@ -2,6 +2,7 @@ package ch.sourcepond.io.checksum;
 
 import javax.inject.Inject;
 
+import ch.sourcepond.io.checksum.api.ChecksumFactory;
 import ch.sourcepond.io.checksum.impl.ChecksumFactoryIntegrationTest;
 
 /**
