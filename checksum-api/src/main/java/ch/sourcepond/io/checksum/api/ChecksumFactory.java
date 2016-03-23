@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -47,13 +48,14 @@ public interface ChecksumFactory {
 
 	/**
 	 * Creates a new {@link Checksum} instance. The necessary data is read from
-	 * the path specified. If the path is a directory, any contained data file
-	 * will be digested. Sub-directories will be scanned recursively. If the
-	 * path is a regular file, its content will be digested.
+	 * the {@link InputStream} returned by {@link StreamSource#openStream()}.
 	 * 
-	 * @param pPath
-	 *            Path to the file or directory to be digested, must not be
-	 *            {@code null}.
+	 * @param pAlgorithm
+	 *            The algorithm to be used for checksum calculation, see
+	 *            {@link Checksum#getAlgorithm()}
+	 * @param pSource
+	 *            The source where to read the data to be digested from, must
+	 *            not be {@code null}.
 	 * @return New {@link Checksum} instance, never {@code null}
 	 * @throws NoSuchAlgorithmException
 	 *             Thrown, if the hashing algorithm specified is unknown.
@@ -69,6 +71,9 @@ public interface ChecksumFactory {
 	 * will be digested. Sub-directories will be scanned recursively. If the
 	 * path is a regular file, its content will be digested.
 	 * 
+	 * @param pAlgorithm
+	 *            The algorithm to be used for checksum calculation, see
+	 *            {@link Checksum#getAlgorithm()}
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
@@ -84,7 +89,10 @@ public interface ChecksumFactory {
 	/**
 	 * Creates a new {@link Checksum} instance. The necessary data is read from
 	 * the {@link URL} specified.
-	 * 
+	 *
+	 * @param pAlgorithm
+	 *            The algorithm to be used for checksum calculation, see
+	 *            {@link Checksum#getAlgorithm()}
 	 * @param pUrl
 	 *            {@link URL} of the content to be digested, must not be
 	 *            {@code null}.

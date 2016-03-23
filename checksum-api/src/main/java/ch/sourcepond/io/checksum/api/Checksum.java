@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -63,8 +62,8 @@ public interface Checksum {
 
 	/**
 	 * Returns the algorithm name used to calculate this checksum See
-	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/
-	 * StandardNames.html#MessageDigest">MessageDigest Algorithms</a> for
+	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
+	 * MessageDigest Algorithms</a> for
 	 * further information.
 	 * 
 	 * @return Algorithm name, never {@code null}
@@ -82,8 +81,8 @@ public interface Checksum {
 	 * If the latest calculation was successful, the checksum will be returned
 	 * as byte array. The length of the array depends on the used hashing
 	 * algorithm (see
-	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/
-	 * StandardNames.html#MessageDigest">MessageDigest Algorithms</a> for
+	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
+	 * MessageDigest Algorithms</a> for
 	 * further information). Note: the returned array is a copy i.e. changing
 	 * the returned value will have no effect on the internal state of this
 	 * object.
@@ -149,9 +148,6 @@ public interface Checksum {
 	 * an empty string will be returned.
 	 * 
 	 * @return Previous checksum as hex-string, never {@code null}
-	 * @throws IOException
-	 *             Thrown, if the necessary data could not be read for some
-	 *             reason.
 	 */
 	String getPreviousHexValue();
 }
