@@ -13,12 +13,13 @@
 		the specific language governing permissions and limitations under the License. -->
 
 	<parent>
-		<groupId>ch.sourcepond.io</groupId>
-		<artifactId>checksum</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<groupId>ch.sourcepond</groupId>
+		<artifactId>bundle-test</artifactId>
+		<version>0.4.7</version>
+		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>checksum-test-osgi</artifactId>
+	<artifactId>checksum-test</artifactId>
 	<inceptionYear>2015</inceptionYear>
 	<description>
 		OSGi integration test for bundle checksum-impl.
@@ -29,15 +30,13 @@
 		<dependency>
 			<groupId>ch.sourcepond.io</groupId>
 			<artifactId>checksum-impl</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<type>test-jar</type>
 			<groupId>ch.sourcepond.io</groupId>
 			<artifactId>checksum-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ch.sourcepond.testing</groupId>
-			<artifactId>test-support-osgi</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
