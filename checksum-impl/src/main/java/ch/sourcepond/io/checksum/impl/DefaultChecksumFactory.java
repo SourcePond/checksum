@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
 import java.net.URL;
 import java.nio.file.Path;

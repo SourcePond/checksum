@@ -1,25 +1,13 @@
-/*Copyright (C) 2015 Roland Hauser, <sourcepond@gmail.com>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.BaseChecksum.INITIAL;
+import static ch.sourcepond.io.checksum.impl.DefaultChecksum.INITIAL;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -37,22 +25,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.sourcepond.io.checksum.ChecksumException;
-import ch.sourcepond.io.checksum.impl.digest.UpdatableDigest;
+import ch.sourcepond.io.checksum.api.ChecksumException;
 
 /**
  * @author rolandhauser
  *
  */
-public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdatableChecksum<Path>> {
-
+public class DefaultChecksumTest {
 	/**
 	 * @author rolandhauser
 	 *
 	 */
 	private class InterruptTest implements Runnable {
-		private boolean fail;
-		private ChecksumException exception;
+		private volatile boolean fail;
+		private volatile Exception exception;
 
 		@Override
 		public void run() {
@@ -61,7 +47,7 @@ public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdata
 				currentThread().interrupt();
 				checksum.getValue();
 				fail = true;
-			} catch (final ChecksumException e) {
+			} catch (final Exception e) {
 				exception = e;
 			}
 		}
@@ -82,17 +68,48 @@ public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdata
 		}
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#setup()
-	 */
-	@Override
+	private static final String ANY_ALGORITHM = "anyAlgorith";
+	private static final String HEX_VALUE = "01030305";
+	private static final byte[] VALUE = new byte[] { 1, 3, 3, 5 };
+	private final DefaultChecksum checksum = new DefaultChecksum(digester, executor);
+
 	@Before
 	public void setup() throws Exception {
-		super.setup();
 		when(digester.getAlgorithm()).thenReturn(ANY_ALGORITHM);
 		when(digester.getSource()).thenReturn(path);
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void verifyGetAlgorithm() {
+		assertEquals(ANY_ALGORITHM, checksum.getAlgorithm());
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void verifyCopyArrayGetValue() throws Exception {
+		when(digester.updateDigest()).thenReturn(VALUE);
+		checksum.update();
+		final byte[] copy = checksum.getValue();
+		assertNotSame(VALUE, copy);
+		assertArrayEquals(VALUE, copy);
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void verifyCopyArrayGetPreviousValue() throws Exception {
+		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update();
+		checksum.update();
+		final byte[] copy = checksum.getPreviousValue();
+		assertNotSame(VALUE, copy);
+		assertArrayEquals(VALUE, copy);
 	}
 
 	/**
@@ -101,14 +118,6 @@ public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdata
 	@After
 	public void tearDown() {
 		delegate.shutdown();
-	}
-
-	/**
-	 * 
-	 */
-	@Test
-	public void verifyGetSource() {
-		assertEquals(path, checksum.getSource());
 	}
 
 	/**
@@ -274,16 +283,6 @@ public class DefaultUpdatableChecksumTest extends BaseChecksumTest<DefaultUpdata
 		th.join();
 
 		assertFalse("Exception expected", r.fail);
-		assertEquals(InterruptedException.class, r.exception.getCause().getClass());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ch.sourcepond.io.checksum.impl.BaseChecksumTest#createChecksum()
-	 */
-	@Override
-	protected DefaultUpdatableChecksum<Path> createChecksum() {
-		return new DefaultUpdatableChecksum<Path>(digester, executor);
+		assertEquals(InterruptedException.class, r.exception.getClass());
 	}
 }

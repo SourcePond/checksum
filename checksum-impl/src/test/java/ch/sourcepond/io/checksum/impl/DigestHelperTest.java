@@ -11,10 +11,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.digest.DigestHelper.perform;
-import static ch.sourcepond.io.checksum.impl.digest.DigestHelper.performUpdate;
+import static ch.sourcepond.io.checksum.impl.DigestHelper.perform;
+import static ch.sourcepond.io.checksum.impl.DigestHelper.performUpdate;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Thread.sleep;
 import static java.nio.file.StandardOpenOption.READ;
@@ -74,7 +74,7 @@ public class DigestHelperTest {
 		when(in.read()).thenAnswer(new Answer<Integer>() {
 
 			@Override
-			public Integer answer(InvocationOnMock invocation) throws Throwable {
+			public Integer answer(final InvocationOnMock invocation) throws Throwable {
 				sleep(10);
 				return 0;
 			}
@@ -99,15 +99,15 @@ public class DigestHelperTest {
 	}
 
 	@SuppressWarnings("serial")
-	private class FileAttrMatcher extends BaseMatcher<FileAttribute<?>> implements VarargMatcher {
+	private class FileAttrMatcher extends BaseMatcher<FileAttribute<?>>implements VarargMatcher {
 
 		@Override
-		public boolean matches(Object item) {
+		public boolean matches(final Object item) {
 			return ((FileAttribute<?>[]) item).length == 0;
 		}
 
 		@Override
-		public void describeTo(Description description) {
+		public void describeTo(final Description description) {
 			// noop
 		}
 	}
@@ -117,8 +117,8 @@ public class DigestHelperTest {
 	 */
 	@Test(timeout = 1000)
 	public void verifyCancelDuringPerformUpdated() throws Exception {
-		FileLock lock = mock(FileLock.class);
-		FileChannel ch = spy(FileChannel.class);
+		final FileLock lock = mock(FileLock.class);
+		final FileChannel ch = spy(FileChannel.class);
 		final Path path = mock(Path.class);
 		final FileSystem fs = mock(FileSystem.class);
 		final FileSystemProvider provider = mock(FileSystemProvider.class);
@@ -128,18 +128,18 @@ public class DigestHelperTest {
 
 			@SuppressWarnings("unchecked")
 			@Override
-			public boolean matches(Object item) {
+			public boolean matches(final Object item) {
 				final Set<? extends OpenOption> set = (Set<? extends OpenOption>) item;
 				return set.contains(READ) && set.size() == 1;
 			}
 
 			@Override
-			public void describeTo(Description description) {
+			public void describeTo(final Description description) {
 				// noop
 			}
 		}), Mockito.argThat(new FileAttrMatcher()))).thenReturn(ch);
 		when(ch.lock(0l, MAX_VALUE, true)).thenReturn(lock);
-		ByteBuffer buffer = ByteBuffer.allocate(100);
+		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		srv.schedule(cancelTask, 500, MILLISECONDS);
 
 		// Update should be cancelled after 500ms

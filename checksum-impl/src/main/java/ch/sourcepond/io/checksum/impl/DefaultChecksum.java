@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
 import static java.lang.System.arraycopy;
 import static java.lang.Thread.currentThread;
@@ -92,13 +92,9 @@ class DefaultChecksum implements Checksum, Runnable {
 	public void update() {
 		lock.lock();
 		try {
-			triggeredUpdates++;
-			if (triggeredUpdates++ == 1) {
+			if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
 				executor.execute(this);
-			} else if (triggeredUpdates == 2) {
-				triggeredUpdates++;
 			}
-
 		} finally {
 			lock.unlock();
 		}
@@ -108,7 +104,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	public boolean isUpdating() {
 		lock.lock();
 		try {
-			return triggeredUpdates == 0;
+			return triggeredUpdates > 0;
 		} finally {
 			lock.unlock();
 		}
@@ -176,7 +172,7 @@ class DefaultChecksum implements Checksum, Runnable {
 
 	@Override
 	public void run() {
-		// Do the calculation outside the mutext
+		// Do the calculation outside the mutex
 		byte[] newValue = null;
 		Throwable th = null;
 		try {
@@ -196,7 +192,10 @@ class DefaultChecksum implements Checksum, Runnable {
 				value = newValue;
 			}
 		} finally {
-			triggeredUpdates--;
+			if (--triggeredUpdates == 1) {
+				executor.execute(this);
+			}
+
 			updateDone.signalAll();
 			lock.unlock();
 		}

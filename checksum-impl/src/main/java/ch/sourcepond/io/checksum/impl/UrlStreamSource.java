@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
 import java.io.IOException;
 import java.io.InputStream;

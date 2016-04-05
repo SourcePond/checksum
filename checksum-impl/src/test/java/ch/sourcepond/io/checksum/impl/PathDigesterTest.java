@@ -11,10 +11,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_CONTENT_FILE_NAME;
-import static ch.sourcepond.io.checksum.impl.ChecksumFactoryTest.FIRST_EXPECTED_HASH;
 import static java.nio.file.FileSystems.getDefault;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
@@ -30,8 +28,9 @@ import org.junit.Test;
  *
  */
 public class PathDigesterTest {
+	public static final String EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
 	private static final String ALGORITHM = "SHA-256";
-	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", FIRST_CONTENT_FILE_NAME);
+	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", "first_content.txt");
 	private PathDigest digester;
 
 	/**
@@ -48,7 +47,7 @@ public class PathDigesterTest {
 	@Test
 	public void verifyUpdateDigest() throws Exception {
 		final byte[] result = digester.updateDigest();
-		assertEquals(FIRST_EXPECTED_HASH, encodeHexString(result));
+		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
 
 	/**
@@ -63,6 +62,6 @@ public class PathDigesterTest {
 		// This should not cause an exception; weak-references are initialized
 		// with new values.
 		final byte[] result = digester.updateDigest();
-		assertEquals(FIRST_EXPECTED_HASH, encodeHexString(result));
+		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
 }

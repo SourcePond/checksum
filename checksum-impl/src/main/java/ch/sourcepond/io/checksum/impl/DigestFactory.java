@@ -11,9 +11,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
-import java.io.InputStream;
 import java.nio.file.Path;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
@@ -22,17 +21,6 @@ import ch.sourcepond.io.checksum.api.StreamSource;
  * Default implementation of the {@link DigestFactory} interface.
  */
 public class DigestFactory {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newDigestTask(java.
-	 * lang.String, java.io.InputStream)
-	 */
-	public InputStreamDigest newDigestTask(final String pAlgorithm, final InputStream pSource) {
-		return new InputStreamDigest(pAlgorithm, pSource);
-	}
 
 	/*
 	 * (non-Javadoc)

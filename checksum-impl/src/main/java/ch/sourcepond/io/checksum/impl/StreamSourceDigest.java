@@ -1,6 +1,6 @@
-package ch.sourcepond.io.checksum.impl.digest;
+package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.digest.DigestHelper.perform;
+import static ch.sourcepond.io.checksum.impl.DigestHelper.perform;
 
 import java.io.IOException;
 
