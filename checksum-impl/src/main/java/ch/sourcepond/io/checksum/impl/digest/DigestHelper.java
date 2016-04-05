@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.digest;
 
-import static ch.sourcepond.io.checksum.impl.DefaultChecksumBuilderFactory.DEFAULT_BUFFER_SIZE;
 import static java.lang.Long.MAX_VALUE;
 import static java.nio.channels.FileChannel.open;
 import static java.nio.file.StandardOpenOption.READ;
@@ -34,6 +33,10 @@ import org.slf4j.Logger;
  *
  */
 final class DigestHelper {
+	/**
+	 * 
+	 */
+	static final int DEFAULT_BUFFER_SIZE = 8192;
 	private static final Logger LOG = getLogger(DigestHelper.class);
 
 	/**
@@ -43,7 +46,7 @@ final class DigestHelper {
 	 * @return
 	 * @throws IOException
 	 */
-	public static byte[] perform(final MessageDigest digest, Cancellable pCancellable, final InputStream pSource)
+	public static byte[] perform(final MessageDigest digest, final Cancellable pCancellable, final InputStream pSource)
 			throws IOException {
 		try (final DigestInputStream din = new DigestInputStream(pSource, digest)) {
 			final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
@@ -64,8 +67,8 @@ final class DigestHelper {
 	 * @param pChannel
 	 * @throws IOException
 	 */
-	public static void performUpdate(MessageDigest digest, final Cancellable pCancellable, final Path pPath,
-			ByteBuffer buffer) throws IOException {
+	public static void performUpdate(final MessageDigest digest, final Cancellable pCancellable, final Path pPath,
+			final ByteBuffer buffer) throws IOException {
 		try (final FileChannel ch = open(pPath, READ)) {
 			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
 			try {

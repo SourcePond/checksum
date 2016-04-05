@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.digest;
 
-import static ch.sourcepond.io.checksum.impl.DefaultChecksumBuilderFactory.DEFAULT_BUFFER_SIZE;
+import static ch.sourcepond.io.checksum.impl.digest.DigestHelper.DEFAULT_BUFFER_SIZE;
 import static ch.sourcepond.io.checksum.impl.digest.DigestHelper.performUpdate;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.file.FileVisitResult.TERMINATE;
@@ -81,7 +81,7 @@ class PathDigest extends UpdatableDigest<Path> {
 	 * @throws IOException
 	 */
 	@Override
-	public byte[] updateDigest() throws IOException {
+	protected byte[] doUpdateDigest() throws IOException {
 		// Initialize the temporary hard reference to the digester; this must be
 		// set to null after the update has been performed.
 		tempDigest = getDigest();
@@ -107,7 +107,6 @@ class PathDigest extends UpdatableDigest<Path> {
 			}
 			return res;
 		} finally {
-			setCancelled(false);
 			tempDigest = null;
 			tempBuffer = null;
 		}

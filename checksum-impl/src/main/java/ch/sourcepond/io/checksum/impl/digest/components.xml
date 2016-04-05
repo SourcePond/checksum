@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<bean id="digestFactory" class="ch.sourcepond.io.checksum.impl2.DigestFactory" />
+
+	<bean id="checksumFactory"
+		class="com.bechtle.terra.search.impl.SearchServiceImpl">
+		<argument ref="digestFactory" />
+	</bean>
+
+</blueprint>

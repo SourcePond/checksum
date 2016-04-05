@@ -33,18 +33,12 @@ public interface Checksum {
 	void cancel();
 
 	/**
-	 * <p>
 	 * Updates this checksum. After the new checksum has been calculated, the
 	 * old checksum will be saved and can later be accessed through
 	 * {@link #getPreviousValue()} or {@link #getPreviousHexValue()}. The newly
 	 * calculated checksum can be accessed through {@link #getValue()} or
-	 * {@link #getHexValue()}.
-	 * </p>
-	 * 
-	 * <p>
-	 * The new checksum can be accessed through {@link #getValue()} or
-	 * {@link #getHexValue()}.
-	 * </p>
+	 * {@link #getHexValue()}. If an update is already running, then nothing
+	 * happens.
 	 * 
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
@@ -61,10 +55,9 @@ public interface Checksum {
 	boolean isUpdating();
 
 	/**
-	 * Returns the algorithm name used to calculate this checksum See
-	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
-	 * MessageDigest Algorithms</a> for
-	 * further information.
+	 * Returns the algorithm name used to calculate this checksum See <a href=
+	 * "http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
+	 * MessageDigest Algorithms</a> for further information.
 	 * 
 	 * @return Algorithm name, never {@code null}
 	 */
@@ -72,20 +65,19 @@ public interface Checksum {
 
 	/**
 	 * <p>
-	 * Gets the result of the latest completely done calculation triggered
-	 * through {@link #update()}. If the latest calculation has been failed, the
-	 * causing exception will be re-thrown.
+	 * Gets the result of the latest completed calculation triggered through
+	 * {@link #update()}. If the latest calculation has been failed, the causing
+	 * exception will be re-thrown.
 	 * </p>
 	 * 
 	 * <p>
 	 * If the latest calculation was successful, the checksum will be returned
 	 * as byte array. The length of the array depends on the used hashing
-	 * algorithm (see
-	 * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
-	 * MessageDigest Algorithms</a> for
-	 * further information). Note: the returned array is a copy i.e. changing
-	 * the returned value will have no effect on the internal state of this
-	 * object.
+	 * algorithm (see <a href=
+	 * "http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
+	 * MessageDigest Algorithms</a> for further information). Note: the returned
+	 * array is a copy i.e. changing the returned value will have no effect on
+	 * the internal state of this object.
 	 * </p>
 	 * 
 	 * <p>
@@ -126,12 +118,22 @@ public interface Checksum {
 	 * <em>after</em> the latest {@link #update()} has been
 	 * <em>successfully</em> performed, is equal to the previous checksum, i.e.
 	 * the last <em>successfully</em> calculated checksum <em>before</em> the
-	 * latest {@link #update()} has been performed.
+	 * latest {@link #update()} has been performed. If an update is currently
+	 * running ({@link #isUpdating()} returns {@code true}), this method blocks
+	 * until the update operation is done.
 	 * 
 	 * @return {@code true} if the current and previous checksum are equal,
 	 *         {@code false} otherwise.
+	 * @throws InterruptedException
+	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             interrupted (see {@link #cancel()}).
+	 * @throws ChecksumException
+	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             failed (necessary data could not read from its source for any
+	 *             reason, the calculating thread has been interrupted, or
+	 *             another unexpected exception has occurred)
 	 */
-	boolean equalsPrevious();
+	boolean equalsPrevious() throws InterruptedException, ChecksumException;
 
 	/**
 	 * Returns the previous checksum before the latest {@link #update()} has
@@ -139,8 +141,16 @@ public interface Checksum {
 	 * will be returned.
 	 * 
 	 * @return Previous checksum as byte array, never {@code null}
+	 * @throws InterruptedException
+	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             interrupted (see {@link #cancel()}).
+	 * @throws ChecksumException
+	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             failed (necessary data could not read from its source for any
+	 *             reason, the calculating thread has been interrupted, or
+	 *             another unexpected exception has occurred)
 	 */
-	byte[] getPreviousValue();
+	byte[] getPreviousValue() throws InterruptedException, ChecksumException;
 
 	/**
 	 * Returns the previous checksum before the last {@link #update()} occurred
@@ -148,6 +158,14 @@ public interface Checksum {
 	 * an empty string will be returned.
 	 * 
 	 * @return Previous checksum as hex-string, never {@code null}
+	 * @throws InterruptedException
+	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             interrupted (see {@link #cancel()}).
+	 * @throws ChecksumException
+	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             failed (necessary data could not read from its source for any
+	 *             reason, the calculating thread has been interrupted, or
+	 *             another unexpected exception has occurred)
 	 */
-	String getPreviousHexValue();
+	String getPreviousHexValue() throws InterruptedException, ChecksumException;
 }

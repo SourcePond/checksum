@@ -24,7 +24,7 @@ public abstract class Digest<T> implements Cancellable {
 	/**
 	 * @param pAlgorithm
 	 */
-	Digest(final String pAlgorithm, T pSource) {
+	Digest(final String pAlgorithm, final T pSource) {
 		algorithm = pAlgorithm;
 		source = pSource;
 	}

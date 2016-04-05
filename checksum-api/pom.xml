@@ -11,29 +11,20 @@
 		under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 		OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 		the specific language governing permissions and limitations under the License. -->
-
 	<parent>
 		<groupId>ch.sourcepond</groupId>
 		<artifactId>bundle</artifactId>
-		<version>0.2.1-SNAPSHOT</version>
+		<version>0.4-SNAPSHOT</version>
 		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.sourcepond.io</groupId>
 	<artifactId>checksum-api</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<inceptionYear>2015</inceptionYear>
 	<packaging>bundle</packaging>
 	<description>
 		Provides a simple API to calculate checksums for the content of any input-stream, file or directory.
 	</description>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>
+

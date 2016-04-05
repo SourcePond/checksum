@@ -14,36 +14,45 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.digest;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
+
+import ch.sourcepond.io.checksum.api.StreamSource;
 
 /**
- * @author rolandhauser
- *
+ * Default implementation of the {@link DigestFactory} interface.
  */
-public interface DigestFactory {
+public class DigestFactory {
 
-	/**
-	 * @param pAlgorithm
-	 * @param pSource
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newDigestTask(java.
+	 * lang.String, java.io.InputStream)
 	 */
-	InputStreamDigest newDigestTask(String pAlgorithm, InputStream pSource);
+	public InputStreamDigest newDigestTask(final String pAlgorithm, final InputStream pSource) {
+		return new InputStreamDigest(pAlgorithm, pSource);
+	}
 
-	/**
-	 * @param pAlgorithm
-	 * @param pPath
-	 * @return
-	 * @throws NoSuchAlgorithmException
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newPathDigest(java.
+	 * lang.String, java.nio.file.Path)
 	 */
-	UpdatableDigest<Path> newDigest(String pAlgorithm, Path pPath);
+	public UpdatableDigest<Path> newDigest(final String pAlgorithm, final Path pPath) {
+		return new PathDigest(pAlgorithm, pPath);
+	}
 
-	/**
-	 * @param pAlgorithm
-	 * @param pUrl
-	 * @return
-	 * @throws NoSuchAlgorithmException
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newUrlDigest(java.
+	 * lang.String, java.net.URL)
 	 */
-	UpdatableDigest<URL> newDigest(String pAlgorithm, URL pUrl);
+	public UpdatableDigest<StreamSource> newDigest(final String pAlgorithm, final StreamSource pSource) {
+		return new StreamSourceDigest(pAlgorithm, pSource);
+	}
 }

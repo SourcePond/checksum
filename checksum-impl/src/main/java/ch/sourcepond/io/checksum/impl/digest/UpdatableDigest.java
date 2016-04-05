@@ -25,7 +25,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @param <T>
  */
-public abstract class UpdatableDigest<T> extends Digest<T> implements Cancellable {
+public abstract class UpdatableDigest<T> extends Digest<T>implements Cancellable {
 	// To safe as much system resources as possible, we do not hold hard
 	// references to the digester.
 	private WeakReference<MessageDigest> digestRef;
@@ -38,7 +38,7 @@ public abstract class UpdatableDigest<T> extends Digest<T> implements Cancellabl
 		super(pAlgorithm, pSource);
 		try {
 			digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			// This can never happen because it has already been validated
 			// during construction of the build that the algorithm is available.
 			throw new InstantiationError(e.getMessage());
@@ -64,9 +64,17 @@ public abstract class UpdatableDigest<T> extends Digest<T> implements Cancellabl
 		return tempDigest;
 	}
 
+	protected abstract byte[] doUpdateDigest() throws IOException;
+
 	/**
 	 * @param pChannel
 	 * @throws IOException
 	 */
-	public abstract byte[] updateDigest() throws IOException;
+	public final byte[] updateDigest() throws IOException {
+		try {
+			return doUpdateDigest();
+		} finally {
+			setCancelled(false);
+		}
+	}
 }

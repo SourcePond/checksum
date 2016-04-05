@@ -14,8 +14,9 @@
 
 	<parent>
 		<groupId>ch.sourcepond</groupId>
-		<artifactId>module</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<artifactId>build</artifactId>
+		<version>0.4-SNAPSHOT</version>
+		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.sourcepond.io</groupId>
@@ -29,24 +30,6 @@
 	<modules>
 		<module>checksum-api</module>
 		<module>checksum-impl</module>
-		<module>checksum-test-cdi</module>
-		<module>checksum-test-osgi</module>
-		<module>checksum-test-sisu</module>
+		<module>checksum-test</module>
 	</modules>
-	
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>ch.sourcepond.io</groupId>
-				<artifactId>checksum-impl</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<type>test-jar</type>
-				<groupId>ch.sourcepond.io</groupId>
-				<artifactId>checksum-impl</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

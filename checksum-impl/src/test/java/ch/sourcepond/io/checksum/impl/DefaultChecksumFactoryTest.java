@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import org.junit.Test;
 
 import ch.sourcepond.io.checksum.ChecksumBuilderFactory;
-import ch.sourcepond.io.checksum.impl.digest.DefaultDigestFactory;
+import ch.sourcepond.io.checksum.impl2.DefaultDigestFactory;
 
 /**
  * @author rolandhauser
