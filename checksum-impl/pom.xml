@@ -30,14 +30,6 @@
 			<artifactId>checksum-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>osgi.cmpn</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
@@ -49,7 +41,11 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
-					<Require-Capability>checksum;filter="(|(objectClass=person)(objectClass=user))"</Require-Capability>
+					<Bundle-Blueprint>
+						ch/sourcepond/io/checksum/impl/components.xml,
+						ch/sourcepond/io/checksum/impl/export.xml,
+						ch/sourcepond/io/checksum/impl/import.xml
+					</Bundle-Blueprint>
 				</configuration>
 			</plugin>
 		</plugins>
