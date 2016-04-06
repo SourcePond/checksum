@@ -30,10 +30,6 @@ public abstract class UpdatableDigest<T> extends Digest<T>implements Cancellable
 	// references to the digester.
 	private WeakReference<MessageDigest> digestRef;
 
-	/**
-	 * @param pAlgorithm
-	 * @throws NoSuchAlgorithmException
-	 */
 	UpdatableDigest(final String pAlgorithm, final T pSource) {
 		super(pAlgorithm, pSource);
 		try {
@@ -45,9 +41,6 @@ public abstract class UpdatableDigest<T> extends Digest<T>implements Cancellable
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	protected final MessageDigest getDigest() {
 		// Initialize the temporary hard reference to the digester; this must be
 		// set to null after the update has been performed.
@@ -66,10 +59,6 @@ public abstract class UpdatableDigest<T> extends Digest<T>implements Cancellable
 
 	protected abstract byte[] doUpdateDigest() throws IOException;
 
-	/**
-	 * @param pChannel
-	 * @throws IOException
-	 */
 	public final byte[] updateDigest() throws IOException {
 		try {
 			return doUpdateDigest();

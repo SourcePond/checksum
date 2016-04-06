@@ -21,48 +21,28 @@ public abstract class Digest<T> implements Cancellable {
 	private final T source;
 	private volatile boolean cancelled;
 
-	/**
-	 * @param pAlgorithm
-	 */
 	Digest(final String pAlgorithm, final T pSource) {
 		algorithm = pAlgorithm;
 		source = pSource;
 	}
 
-	/**
-	 * @return
-	 */
 	public T getSource() {
 		return source;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ch.sourcepond.io.checksum.impl.digest.Cancellable#isCancelled()
-	 */
 	@Override
 	public final boolean isCancelled() {
 		return cancelled;
 	}
 
-	/**
-	 * @param pCancelled
-	 */
 	protected final void setCancelled(final boolean pCancelled) {
 		cancelled = pCancelled;
 	}
 
-	/**
-	 * 
-	 */
 	public final void cancel() {
 		setCancelled(true);
 	}
 
-	/**
-	 * @return
-	 */
 	public String getAlgorithm() {
 		return algorithm;
 	}

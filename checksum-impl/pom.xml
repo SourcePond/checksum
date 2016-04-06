@@ -41,11 +41,13 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
-					<Bundle-Blueprint>
-						ch/sourcepond/io/checksum/impl/components.xml,
-						ch/sourcepond/io/checksum/impl/export.xml,
-						ch/sourcepond/io/checksum/impl/import.xml
-					</Bundle-Blueprint>
+					<instructions>
+						<Bundle-Blueprint>
+							ch/sourcepond/io/checksum/impl/components.xml,
+							ch/sourcepond/io/checksum/impl/export.xml,
+							ch/sourcepond/io/checksum/impl/import.xml
+						</Bundle-Blueprint>
+					</instructions>
 				</configuration>
 			</plugin>
 		</plugins>

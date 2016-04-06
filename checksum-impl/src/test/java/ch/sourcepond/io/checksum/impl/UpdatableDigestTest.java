@@ -24,7 +24,7 @@ public class UpdatableDigestTest {
 	/**
 	 * 
 	 */
-	@Test(expected = InstantiationError.class)
+	@Test
 	public void verifyThrowErrorIfAlgorithmIsUnknown() {
 
 	}

@@ -115,7 +115,7 @@ public class DigestHelperTest {
 	/**
 	 * @throws Exception
 	 */
-	@Test(timeout = 1000)
+	@Test(timeout = 2000)
 	public void verifyCancelDuringPerformUpdated() throws Exception {
 		final FileLock lock = mock(FileLock.class);
 		final FileChannel ch = spy(FileChannel.class);

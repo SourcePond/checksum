@@ -19,8 +19,5 @@ package ch.sourcepond.io.checksum.impl;
  */
 interface Cancellable {
 
-	/**
-	 * @return
-	 */
 	boolean isCancelled();
 }
