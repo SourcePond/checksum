@@ -23,33 +23,34 @@ import ch.sourcepond.io.checksum.api.ChecksumFactory;
 import ch.sourcepond.io.checksum.api.StreamSource;
 
 /**
- * @author rolandhauser
+ * Default implementation of the {@link ChecksumFactory} interface. An instance
+ * of this class will be exported as OSGi-service via Blueprint.
  *
  */
 public final class DefaultChecksumFactory implements ChecksumFactory {
 	private final ExecutorService executor;
-	private final UpdateStrategyFactory digestFactory;
+	private final UpdateStrategyFactory updateStrategyFactory;
 
 	/**
 	 * @param pExecutor
 	 */
 	public DefaultChecksumFactory(final ExecutorService pExecutor, final UpdateStrategyFactory pDigestFactory) {
 		executor = pExecutor;
-		digestFactory = pDigestFactory;
+		updateStrategyFactory = pDigestFactory;
 	}
 
 	@Override
 	public Checksum create(final String pAlgorithm, final StreamSource pSource) throws NoSuchAlgorithmException {
-		return new DefaultChecksum(digestFactory.newDigest(pAlgorithm, pSource), executor);
+		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, pSource), executor);
 	}
 
 	@Override
 	public Checksum create(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
-		return new DefaultChecksum(digestFactory.newDigest(pAlgorithm, pPath), executor);
+		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, pPath), executor);
 	}
 
 	@Override
 	public Checksum create(final String pAlgorithm, final URL pUrl) throws NoSuchAlgorithmException {
-		return new DefaultChecksum(digestFactory.newDigest(pAlgorithm, new UrlStreamSource(pUrl)), executor);
+		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, new UrlStreamSource(pUrl)), executor);
 	}
 }

@@ -30,7 +30,7 @@ import java.security.MessageDigest;
 import org.slf4j.Logger;
 
 /**
- *
+ * Utility class to perform the actual checksum digest.
  */
 final class DigestHelper {
 	/**
@@ -40,15 +40,22 @@ final class DigestHelper {
 	private static final Logger LOG = getLogger(DigestHelper.class);
 
 	/**
-	 * @param digest
+	 * Performs the the hash calculation upon the data received through the
+	 * input-stream specified.
+	 * 
+	 * @param pDigest
+	 *            The message digester, must not be {@code null}
 	 * @param pCancellable
+	 *            Cancel callback, must not be {@code null}
 	 * @param pSource
-	 * @return
+	 *            Stream where to read the data from, must not be {@code null}
+	 * @return The digested hash, never {@code null}
 	 * @throws IOException
+	 *             Thrown, if an exception occurred while reading the data.
 	 */
-	public static byte[] perform(final MessageDigest digest, final Cancellable pCancellable, final InputStream pSource)
+	public static byte[] perform(final MessageDigest pDigest, final Cancellable pCancellable, final InputStream pSource)
 			throws IOException {
-		try (final DigestInputStream din = new DigestInputStream(pSource, digest)) {
+		try (final DigestInputStream din = new DigestInputStream(pSource, pDigest)) {
 			final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
 			int read = din.read(buf);
 			while (!pCancellable.isCancelled() && read != -1) {
@@ -56,16 +63,28 @@ final class DigestHelper {
 			}
 
 			if (pCancellable.isCancelled()) {
-				LOG.info("Checksum calculation cancelled by user.");
+				LOG.debug("Checksum calculation cancelled by user.");
 				return null;
 			}
 		}
-		return digest.digest();
+		return pDigest.digest();
 	}
 
 	/**
-	 * @param pChannel
+	 * Performs the the hash calculation upon the data provided by the path
+	 * specified.
+	 * 
+	 * @param digest
+	 *            The message digester, must not be {@code null}
+	 * @param pCancellable
+	 *            Cancel callback, must not be {@code null}
+	 * @param pPath
+	 *            The path where to read the data from; must be a regular file
+	 *            and must not be {@code null}
+	 * @param buffer
+	 *            The {@link ByteBuffer} instance where to store read data.
 	 * @throws IOException
+	 *             Thrown, if an exception occurred while reading the data.
 	 */
 	public static void performUpdate(final MessageDigest digest, final Cancellable pCancellable, final Path pPath,
 			final ByteBuffer buffer) throws IOException {
@@ -83,7 +102,7 @@ final class DigestHelper {
 				}
 
 				if (pCancellable.isCancelled()) {
-					LOG.info("Checksum calculation cancelled by user.");
+					LOG.debug("Checksum calculation cancelled by user.");
 				}
 			} finally {
 				fl.release();

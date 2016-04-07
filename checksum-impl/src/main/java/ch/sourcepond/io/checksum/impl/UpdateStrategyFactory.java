@@ -29,7 +29,7 @@ public class UpdateStrategyFactory {
 	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newPathDigest(java.
 	 * lang.String, java.nio.file.Path)
 	 */
-	public UpdateStrategy<Path> newDigest(final String pAlgorithm, final Path pPath) {
+	public UpdateStrategy<Path> newStrategy(final String pAlgorithm, final Path pPath) {
 		return new PathUpdateStrategy(pAlgorithm, pPath);
 	}
 
@@ -40,7 +40,7 @@ public class UpdateStrategyFactory {
 	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newUrlDigest(java.
 	 * lang.String, java.net.URL)
 	 */
-	public UpdateStrategy<StreamSource> newDigest(final String pAlgorithm, final StreamSource pSource) {
+	public UpdateStrategy<StreamSource> newStrategy(final String pAlgorithm, final StreamSource pSource) {
 		return new StreamSourceUpdateStrategy(pAlgorithm, pSource);
 	}
 }
