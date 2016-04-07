@@ -2,6 +2,7 @@ package ch.sourcepond.io.checksum.impl;
 
 import static ch.sourcepond.io.checksum.impl.DefaultChecksum.INITIAL;
 import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertArrayEquals;
@@ -77,6 +78,17 @@ public class DefaultChecksumTest {
 	public void setup() throws Exception {
 		when(digester.getAlgorithm()).thenReturn(ANY_ALGORITHM);
 		when(digester.getSource()).thenReturn(path);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyIsUpdating() throws Exception {
+		assertSame(checksum, checksum.update());
+		assertTrue(checksum.isUpdating());
+		sleep(1000);
+		assertFalse(checksum.isUpdating());
 	}
 
 	/**

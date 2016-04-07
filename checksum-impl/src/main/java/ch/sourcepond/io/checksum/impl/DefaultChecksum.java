@@ -89,12 +89,13 @@ class DefaultChecksum implements Checksum, Runnable {
 	}
 
 	@Override
-	public void update() {
+	public Checksum update() {
 		lock.lock();
 		try {
 			if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
 				executor.execute(this);
 			}
+			return this;
 		} finally {
 			lock.unlock();
 		}

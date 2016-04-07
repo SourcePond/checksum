@@ -3,7 +3,7 @@ package ch.sourcepond.io.checksum.impl;
 import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.ChecksumFactory;
@@ -13,14 +13,14 @@ import ch.sourcepond.io.checksum.api.StreamSource;
  * @author rolandhauser
  *
  */
-final class DefaultChecksumFactory implements ChecksumFactory {
-	private final Executor executor;
+public final class DefaultChecksumFactory implements ChecksumFactory {
+	private final ExecutorService executor;
 	private final DigestFactory digestFactory;
 
 	/**
 	 * @param pExecutor
 	 */
-	public DefaultChecksumFactory(final Executor pExecutor, final DigestFactory pDigestFactory) {
+	public DefaultChecksumFactory(final ExecutorService pExecutor, final DigestFactory pDigestFactory) {
 		executor = pExecutor;
 		digestFactory = pDigestFactory;
 	}

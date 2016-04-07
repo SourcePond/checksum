@@ -3,6 +3,6 @@
 
 	<!-- Import services -->
 	<reference id="OSGi_service.checksumExecutor"
-		interface="java.util.concurrent.Executor"
+		interface="java.util.concurrent.ExecutorService"
 		filter="(checksum-executor-service=true)" />
 </blueprint>

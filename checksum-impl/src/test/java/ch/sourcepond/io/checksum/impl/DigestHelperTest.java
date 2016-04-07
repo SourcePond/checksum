@@ -38,11 +38,10 @@ import java.security.MessageDigest;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.VarargMatcher;
 import org.mockito.invocation.InvocationOnMock;
@@ -99,7 +98,7 @@ public class DigestHelperTest {
 	}
 
 	@SuppressWarnings("serial")
-	private class FileAttrMatcher extends BaseMatcher<FileAttribute<?>>implements VarargMatcher {
+	private class FileAttrMatcher implements ArgumentMatcher<FileAttribute<?>>, VarargMatcher {
 
 		@Override
 		public boolean matches(final Object item) {
@@ -107,8 +106,8 @@ public class DigestHelperTest {
 		}
 
 		@Override
-		public void describeTo(final Description description) {
-			// noop
+		public String toString() {
+			return "Empty FileAttribute array";
 		}
 	}
 
@@ -124,20 +123,22 @@ public class DigestHelperTest {
 		final FileSystemProvider provider = mock(FileSystemProvider.class);
 		when(path.getFileSystem()).thenReturn(fs);
 		when(fs.provider()).thenReturn(provider);
-		when(provider.newFileChannel(Mockito.eq(path), Mockito.argThat(new BaseMatcher<Set<? extends OpenOption>>() {
 
-			@SuppressWarnings("unchecked")
-			@Override
-			public boolean matches(final Object item) {
-				final Set<? extends OpenOption> set = (Set<? extends OpenOption>) item;
-				return set.contains(READ) && set.size() == 1;
-			}
+		when(provider.newFileChannel(Mockito.eq(path),
+				Mockito.argThat(new ArgumentMatcher<Set<? extends OpenOption>>() {
 
-			@Override
-			public void describeTo(final Description description) {
-				// noop
-			}
-		}), Mockito.argThat(new FileAttrMatcher()))).thenReturn(ch);
+					@SuppressWarnings("unchecked")
+					@Override
+					public boolean matches(final Object item) {
+						final Set<? extends OpenOption> set = (Set<? extends OpenOption>) item;
+						return set.contains(READ) && set.size() == 1;
+					}
+
+					@Override
+					public String toString() {
+						return "Set of size 1 and OpenOption 'READ'";
+					}
+				}), Mockito.argThat(new FileAttrMatcher()))).thenReturn(ch);
 		when(ch.lock(0l, MAX_VALUE, true)).thenReturn(lock);
 		final ByteBuffer buffer = ByteBuffer.allocate(100);
 		srv.schedule(cancelTask, 500, MILLISECONDS);
