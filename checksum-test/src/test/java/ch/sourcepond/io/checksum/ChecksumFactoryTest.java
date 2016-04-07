@@ -1,7 +1,9 @@
 package ch.sourcepond.io.checksum;
 
 import static ch.sourcepond.io.checksum.api.ChecksumFactory.SHA256;
+import static ch.sourcepond.testing.OptionsHelper.blueprintBundles;
 import static ch.sourcepond.testing.OptionsHelper.defaultOptions;
+import static ch.sourcepond.testing.OptionsHelper.stubService;
 import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.newInputStream;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
 
@@ -59,7 +62,9 @@ public class ChecksumFactoryTest {
 	 */
 	@Configuration
 	public Option[] config() throws Exception {
-		return options(defaultOptions(getClass().getPackage().getName()),
+		return options(defaultOptions(getClass().getPackage().getName()), blueprintBundles(),
+				stubService(ExecutorService.class).withFactory(ExecutorServiceFactory.class)
+						.addProperty("checksum-executor-service", "true").build(),
 				mavenBundle("commons-codec", "commons-codec").versionAsInProject());
 	}
 
@@ -95,7 +100,7 @@ public class ChecksumFactoryTest {
 			public InputStream openStream() throws IOException {
 				return asStream(FIRST_CONTENT_FILE_NAME);
 			}
-		});
+		}).update();
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 	}
 
@@ -107,7 +112,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE);
+		final Checksum chsm = factory.create(SHA256, TEST_FILE).update();
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -125,7 +130,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateUrlChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL());
+		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update();
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -139,15 +144,7 @@ public class ChecksumFactoryTest {
 	 * @return
 	 */
 	private Path resolveResourcesDirectory() {
-		return getResourceRootPath().resolve("src").resolve("test").resolve("resources");
-	}
-
-	/**
-	 * @param pFs
-	 * @return
-	 */
-	protected Path getResourceRootPath() {
-		return getDefault().getPath(USER_DIR);
+		return getDefault().getPath(USER_DIR).resolve("src").resolve("test").resolve("resources");
 	}
 
 	/**
@@ -155,7 +152,7 @@ public class ChecksumFactoryTest {
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory());
+		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update();
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }
