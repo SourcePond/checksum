@@ -40,11 +40,12 @@ public interface Checksum {
 	 * {@link #getHexValue()}. If an update is already running, then nothing
 	 * happens.
 	 * 
+	 * @return Returns this checksum object, never {@code null}
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	void update();
+	Checksum update();
 
 	/**
 	 * Checks whether an update is currently running (started through
