@@ -14,10 +14,16 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
 /**
- * Interface to check whether a {@link UpdateStrategy} is cancelled.
+ * Callback interface to check whether a user has requested to cancel an ongoing
+ * update performed through an {@link UpdateStrategy}.
  *
  */
 interface Cancellable {
 
+	/**
+	 * Checks, whether a user has requested to cancel to current update.
+	 * 
+	 * @return {@code true} if cancelled, {@code false} otherwise.
+	 */
 	boolean isCancelled();
 }
