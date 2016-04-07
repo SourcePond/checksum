@@ -19,15 +19,15 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
-import ch.sourcepond.io.checksum.impl.Digest;
+import ch.sourcepond.io.checksum.impl.UpdateStrategy;
 
 /**
  * @author rolandhauser
  *
  */
-public class DigestTest {
+public class UpdateStrategyTest {
 	@SuppressWarnings("unchecked")
-	private final Digest<Object> digest = mock(Digest.class);
+	private final UpdateStrategy<Object> digest = mock(UpdateStrategy.class);
 
 	/**
 	 * 

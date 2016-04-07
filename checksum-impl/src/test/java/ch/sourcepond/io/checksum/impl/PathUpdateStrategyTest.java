@@ -27,18 +27,18 @@ import org.junit.Test;
  * @author rolandhauser
  *
  */
-public class PathDigesterTest {
+public class PathUpdateStrategyTest {
 	public static final String EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
 	private static final String ALGORITHM = "SHA-256";
 	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", "first_content.txt");
-	private PathDigest digester;
+	private PathUpdateStrategy strategy;
 
 	/**
 	 * 
 	 */
 	@Before
 	public void setup() throws Exception {
-		digester = new PathDigest(ALGORITHM, file);
+		strategy = new PathUpdateStrategy(ALGORITHM, file);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class PathDigesterTest {
 	 */
 	@Test
 	public void verifyUpdateDigest() throws Exception {
-		final byte[] result = digester.updateDigest();
+		final byte[] result = strategy.update();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
 
@@ -61,7 +61,7 @@ public class PathDigesterTest {
 
 		// This should not cause an exception; weak-references are initialized
 		// with new values.
-		final byte[] result = digester.updateDigest();
+		final byte[] result = strategy.update();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
 }

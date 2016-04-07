@@ -21,17 +21,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @author rolandhauser
- *
- * @param <T>
+ * 
  */
-public abstract class UpdatableDigest<T> extends Digest<T>implements Cancellable {
+public abstract class UpdateStrategy<T> implements Cancellable {
+	private final String algorithm;
+	private final T source;
+	private volatile boolean cancelled;
 	// To safe as much system resources as possible, we do not hold hard
 	// references to the digester.
 	private WeakReference<MessageDigest> digestRef;
 
-	UpdatableDigest(final String pAlgorithm, final T pSource) {
-		super(pAlgorithm, pSource);
+	UpdateStrategy(final String pAlgorithm, final T pSource) {
+		algorithm = pAlgorithm;
+		source = pSource;
 		try {
 			digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
 		} catch (final NoSuchAlgorithmException e) {
@@ -57,13 +59,39 @@ public abstract class UpdatableDigest<T> extends Digest<T>implements Cancellable
 		return tempDigest;
 	}
 
-	protected abstract byte[] doUpdateDigest() throws IOException;
+	protected abstract byte[] doUpdate() throws IOException;
 
-	public final byte[] updateDigest() throws IOException {
+	public final byte[] update() throws IOException {
 		try {
-			return doUpdateDigest();
+			return doUpdate();
 		} finally {
 			setCancelled(false);
 		}
+	}
+
+	public T getSource() {
+		return source;
+	}
+
+	@Override
+	public final boolean isCancelled() {
+		return cancelled;
+	}
+
+	protected final void setCancelled(final boolean pCancelled) {
+		cancelled = pCancelled;
+	}
+
+	public final void cancel() {
+		setCancelled(true);
+	}
+
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	@Override
+	protected final void finalize() throws Throwable {
+		cancel();
 	}
 }

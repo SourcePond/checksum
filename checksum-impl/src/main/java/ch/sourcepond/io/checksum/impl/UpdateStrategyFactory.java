@@ -18,9 +18,9 @@ import java.nio.file.Path;
 import ch.sourcepond.io.checksum.api.StreamSource;
 
 /**
- * Default implementation of the {@link DigestFactory} interface.
+ * Default implementation of the {@link UpdateStrategyFactory} interface.
  */
-public class DigestFactory {
+public class UpdateStrategyFactory {
 
 	/*
 	 * (non-Javadoc)
@@ -29,8 +29,8 @@ public class DigestFactory {
 	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newPathDigest(java.
 	 * lang.String, java.nio.file.Path)
 	 */
-	public UpdatableDigest<Path> newDigest(final String pAlgorithm, final Path pPath) {
-		return new PathDigest(pAlgorithm, pPath);
+	public UpdateStrategy<Path> newDigest(final String pAlgorithm, final Path pPath) {
+		return new PathUpdateStrategy(pAlgorithm, pPath);
 	}
 
 	/*
@@ -40,7 +40,7 @@ public class DigestFactory {
 	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newUrlDigest(java.
 	 * lang.String, java.net.URL)
 	 */
-	public UpdatableDigest<StreamSource> newDigest(final String pAlgorithm, final StreamSource pSource) {
-		return new StreamSourceDigest(pAlgorithm, pSource);
+	public UpdateStrategy<StreamSource> newDigest(final String pAlgorithm, final StreamSource pSource) {
+		return new StreamSourceUpdateStrategy(pAlgorithm, pSource);
 	}
 }

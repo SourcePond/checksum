@@ -57,7 +57,7 @@ public class DefaultChecksumTest {
 	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
 	private final Path path = mock(Path.class);
 	@SuppressWarnings("unchecked")
-	private final UpdatableDigest<Path> digester = mock(UpdatableDigest.class);
+	private final UpdateStrategy<Path> updater = mock(UpdateStrategy.class);
 	private final ScheduledExecutorService delegate = newScheduledThreadPool(1);
 	private final Executor executor = new Executor() {
 
@@ -72,12 +72,12 @@ public class DefaultChecksumTest {
 	private static final String ANY_ALGORITHM = "anyAlgorith";
 	private static final String HEX_VALUE = "01030305";
 	private static final byte[] VALUE = new byte[] { 1, 3, 3, 5 };
-	private final DefaultChecksum checksum = new DefaultChecksum(digester, executor);
+	private final DefaultChecksum checksum = new DefaultChecksum(updater, executor);
 
 	@Before
 	public void setup() throws Exception {
-		when(digester.getAlgorithm()).thenReturn(ANY_ALGORITHM);
-		when(digester.getSource()).thenReturn(path);
+		when(updater.getAlgorithm()).thenReturn(ANY_ALGORITHM);
+		when(updater.getSource()).thenReturn(path);
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyCopyArrayGetValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE);
+		when(updater.update()).thenReturn(VALUE);
 		checksum.update();
 		final byte[] copy = checksum.getValue();
 		assertNotSame(VALUE, copy);
@@ -116,7 +116,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyCopyArrayGetPreviousValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
 		checksum.update();
 		final byte[] copy = checksum.getPreviousValue();
@@ -138,7 +138,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyCancel() {
 		checksum.cancel();
-		assertTrue(digester.isCancelled());
+		assertTrue(updater.isCancelled());
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetHexValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
 		assertEquals(HEX_VALUE, checksum.getHexValue());
 		checksum.update();
@@ -190,7 +190,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetPreviousHexValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
 		checksum.update();
 		assertEquals(HEX_VALUE, checksum.getPreviousHexValue());
@@ -201,7 +201,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyEqualsPrevious() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE).thenReturn(VALUE).thenReturn(VALUE);
+		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE).thenReturn(VALUE).thenReturn(VALUE);
 		checksum.update();
 		assertFalse(checksum.equalsPrevious());
 		checksum.update();
@@ -217,7 +217,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE);
+		when(updater.update()).thenReturn(VALUE);
 		checksum.update();
 		assertArrayEquals(VALUE, checksum.getValue());
 	}
@@ -227,7 +227,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetPreviousValue() throws Exception {
-		when(digester.updateDigest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
 		checksum.update();
 		assertArrayEquals(VALUE, checksum.getPreviousValue());
@@ -239,7 +239,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyGetValueIOExceptionOccurred() throws Exception {
 		final IOException expected = new IOException();
-		doThrow(expected).when(digester).updateDigest();
+		doThrow(expected).when(updater).update();
 		checksum.update();
 
 		try {
@@ -256,7 +256,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyGetValueRuntimeExceptionOccurred() throws Exception {
 		final RuntimeException expected = new RuntimeException();
-		doThrow(expected).when(digester).updateDigest();
+		doThrow(expected).when(updater).update();
 		checksum.update();
 
 		try {
@@ -273,7 +273,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyDoNotCatchError() throws Exception {
 		final Error expected = new Error();
-		doThrow(expected).when(digester).updateDigest();
+		doThrow(expected).when(updater).update();
 		checksum.update();
 
 		try {

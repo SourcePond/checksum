@@ -13,42 +13,25 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import static ch.sourcepond.io.checksum.impl.DigestHelper.perform;
+
+import java.io.IOException;
+
+import ch.sourcepond.io.checksum.api.StreamSource;
+
 /**
+ * @author rolandhauser
  *
  */
-public abstract class Digest<T> implements Cancellable {
-	private final String algorithm;
-	private final T source;
-	private volatile boolean cancelled;
+final class StreamSourceUpdateStrategy extends UpdateStrategy<StreamSource> {
 
-	Digest(final String pAlgorithm, final T pSource) {
-		algorithm = pAlgorithm;
-		source = pSource;
-	}
-
-	public T getSource() {
-		return source;
+	StreamSourceUpdateStrategy(final String pAlgorithm, final StreamSource pSource) {
+		super(pAlgorithm, pSource);
 	}
 
 	@Override
-	public final boolean isCancelled() {
-		return cancelled;
+	protected byte[] doUpdate() throws IOException {
+		return perform(getDigest(), this, getSource().openStream());
 	}
 
-	protected final void setCancelled(final boolean pCancelled) {
-		cancelled = pCancelled;
-	}
-
-	public final void cancel() {
-		setCancelled(true);
-	}
-
-	public String getAlgorithm() {
-		return algorithm;
-	}
-
-	@Override
-	protected final void finalize() throws Throwable {
-		cancel();
-	}
 }

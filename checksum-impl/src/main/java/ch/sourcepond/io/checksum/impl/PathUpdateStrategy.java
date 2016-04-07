@@ -36,7 +36,7 @@ import java.security.NoSuchAlgorithmException;
  * (except of {@link #cancel()}).
  *
  */
-class PathDigest extends UpdatableDigest<Path> {
+class PathUpdateStrategy extends UpdateStrategy<Path> {
 	/**
 	 * Visitor to scan a directory structure for files to be digested.
 	 */
@@ -50,7 +50,7 @@ class PathDigest extends UpdatableDigest<Path> {
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 			if (!isCancelled()) {
-				performUpdate(tempDigest, PathDigest.this, file, tempBuffer);
+				performUpdate(tempDigest, PathUpdateStrategy.this, file, tempBuffer);
 				return super.visitFile(file, attrs);
 			}
 			return TERMINATE;
@@ -71,7 +71,7 @@ class PathDigest extends UpdatableDigest<Path> {
 	 * @param pDigest
 	 * @throws NoSuchAlgorithmException
 	 */
-	PathDigest(final String pAlgorithm, final Path pPath) {
+	PathUpdateStrategy(final String pAlgorithm, final Path pPath) {
 		super(pAlgorithm, pPath);
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}
@@ -81,7 +81,7 @@ class PathDigest extends UpdatableDigest<Path> {
 	 * @throws IOException
 	 */
 	@Override
-	protected byte[] doUpdateDigest() throws IOException {
+	protected byte[] doUpdate() throws IOException {
 		// Initialize the temporary hard reference to the digester; this must be
 		// set to null after the update has been performed.
 		tempDigest = getDigest();

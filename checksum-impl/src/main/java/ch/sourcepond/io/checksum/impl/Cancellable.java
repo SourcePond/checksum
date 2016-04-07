@@ -14,7 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
 /**
- * Interface to check whether a {@link Digest} is cancelled.
+ * Interface to check whether a {@link UpdateStrategy} is cancelled.
  *
  */
 interface Cancellable {
