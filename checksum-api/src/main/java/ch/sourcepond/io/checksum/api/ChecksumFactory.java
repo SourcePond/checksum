@@ -47,8 +47,15 @@ public interface ChecksumFactory {
 	String SHA512 = "SHA-512";
 
 	/**
+	 * <p>
 	 * Creates a new {@link Checksum} instance. The necessary data is read from
 	 * the {@link InputStream} returned by {@link StreamSource#openStream()}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: the returned checksum is not updated yet. You need to call
+	 * {@link Checksum#update()} before its first usage.
+	 * </p>
 	 * 
 	 * @param pAlgorithm
 	 *            The algorithm to be used for checksum calculation, see
@@ -66,10 +73,17 @@ public interface ChecksumFactory {
 	Checksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
 
 	/**
+	 * <p>
 	 * Creates a new {@link Checksum} instance. The necessary data is read from
 	 * the path specified. If the path is a directory, any contained data file
 	 * will be digested. Sub-directories will be scanned recursively. If the
 	 * path is a regular file, its content will be digested.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: the returned checksum is not updated yet. You need to call
+	 * {@link Checksum#update()} before its first usage.
+	 * </p>
 	 * 
 	 * @param pAlgorithm
 	 *            The algorithm to be used for checksum calculation, see
@@ -87,8 +101,15 @@ public interface ChecksumFactory {
 	Checksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
 
 	/**
+	 * <p>
 	 * Creates a new {@link Checksum} instance. The necessary data is read from
 	 * the {@link URL} specified.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: the returned checksum is not updated yet. You need to call
+	 * {@link Checksum#update()} before its first usage.
+	 * </p>
 	 *
 	 * @param pAlgorithm
 	 *            The algorithm to be used for checksum calculation, see
