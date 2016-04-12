@@ -92,10 +92,11 @@ class DefaultChecksum implements Checksum, Runnable {
 	}
 
 	@Override
-	public void cancel() {
+	public Checksum cancel() {
 		lock.lock();
 		try {
 			digester.cancel();
+			return this;
 		} finally {
 			lock.unlock();
 		}

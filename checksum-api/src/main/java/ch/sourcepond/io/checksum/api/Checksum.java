@@ -29,8 +29,10 @@ public interface Checksum {
 	 * cancelled, and, this object will remain in the state before the
 	 * calculation has been started. If no calculation is running, nothing
 	 * happens.
+	 * 
+	 * @return Returns this checksum object, never {@code null}
 	 */
-	void cancel();
+	Checksum cancel();
 
 	/**
 	 * Updates this checksum. After the new checksum has been calculated, the
