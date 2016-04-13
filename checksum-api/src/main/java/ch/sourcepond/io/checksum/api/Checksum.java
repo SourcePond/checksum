@@ -50,6 +50,8 @@ public interface Checksum {
 	 */
 	Checksum update();
 
+	Checksum update(long pIntervalInMilliseconds);
+
 	Checksum update(TimeUnit pUnit, long pInterval);
 
 	/**

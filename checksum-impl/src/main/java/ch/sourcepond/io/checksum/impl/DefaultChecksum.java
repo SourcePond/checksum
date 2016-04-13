@@ -122,6 +122,11 @@ class DefaultChecksum implements Checksum, Runnable {
 	}
 
 	@Override
+	public Checksum update(final long pIntervalInMilliseconds) {
+		return update(MILLISECONDS, pIntervalInMilliseconds);
+	}
+
+	@Override
 	public Checksum update(final TimeUnit pUnit, final long pInterval) {
 		lock.lock();
 		try {
@@ -231,4 +236,5 @@ class DefaultChecksum implements Checksum, Runnable {
 			lock.unlock();
 		}
 	}
+
 }
