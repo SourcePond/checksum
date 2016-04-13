@@ -14,10 +14,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -55,9 +55,7 @@ public class DefaultChecksumTest {
 	}
 
 	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
-	private final Path path = mock(Path.class);
-	@SuppressWarnings("unchecked")
-	private final UpdateStrategy<Path> updater = mock(UpdateStrategy.class);
+	private final UpdateStrategy strategy = mock(UpdateStrategy.class);
 	private final ScheduledExecutorService delegate = newScheduledThreadPool(1);
 	private final Executor executor = new Executor() {
 
@@ -72,12 +70,11 @@ public class DefaultChecksumTest {
 	private static final String ANY_ALGORITHM = "anyAlgorith";
 	private static final String HEX_VALUE = "01030305";
 	private static final byte[] VALUE = new byte[] { 1, 3, 3, 5 };
-	private final DefaultChecksum checksum = new DefaultChecksum(updater, executor);
+	private final DefaultChecksum checksum = new DefaultChecksum(strategy, executor);
 
 	@Before
 	public void setup() throws Exception {
-		when(updater.getAlgorithm()).thenReturn(ANY_ALGORITHM);
-		when(updater.getSource()).thenReturn(path);
+		when(strategy.getAlgorithm()).thenReturn(ANY_ALGORITHM);
 	}
 
 	/**
@@ -104,7 +101,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyCopyArrayGetValue() throws Exception {
-		when(updater.update()).thenReturn(VALUE);
+		when(strategy.digest()).thenReturn(VALUE);
 		checksum.update();
 		final byte[] copy = checksum.getValue();
 		assertNotSame(VALUE, copy);
@@ -116,9 +113,9 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyCopyArrayGetPreviousValue() throws Exception {
-		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
-		checksum.update();
-		checksum.update();
+		when(strategy.digest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update().getValue();
+		checksum.update().getValue();
 		final byte[] copy = checksum.getPreviousValue();
 		assertNotSame(VALUE, copy);
 		assertArrayEquals(VALUE, copy);
@@ -137,8 +134,8 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyCancel() {
-		checksum.cancel();
-		assertTrue(updater.isCancelled());
+		assertSame(checksum, checksum.cancel());
+		verify(strategy).cancel();
 	}
 
 	/**
@@ -178,7 +175,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetHexValue() throws Exception {
-		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		when(strategy.digest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
 		checksum.update();
 		assertEquals(HEX_VALUE, checksum.getHexValue());
 		checksum.update();
@@ -190,9 +187,9 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetPreviousHexValue() throws Exception {
-		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
-		checksum.update();
-		checksum.update();
+		when(strategy.digest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update().getValue();
+		checksum.update().getValue();
 		assertEquals(HEX_VALUE, checksum.getPreviousHexValue());
 	}
 
@@ -201,7 +198,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyEqualsPrevious() throws Exception {
-		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE).thenReturn(VALUE).thenReturn(VALUE);
+		when(strategy.digest()).thenReturn(VALUE).thenReturn(SECOND_VALUE).thenReturn(VALUE).thenReturn(VALUE);
 		checksum.update();
 		assertFalse(checksum.equalsPrevious());
 		checksum.update();
@@ -217,7 +214,7 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetValue() throws Exception {
-		when(updater.update()).thenReturn(VALUE);
+		when(strategy.digest()).thenReturn(VALUE);
 		checksum.update();
 		assertArrayEquals(VALUE, checksum.getValue());
 	}
@@ -227,9 +224,9 @@ public class DefaultChecksumTest {
 	 */
 	@Test
 	public void verifyGetPreviousValue() throws Exception {
-		when(updater.update()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
-		checksum.update();
-		checksum.update();
+		when(strategy.digest()).thenReturn(VALUE).thenReturn(SECOND_VALUE);
+		checksum.update().getValue();
+		checksum.update().getValue();
 		assertArrayEquals(VALUE, checksum.getPreviousValue());
 	}
 
@@ -239,7 +236,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyGetValueIOExceptionOccurred() throws Exception {
 		final IOException expected = new IOException();
-		doThrow(expected).when(updater).update();
+		doThrow(expected).when(strategy).update();
 		checksum.update();
 
 		try {
@@ -256,7 +253,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyGetValueRuntimeExceptionOccurred() throws Exception {
 		final RuntimeException expected = new RuntimeException();
-		doThrow(expected).when(updater).update();
+		doThrow(expected).when(strategy).update();
 		checksum.update();
 
 		try {
@@ -273,7 +270,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyDoNotCatchError() throws Exception {
 		final Error expected = new Error();
-		doThrow(expected).when(updater).update();
+		doThrow(expected).when(strategy).update();
 		checksum.update();
 
 		try {

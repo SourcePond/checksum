@@ -37,7 +37,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	static final byte[] INITIAL = new byte[0];
 	private final Lock lock = new ReentrantLock();
 	private final Condition updateDone = lock.newCondition();
-	private final UpdateStrategy<?> strategy;
+	private final UpdateStrategy strategy;
 	private final Executor executor;
 	private int triggeredUpdates;
 	private Throwable throwable;
@@ -48,7 +48,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	 * @param pDigester
 	 * @param pExecutor
 	 */
-	DefaultChecksum(final UpdateStrategy<?> pDigester, final Executor pExecutor) {
+	DefaultChecksum(final UpdateStrategy pDigester, final Executor pExecutor) {
 		strategy = pDigester;
 		executor = pExecutor;
 	}
@@ -71,6 +71,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	 * @throws InterruptedException
 	 */
 	private void awaitCalculation() throws InterruptedException, ChecksumException {
+		final boolean needsDigest = triggeredUpdates > 0;
 		try {
 			while (triggeredUpdates > 0) {
 				updateDone.await();
@@ -88,6 +89,15 @@ class DefaultChecksum implements Checksum, Runnable {
 				throw new ChecksumException(throwable.getMessage(), throwable);
 			}
 			throw new Error(throwable.getMessage(), throwable);
+		}
+
+		if (needsDigest) {
+			// Finally, assign the new digester values if not cancelled
+			final byte[] newValue = strategy.digest();
+			if (newValue != null) {
+				previousValue = value;
+				value = newValue;
+			}
 		}
 	}
 
@@ -188,10 +198,9 @@ class DefaultChecksum implements Checksum, Runnable {
 	@Override
 	public void run() {
 		// Do the calculation outside the mutex
-		byte[] newValue = null;
 		Throwable th = null;
 		try {
-			newValue = strategy.update();
+			strategy.update();
 		} catch (final Throwable e) {
 			th = e;
 		}
@@ -201,10 +210,6 @@ class DefaultChecksum implements Checksum, Runnable {
 		try {
 			if (th != null) {
 				throwable = th;
-			}
-			if (newValue != null) {
-				previousValue = value;
-				value = newValue;
 			}
 		} finally {
 			if (--triggeredUpdates == 1) {

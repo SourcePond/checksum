@@ -28,7 +28,6 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -36,7 +35,7 @@ import java.security.NoSuchAlgorithmException;
  * (except of {@link #cancel()}).
  *
  */
-class PathUpdateStrategy extends UpdateStrategy<Path> {
+class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	/**
 	 * Visitor to scan a directory structure for files to be digested.
 	 */
@@ -50,7 +49,7 @@ class PathUpdateStrategy extends UpdateStrategy<Path> {
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 			if (!isCancelled()) {
-				performUpdate(tempDigest, PathUpdateStrategy.this, file, tempBuffer);
+				performUpdate(getTmpDigest(), PathUpdateStrategy.this, file, tempBuffer);
 				return super.visitFile(file, attrs);
 			}
 			return TERMINATE;
@@ -64,14 +63,13 @@ class PathUpdateStrategy extends UpdateStrategy<Path> {
 	// These fields will be initialized when an update is performed. After the
 	// update they will be set to null.
 	private ByteBuffer tempBuffer;
-	private MessageDigest tempDigest;
 
 	/**
 	 * @param pBuffers
 	 * @param pDigest
 	 * @throws NoSuchAlgorithmException
 	 */
-	PathUpdateStrategy(final String pAlgorithm, final Path pPath) {
+	PathUpdateStrategy(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
 		super(pAlgorithm, pPath);
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}
@@ -81,11 +79,7 @@ class PathUpdateStrategy extends UpdateStrategy<Path> {
 	 * @throws IOException
 	 */
 	@Override
-	protected byte[] doUpdate() throws IOException {
-		// Initialize the temporary hard reference to the digester; this must be
-		// set to null after the update has been performed.
-		tempDigest = getDigest();
-
+	protected void doUpdate() throws IOException {
 		// Initialize the temporary hard reference to the tempBuffer; this must
 		// be set to null after the update has been performed.
 		tempBuffer = bufferRef.get();
@@ -98,16 +92,9 @@ class PathUpdateStrategy extends UpdateStrategy<Path> {
 			if (isDirectory(getSource())) {
 				walkFileTree(getSource(), visitor);
 			} else {
-				performUpdate(tempDigest, this, getSource(), tempBuffer);
+				performUpdate(getTmpDigest(), this, getSource(), tempBuffer);
 			}
-
-			byte[] res = null;
-			if (!isCancelled()) {
-				res = tempDigest.digest();
-			}
-			return res;
 		} finally {
-			tempDigest = null;
 			tempBuffer = null;
 		}
 	}

@@ -19,26 +19,22 @@ import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author rolandhauser
  *
  */
-public class PathUpdateStrategyTest {
+public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStrategy> {
 	public static final String EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
 	private static final String ALGORITHM = "SHA-256";
 	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", "first_content.txt");
-	private PathUpdateStrategy strategy;
 
-	/**
-	 * 
-	 */
-	@Before
-	public void setup() throws Exception {
-		strategy = new PathUpdateStrategy(ALGORITHM, file);
+	@Override
+	protected PathUpdateStrategy newStrategy() throws NoSuchAlgorithmException {
+		return new PathUpdateStrategy(ALGORITHM, file);
 	}
 
 	/**
@@ -46,7 +42,8 @@ public class PathUpdateStrategyTest {
 	 */
 	@Test
 	public void verifyUpdateDigest() throws Exception {
-		final byte[] result = strategy.update();
+		strategy.update();
+		final byte[] result = strategy.digest();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
 
@@ -61,7 +58,8 @@ public class PathUpdateStrategyTest {
 
 		// This should not cause an exception; weak-references are initialized
 		// with new values.
-		final byte[] result = strategy.update();
+		strategy.update();
+		final byte[] result = strategy.digest();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
 }

@@ -15,29 +15,39 @@ package ch.sourcepond.io.checksum.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
+import java.security.NoSuchAlgorithmException;
+
+import org.junit.Before;
 import org.junit.Test;
-
-import ch.sourcepond.io.checksum.impl.UpdateStrategy;
 
 /**
  * @author rolandhauser
  *
  */
-public class UpdateStrategyTest {
-	@SuppressWarnings("unchecked")
-	private final UpdateStrategy<Object> digest = mock(UpdateStrategy.class);
+public abstract class BaseUpdateStrategyTest<T extends BaseUpdateStrategy<?>> {
+	protected T strategy;
+
+	protected abstract T newStrategy() throws NoSuchAlgorithmException;
+
+	/**
+	 * @throws NoSuchAlgorithmException
+	 * 
+	 */
+	@Before
+	public void setup() throws NoSuchAlgorithmException {
+		strategy = newStrategy();
+	}
 
 	/**
 	 * 
 	 */
 	@Test
-	public void verifyCancel() {
-		assertFalse(digest.isCancelled());
-		digest.cancel();
-		assertTrue(digest.isCancelled());
-		digest.setCancelled(false);
-		assertFalse(digest.isCancelled());
+	public void verifyCancel() throws Exception {
+		assertFalse(strategy.isCancelled());
+		strategy.cancel();
+		assertTrue(strategy.isCancelled());
+		strategy.update();
+		assertFalse(strategy.isCancelled());
 	}
 }

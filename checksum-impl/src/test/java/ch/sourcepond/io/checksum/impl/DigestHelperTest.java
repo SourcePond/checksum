@@ -20,7 +20,6 @@ import static java.lang.Thread.sleep;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -94,7 +93,7 @@ public class DigestHelperTest {
 	@Test(timeout = 1000)
 	public void verifyCancelDuringPerform() throws Exception {
 		srv.schedule(cancelTask, 500, MILLISECONDS);
-		assertNull(perform(digest, cancellable, in));
+		perform(digest, cancellable, in);
 	}
 
 	@SuppressWarnings("serial")

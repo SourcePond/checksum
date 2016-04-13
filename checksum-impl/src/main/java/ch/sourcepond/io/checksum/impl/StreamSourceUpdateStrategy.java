@@ -16,6 +16,7 @@ package ch.sourcepond.io.checksum.impl;
 import static ch.sourcepond.io.checksum.impl.DigestHelper.perform;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
 
@@ -23,15 +24,15 @@ import ch.sourcepond.io.checksum.api.StreamSource;
  * @author rolandhauser
  *
  */
-final class StreamSourceUpdateStrategy extends UpdateStrategy<StreamSource> {
+final class StreamSourceUpdateStrategy extends BaseUpdateStrategy<StreamSource> {
 
-	StreamSourceUpdateStrategy(final String pAlgorithm, final StreamSource pSource) {
+	StreamSourceUpdateStrategy(final String pAlgorithm, final StreamSource pSource) throws NoSuchAlgorithmException {
 		super(pAlgorithm, pSource);
 	}
 
 	@Override
-	protected byte[] doUpdate() throws IOException {
-		return perform(getDigest(), this, getSource().openStream());
+	protected void doUpdate() throws IOException {
+		perform(getTmpDigest(), this, getSource().openStream());
 	}
 
 }

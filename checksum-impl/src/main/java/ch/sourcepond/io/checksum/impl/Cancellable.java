@@ -15,7 +15,7 @@ package ch.sourcepond.io.checksum.impl;
 
 /**
  * Callback interface to check whether a user has requested to cancel an ongoing
- * update performed through an {@link UpdateStrategy}.
+ * update performed through an {@link BaseUpdateStrategy}.
  *
  */
 interface Cancellable {

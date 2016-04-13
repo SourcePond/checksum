@@ -14,6 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
 
@@ -29,7 +30,7 @@ public class UpdateStrategyFactory {
 	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newPathDigest(java.
 	 * lang.String, java.nio.file.Path)
 	 */
-	public UpdateStrategy<Path> newStrategy(final String pAlgorithm, final Path pPath) {
+	public UpdateStrategy newStrategy(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
 		return new PathUpdateStrategy(pAlgorithm, pPath);
 	}
 
@@ -40,7 +41,8 @@ public class UpdateStrategyFactory {
 	 * ch.sourcepond.io.checksum.impl.digest.DigestFactory#newUrlDigest(java.
 	 * lang.String, java.net.URL)
 	 */
-	public UpdateStrategy<StreamSource> newStrategy(final String pAlgorithm, final StreamSource pSource) {
+	public UpdateStrategy newStrategy(final String pAlgorithm, final StreamSource pSource)
+			throws NoSuchAlgorithmException {
 		return new StreamSourceUpdateStrategy(pAlgorithm, pSource);
 	}
 }
