@@ -53,7 +53,7 @@ final class DigestHelper {
 	 * @throws IOException
 	 *             Thrown, if an exception occurred while reading the data.
 	 */
-	public static void perform(final MessageDigest pDigest, final Cancellable pCancellable, final InputStream pSource)
+	public static void performUpdate(final MessageDigest pDigest, final Cancellable pCancellable, final InputStream pSource)
 			throws IOException {
 		try (final DigestInputStream din = new DigestInputStream(pSource, pDigest)) {
 			final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];

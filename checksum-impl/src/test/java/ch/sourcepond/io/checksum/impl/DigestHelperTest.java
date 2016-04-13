@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.DigestHelper.perform;
+import static ch.sourcepond.io.checksum.impl.DigestHelper.performUpdate;
 import static ch.sourcepond.io.checksum.impl.DigestHelper.performUpdate;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Thread.sleep;
@@ -93,7 +93,7 @@ public class DigestHelperTest {
 	@Test(timeout = 1000)
 	public void verifyCancelDuringPerform() throws Exception {
 		srv.schedule(cancelTask, 500, MILLISECONDS);
-		perform(digest, cancellable, in);
+		performUpdate(digest, cancellable, in);
 	}
 
 	@SuppressWarnings("serial")

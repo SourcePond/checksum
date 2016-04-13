@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.DigestHelper.perform;
+import static ch.sourcepond.io.checksum.impl.DigestHelper.performUpdate;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -32,7 +32,7 @@ final class StreamSourceUpdateStrategy extends BaseUpdateStrategy<StreamSource> 
 
 	@Override
 	protected void doUpdate() throws IOException {
-		perform(getTmpDigest(), this, getSource().openStream());
+		performUpdate(getTmpDigest(), this, getSource().openStream());
 	}
 
 }
