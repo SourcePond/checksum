@@ -20,7 +20,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.sourcepond.io</groupId>
 	<artifactId>checksum-api</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<inceptionYear>2015</inceptionYear>
 	<packaging>bundle</packaging>
 	<description>
