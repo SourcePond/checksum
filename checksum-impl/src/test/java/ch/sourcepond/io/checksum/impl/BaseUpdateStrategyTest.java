@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -47,7 +48,7 @@ public abstract class BaseUpdateStrategyTest<T extends BaseUpdateStrategy<?>> {
 		assertFalse(strategy.isCancelled());
 		strategy.cancel();
 		assertTrue(strategy.isCancelled());
-		strategy.update();
+		strategy.update(0, MILLISECONDS);
 		assertFalse(strategy.isCancelled());
 	}
 }

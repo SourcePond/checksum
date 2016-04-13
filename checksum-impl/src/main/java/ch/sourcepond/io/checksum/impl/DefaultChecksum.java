@@ -15,11 +15,13 @@ package ch.sourcepond.io.checksum.impl;
 
 import static java.lang.System.arraycopy;
 import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -43,6 +45,8 @@ class DefaultChecksum implements Checksum, Runnable {
 	private Throwable throwable;
 	private byte[] previousValue = INITIAL;
 	private byte[] value = INITIAL;
+	private volatile long interval;
+	private volatile TimeUnit unit;
 
 	/**
 	 * @param pDigester
@@ -114,9 +118,16 @@ class DefaultChecksum implements Checksum, Runnable {
 
 	@Override
 	public Checksum update() {
+		return update(MILLISECONDS, 0);
+	}
+
+	@Override
+	public Checksum update(final TimeUnit pUnit, final long pInterval) {
 		lock.lock();
 		try {
 			if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
+				interval = pInterval;
+				unit = pUnit;
 				executor.execute(this);
 			}
 			return this;
@@ -200,7 +211,7 @@ class DefaultChecksum implements Checksum, Runnable {
 		// Do the calculation outside the mutex
 		Throwable th = null;
 		try {
-			strategy.update();
+			strategy.update(interval, unit);
 		} catch (final Throwable e) {
 			th = e;
 		}

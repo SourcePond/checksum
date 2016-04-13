@@ -4,6 +4,7 @@ import static ch.sourcepond.io.checksum.impl.DefaultChecksum.INITIAL;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -236,7 +237,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyGetValueIOExceptionOccurred() throws Exception {
 		final IOException expected = new IOException();
-		doThrow(expected).when(strategy).update();
+		doThrow(expected).when(strategy).update(0, MILLISECONDS);
 		checksum.update();
 
 		try {
@@ -253,7 +254,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyGetValueRuntimeExceptionOccurred() throws Exception {
 		final RuntimeException expected = new RuntimeException();
-		doThrow(expected).when(strategy).update();
+		doThrow(expected).when(strategy).update(0, MILLISECONDS);
 		checksum.update();
 
 		try {
@@ -270,7 +271,7 @@ public class DefaultChecksumTest {
 	@Test
 	public void verifyDoNotCatchError() throws Exception {
 		final Error expected = new Error();
-		doThrow(expected).when(strategy).update();
+		doThrow(expected).when(strategy).update(0, MILLISECONDS);
 		checksum.update();
 
 		try {

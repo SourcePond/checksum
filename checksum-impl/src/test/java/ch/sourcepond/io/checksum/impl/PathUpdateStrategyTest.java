@@ -14,6 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
 import static java.nio.file.FileSystems.getDefault;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStr
 	 */
 	@Test
 	public void verifyUpdateDigest() throws Exception {
-		strategy.update();
+		strategy.update(0, MILLISECONDS);
 		final byte[] result = strategy.digest();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}
@@ -58,7 +59,7 @@ public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStr
 
 		// This should not cause an exception; weak-references are initialized
 		// with new values.
-		strategy.update();
+		strategy.update(0, MILLISECONDS);
 		final byte[] result = strategy.digest();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
 	}

@@ -13,18 +13,34 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import static java.lang.Thread.currentThread;
 import static java.security.MessageDigest.getInstance;
 import static org.apache.commons.lang3.Validate.notNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
 
 /**
  * 
  */
 abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
+	private static final Logger LOG = getLogger(BaseUpdateStrategy.class);
+	/**
+	 * 
+	 */
+	static final int DEFAULT_BUFFER_SIZE = 8192;
+	static final int EOF = -1;
+	private final Lock lock = new ReentrantLock();
+	private final Condition waitCondition = lock.newCondition();
 	private final String algorithm;
 	private final T source;
 	private volatile boolean cancelled;
@@ -45,6 +61,28 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		return tmpDigest;
 	}
 
+	/**
+	 * @param pInterval
+	 * @param pUnit
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	protected final void wait(final long pInterval, final TimeUnit pUnit) throws IOException {
+		if (isCancelled()) {
+			LOG.debug("Checksum calculation cancelled by user.");
+		} else if (pInterval > 0) {
+			lock.lock();
+			try {
+				waitCondition.await(pInterval, pUnit);
+			} catch (final InterruptedException e) {
+				currentThread().interrupt();
+				throw new IOException(e.getMessage(), e);
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+
 	private MessageDigest getWeakDigest() {
 		// Initialize the temporary hard reference to the digester; this must be
 		// set to null after the update has been performed.
@@ -61,10 +99,10 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		return tempDigest;
 	}
 
-	protected abstract void doUpdate() throws IOException;
+	protected abstract void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException;
 
 	@Override
-	public final void update() throws IOException {
+	public final void update(final long pInterval, final TimeUnit pUnit) throws IOException {
 		try {
 			// Initialize the temporary hard reference to the digester; this
 			// must be
@@ -72,7 +110,7 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 			if (tmpDigest == null) {
 				tmpDigest = getWeakDigest();
 			}
-			doUpdate();
+			doUpdate(pInterval, pUnit);
 		} finally {
 			if (cancelled) {
 				cancelled = false;

@@ -13,22 +13,30 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import static ch.sourcepond.io.checksum.impl.DigestHelper.DEFAULT_BUFFER_SIZE;
-import static ch.sourcepond.io.checksum.impl.DigestHelper.performUpdate;
+import static java.lang.Long.MAX_VALUE;
 import static java.nio.ByteBuffer.allocateDirect;
+import static java.nio.channels.FileChannel.open;
 import static java.nio.file.FileVisitResult.TERMINATE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
+import static java.nio.file.StandardOpenOption.READ;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is <em>not</em> thread-safe and must by synchronized externally
@@ -49,12 +57,14 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 			if (!isCancelled()) {
-				performUpdate(getTmpDigest(), PathUpdateStrategy.this, file, tempBuffer);
+				performUpdate(tempBuffer, 0l, MILLISECONDS);
 				return super.visitFile(file, attrs);
 			}
 			return TERMINATE;
 		}
 	};
+
+	private static final Logger LOG = LoggerFactory.getLogger(PathUpdateStrategy.class);
 
 	// To safe as much system resources as possible, we do not hold hard
 	// references to the tempBuffer.
@@ -74,12 +84,44 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}
 
+	private void performUpdate(final ByteBuffer buffer, final long pInterval, final TimeUnit pUnit) throws IOException {
+		try (final FileChannel ch = open(getSource(), READ)) {
+			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
+			try {
+				final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
+				int read = ch.read(buffer);
+				while (!isCancelled()) {
+					if (read == EOF) {
+						wait(pInterval, pUnit);
+						read = ch.read(buffer);
+						if (read == EOF) {
+							break;
+						}
+					}
+
+					buffer.flip();
+					buffer.get(tmp, 0, read);
+					getTmpDigest().update(tmp, 0, read);
+					buffer.clear();
+					read = ch.read(buffer);
+				}
+
+				if (isCancelled()) {
+					LOG.debug("Checksum calculation cancelled by user.");
+				}
+			} finally {
+				fl.release();
+			}
+		}
+	}
+
 	/**
 	 * @param pChannel
 	 * @throws IOException
+	 * @throws InterruptedException
 	 */
 	@Override
-	protected void doUpdate() throws IOException {
+	protected void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException {
 		// Initialize the temporary hard reference to the tempBuffer; this must
 		// be set to null after the update has been performed.
 		tempBuffer = bufferRef.get();
@@ -92,7 +134,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 			if (isDirectory(getSource())) {
 				walkFileTree(getSource(), visitor);
 			} else {
-				performUpdate(getTmpDigest(), this, getSource(), tempBuffer);
+				performUpdate(tempBuffer, pInterval, pUnit);
 			}
 		} finally {
 			tempBuffer = null;

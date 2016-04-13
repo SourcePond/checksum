@@ -15,6 +15,7 @@ package ch.sourcepond.io.checksum.api;
 
 import java.security.MessageDigest;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstracts a checksum based on a specific hashing algorithm (see
@@ -48,6 +49,8 @@ public interface Checksum {
 	 *             submitted.
 	 */
 	Checksum update();
+
+	Checksum update(TimeUnit pUnit, long pInterval);
 
 	/**
 	 * Checks whether an update is currently running (started through
