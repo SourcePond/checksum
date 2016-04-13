@@ -37,7 +37,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	static final byte[] INITIAL = new byte[0];
 	private final Lock lock = new ReentrantLock();
 	private final Condition updateDone = lock.newCondition();
-	private final UpdateStrategy<?> digester;
+	private final UpdateStrategy<?> strategy;
 	private final Executor executor;
 	private int triggeredUpdates;
 	private Throwable throwable;
@@ -49,7 +49,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	 * @param pExecutor
 	 */
 	DefaultChecksum(final UpdateStrategy<?> pDigester, final Executor pExecutor) {
-		digester = pDigester;
+		strategy = pDigester;
 		executor = pExecutor;
 	}
 
@@ -95,7 +95,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	public Checksum cancel() {
 		lock.lock();
 		try {
-			digester.cancel();
+			strategy.cancel();
 			return this;
 		} finally {
 			lock.unlock();
@@ -127,7 +127,7 @@ class DefaultChecksum implements Checksum, Runnable {
 
 	@Override
 	public String getAlgorithm() {
-		return digester.getAlgorithm();
+		return strategy.getAlgorithm();
 	}
 
 	@Override
@@ -191,7 +191,7 @@ class DefaultChecksum implements Checksum, Runnable {
 		byte[] newValue = null;
 		Throwable th = null;
 		try {
-			newValue = digester.update();
+			newValue = strategy.update();
 		} catch (final Throwable e) {
 			th = e;
 		}
