@@ -13,8 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import static java.lang.System.identityHashCode;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.security.NoSuchAlgorithmException;
@@ -36,7 +39,7 @@ public abstract class BaseUpdateStrategyTest<T extends BaseUpdateStrategy<?>> {
 	 * 
 	 */
 	@Before
-	public void setup() throws NoSuchAlgorithmException {
+	public void setup() throws Exception {
 		strategy = newStrategy();
 	}
 
@@ -50,5 +53,21 @@ public abstract class BaseUpdateStrategyTest<T extends BaseUpdateStrategy<?>> {
 		assertTrue(strategy.isCancelled());
 		strategy.update(0, MILLISECONDS);
 		assertFalse(strategy.isCancelled());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void digest_NoUpdateStarted() {
+		strategy.digest();
+	}
+
+	@Test
+	public void verifyNewDigesterAfterGC() throws Exception {
+		strategy.update(0, MILLISECONDS);
+		final long digest = identityHashCode(strategy.getTmpDigest());
+		strategy.digest();
+		assertNull(strategy.getTmpDigest());
+		System.gc();
+		strategy.update(0, MILLISECONDS);
+		assertNotEquals(digest, identityHashCode(strategy.getTmpDigest()));
 	}
 }

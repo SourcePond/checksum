@@ -121,16 +121,16 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	@Override
 	public final byte[] digest() {
 		byte[] digest = null;
-		if (!cancelled) {
-			notNull(tmpDigest, "tmpDigest digest is null");
-			try {
+		try {
+			if (!cancelled) {
+				notNull(tmpDigest, "tmpDigest digest is null");
 				digest = tmpDigest.digest();
-			} finally {
-				// This is important; we need to clear the hard-reference to the
-				// digest. Otherwise it would not make any sense to hold a
-				// WeakReference ;-)
-				tmpDigest = null;
 			}
+		} finally {
+			// This is important; we need to clear the hard-reference to the
+			// digest. Otherwise it would not make any sense to hold a
+			// WeakReference ;-)
+			tmpDigest = null;
 		}
 		return digest;
 	}
@@ -139,8 +139,12 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		return source;
 	}
 
-	@Override
-	public final boolean isCancelled() {
+	/**
+	 * Checks, whether a user has requested to cancel to current update.
+	 * 
+	 * @return {@code true} if cancelled, {@code false} otherwise.
+	 */
+	protected final boolean isCancelled() {
 		return cancelled;
 	}
 
@@ -152,6 +156,7 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		// Important: clear the hard-reference to the digest object (if not
 		// already done).
 		if (tmpDigest != null) {
+			tmpDigest.reset();
 			tmpDigest = null;
 		}
 	}

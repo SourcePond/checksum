@@ -36,12 +36,7 @@ public interface Checksum {
 	Checksum cancel();
 
 	/**
-	 * Updates this checksum. After the new checksum has been calculated, the
-	 * old checksum will be saved and can later be accessed through
-	 * {@link #getPreviousValue()} or {@link #getPreviousHexValue()}. The newly
-	 * calculated checksum can be accessed through {@link #getValue()} or
-	 * {@link #getHexValue()}. If an update is already running, then nothing
-	 * happens.
+	 * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
 	 * 
 	 * @return Returns this checksum object, never {@code null}
 	 * @throws RejectedExecutionException
@@ -50,9 +45,48 @@ public interface Checksum {
 	 */
 	Checksum update();
 
+	/**
+	 * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
+	 * 
+	 * @param pIntervalInMilliseconds
+	 *            Time to wait in milliseconds.
+	 * @return Returns this checksum object, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
+	 */
 	Checksum update(long pIntervalInMilliseconds);
 
-	Checksum update(TimeUnit pUnit, long pInterval);
+	/**
+	 * <p>
+	 * Updates this checksum in a non-blocking manner. After the new checksum
+	 * has been calculated, the old checksum will be saved and can later be
+	 * accessed through {@link #getPreviousValue()} or
+	 * {@link #getPreviousHexValue()}. The newly calculated checksum can be
+	 * accessed through {@link #getValue()} or {@link #getHexValue()}. If an
+	 * update is already running, then nothing happens.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the end of the data-source has been reached, the update process waits
+	 * until the interval specified elapses. If more data is available, the
+	 * data-source will not be closed and the newly available data will be
+	 * digested. This happens until no more data can be read i.e. the interval
+	 * elapses and no more data is available.
+	 * </p>
+	 * 
+	 * @param pInterval
+	 *            Time to wait until the data-source should be closed when
+	 *            currently no more data is available. Must not be negative, 0
+	 *            indicates no wait.
+	 * @param pUnit
+	 *            Time-unit of the interval specified.
+	 * @return Returns this checksum object, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
+	 */
+	Checksum update(long pInterval, TimeUnit pUnit);
 
 	/**
 	 * Checks whether an update is currently running (started through

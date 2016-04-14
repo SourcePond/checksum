@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
  * @author rolandhauser
  *
  */
-interface UpdateStrategy extends Cancellable {
+interface UpdateStrategy {
 
 	byte[] digest();
 

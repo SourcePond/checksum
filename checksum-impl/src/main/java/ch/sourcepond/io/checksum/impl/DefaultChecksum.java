@@ -118,16 +118,16 @@ class DefaultChecksum implements Checksum, Runnable {
 
 	@Override
 	public Checksum update() {
-		return update(MILLISECONDS, 0);
+		return update(0, MILLISECONDS);
 	}
 
 	@Override
 	public Checksum update(final long pIntervalInMilliseconds) {
-		return update(MILLISECONDS, pIntervalInMilliseconds);
+		return update(pIntervalInMilliseconds, MILLISECONDS);
 	}
 
 	@Override
-	public Checksum update(final TimeUnit pUnit, final long pInterval) {
+	public Checksum update(final long pInterval, final TimeUnit pUnit) {
 		lock.lock();
 		try {
 			if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
