@@ -57,7 +57,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 			if (!isCancelled()) {
-				performUpdate(tempBuffer, 0l, MILLISECONDS);
+				performUpdate(file, tempBuffer, 0l, MILLISECONDS);
 				return super.visitFile(file, attrs);
 			}
 			return TERMINATE;
@@ -84,8 +84,9 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}
 
-	private void performUpdate(final ByteBuffer buffer, final long pInterval, final TimeUnit pUnit) throws IOException {
-		try (final FileChannel ch = open(getSource(), READ)) {
+	private void performUpdate(final Path pFile, final ByteBuffer buffer, final long pInterval, final TimeUnit pUnit)
+			throws IOException {
+		try (final FileChannel ch = open(pFile, READ)) {
 			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
 			try {
 				final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
@@ -134,7 +135,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 			if (isDirectory(getSource())) {
 				walkFileTree(getSource(), visitor);
 			} else {
-				performUpdate(tempBuffer, pInterval, pUnit);
+				performUpdate(getSource(), tempBuffer, pInterval, pUnit);
 			}
 		} finally {
 			tempBuffer = null;
