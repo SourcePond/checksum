@@ -13,21 +13,32 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import static ch.sourcepond.io.checksum.impl.ObserverCallback.CANCELLED;
+import static ch.sourcepond.io.checksum.impl.ObserverCallback.FAILURE;
+import static ch.sourcepond.io.checksum.impl.ObserverCallback.SUCCESS;
+import static java.lang.String.format;
 import static java.lang.System.arraycopy;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.slf4j.Logger;
+
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.ChecksumException;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
+import ch.sourcepond.io.checksum.api.UpdateableChecksum;
 
 /**
  * Default implementation of the {@link Checksum} interface.
@@ -35,18 +46,61 @@ import ch.sourcepond.io.checksum.api.ChecksumException;
  * @author rolandhauser
  *
  */
-class DefaultChecksum implements Checksum, Runnable {
+class DefaultChecksum implements UpdateableChecksum {
+
+	/**
+	 *
+	 */
+	private class UpdateTask implements Runnable {
+		private final long interval;
+		private final TimeUnit unit;
+
+		public UpdateTask(final long pInterval, final TimeUnit pUnit) {
+			interval = pInterval;
+			unit = pUnit;
+		}
+
+		@Override
+		public void run() {
+			// Do the calculation outside the mutex
+			Throwable th = null;
+			try {
+				strategy.update(interval, unit);
+			} catch (final Throwable e) {
+				th = e;
+			}
+
+			// Do any assignment inside the mutex
+			updateLock.lock();
+			try {
+				if (th != null) {
+					throwable = th;
+				}
+			} finally {
+				try {
+					if (--triggeredUpdates == 1) {
+						executor.execute(this);
+					}
+				} finally {
+					updateDone.signalAll();
+					updateLock.unlock();
+				}
+			}
+		}
+	}
+
+	private static final Logger LOG = getLogger(DefaultChecksum.class);
 	static final byte[] INITIAL = new byte[0];
-	private final Lock lock = new ReentrantLock();
-	private final Condition updateDone = lock.newCondition();
+	private final Lock observerLock = new ReentrantLock();
+	private final Lock updateLock = new ReentrantLock();
+	private final Condition updateDone = updateLock.newCondition();
+	private final Set<UpdateObserver> observers = new HashSet<>();
 	private final UpdateStrategy strategy;
 	private final Executor executor;
 	private int triggeredUpdates;
 	private Throwable throwable;
 	private byte[] previousValue = INITIAL;
 	private byte[] value = INITIAL;
-	private volatile long interval;
-	private volatile TimeUnit unit;
 
 	/**
 	 * @param pDigester
@@ -74,7 +128,7 @@ class DefaultChecksum implements Checksum, Runnable {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private void awaitCalculation() throws InterruptedException, ChecksumException {
+	private void awaitCalculation() throws ChecksumException {
 		final boolean needsDigest = triggeredUpdates > 0;
 		try {
 			while (triggeredUpdates > 0) {
@@ -82,37 +136,59 @@ class DefaultChecksum implements Checksum, Runnable {
 			}
 		} catch (final InterruptedException e) {
 			currentThread().interrupt();
-			throw e;
+			throw new ChecksumException(e.getMessage(), e);
 		}
 
 		if (throwable != null) {
-
-			// Only throw an ordinary throwable if the caught throwable is NOT
-			// an error.
+			// Only throw an ordinary throwable if the caught throwable is
+			// NOT an error.
 			if (!(throwable instanceof Error)) {
-				throw new ChecksumException(throwable.getMessage(), throwable);
+				final ChecksumException ex = new ChecksumException(throwable.getMessage(), throwable);
+				informObservers(FAILURE, ex);
+				throw ex;
 			}
 			throw new Error(throwable.getMessage(), throwable);
-		}
-
-		if (needsDigest) {
+		} else if (needsDigest) {
 			// Finally, assign the new digester values if not cancelled
 			final byte[] newValue = strategy.digest();
 			if (newValue != null) {
 				previousValue = value;
 				value = newValue;
+				informObservers(SUCCESS);
+			} else {
+				informObservers(CANCELLED);
 			}
+		}
+	}
+
+	private void informObservers(final ObserverCallback pCallback) {
+		informObservers(pCallback, null);
+	}
+
+	private void informObservers(final ObserverCallback pCallback, final ChecksumException pFailureOrNull) {
+		observerLock.lock();
+		try {
+			for (final UpdateObserver observer : observers) {
+				try {
+					pCallback.inform(observer, this, pFailureOrNull);
+				} catch (final Exception th) {
+					LOG.warn(format("Listener %s has thrown an exception! See stacktrace"), th);
+				}
+			}
+		} finally {
+			throwable = null;
+			observerLock.unlock();
 		}
 	}
 
 	@Override
 	public Checksum cancel() {
-		lock.lock();
+		updateLock.lock();
 		try {
 			strategy.cancel();
 			return this;
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
@@ -128,26 +204,34 @@ class DefaultChecksum implements Checksum, Runnable {
 
 	@Override
 	public Checksum update(final long pInterval, final TimeUnit pUnit) {
-		lock.lock();
+		updateLock.lock();
 		try {
-			if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
-				interval = pInterval;
-				unit = pUnit;
-				executor.execute(this);
+			if (observerLock.tryLock()) {
+				try {
+					if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
+						executor.execute(new UpdateTask(pInterval, pUnit));
+					}
+					return this;
+				} finally {
+					observerLock.unlock();
+				}
+			} else {
+				// This could happen if somewhere in an UpdateObserver update on
+				// this object is called
+				throw new IllegalStateException("Observer-lock is already held by another thread!");
 			}
-			return this;
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public boolean isUpdating() {
-		lock.lock();
+		updateLock.lock();
 		try {
 			return triggeredUpdates > 0;
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
@@ -157,83 +241,79 @@ class DefaultChecksum implements Checksum, Runnable {
 	}
 
 	@Override
-	public byte[] getValue() throws InterruptedException, ChecksumException {
-		lock.lock();
+	public byte[] getValue() throws ChecksumException {
+		updateLock.lock();
 		try {
 			awaitCalculation();
 			return copyArray(value);
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
 	@Override
-	public String getHexValue() throws InterruptedException, ChecksumException {
-		lock.lock();
+	public String getHexValue() throws ChecksumException {
+		updateLock.lock();
 		try {
 			awaitCalculation();
 			return encodeHexString(value);
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
 	@Override
-	public boolean equalsPrevious() throws InterruptedException, ChecksumException {
-		lock.lock();
+	public boolean equalsPrevious() throws ChecksumException {
+		updateLock.lock();
 		try {
 			awaitCalculation();
 			return Arrays.equals(previousValue, value);
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
 	@Override
-	public byte[] getPreviousValue() throws InterruptedException, ChecksumException {
-		lock.lock();
+	public byte[] getPreviousValue() throws ChecksumException {
+		updateLock.lock();
 		try {
 			awaitCalculation();
 			return copyArray(previousValue);
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
 	@Override
-	public String getPreviousHexValue() throws InterruptedException, ChecksumException {
-		lock.lock();
+	public String getPreviousHexValue() throws ChecksumException {
+		updateLock.lock();
 		try {
 			awaitCalculation();
 			return encodeHexString(previousValue);
 		} finally {
-			lock.unlock();
+			updateLock.unlock();
 		}
 	}
 
 	@Override
-	public void run() {
-		// Do the calculation outside the mutex
-		Throwable th = null;
+	public void addUpdateObserver(final UpdateObserver pObserver) {
+		updateLock.lock();
 		try {
-			strategy.update(interval, unit);
-		} catch (final Throwable e) {
-			th = e;
-		}
-
-		// Do any assignment inside the mutex
-		lock.lock();
-		try {
-			if (th != null) {
-				throwable = th;
-			}
+			observers.add(pObserver);
+			LOG.debug("Added observer {}", pObserver);
 		} finally {
-			if (--triggeredUpdates == 1) {
-				executor.execute(this);
-			}
+			updateLock.unlock();
+		}
+	}
 
-			updateDone.signalAll();
-			lock.unlock();
+	@Override
+	public void removeUpdateObserver(final UpdateObserver pObserver) {
+		updateLock.lock();
+		try {
+			observers.remove(pObserver);
+			LOG.debug("Removed observer {}", pObserver);
+		} finally {
+			updateLock.unlock();
 		}
 	}
 

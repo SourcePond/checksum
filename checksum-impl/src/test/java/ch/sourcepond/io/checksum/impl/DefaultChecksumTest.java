@@ -64,7 +64,7 @@ public class DefaultChecksumTest {
 		public void execute(final Runnable command) {
 			// This should cause the checksum methods to wait until update is
 			// done.
-			delegate.schedule(checksum, 500, TimeUnit.MILLISECONDS);
+			delegate.schedule(command, 500, TimeUnit.MILLISECONDS);
 		}
 	};
 
@@ -293,6 +293,6 @@ public class DefaultChecksumTest {
 		th.join();
 
 		assertFalse("Exception expected", r.fail);
-		assertEquals(InterruptedException.class, r.exception.getClass());
+		assertEquals(InterruptedException.class, r.exception.getCause().getClass());
 	}
 }

@@ -27,24 +27,81 @@ import java.util.concurrent.RejectedExecutionException;
 public interface ChecksumFactory {
 
 	/**
-	 * Constant for MD5 algorithm.
+	 * <p>
+	 * Creates a new {@link Checksum} instance. The necessary data is read from
+	 * the {@link InputStream} returned by {@link StreamSource#openStream()}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: the returned checksum is not updated yet. You need to call one of
+	 * the {@code update} methods on {@link UpdateableChecksum} before its first
+	 * usage.
+	 * </p>
+	 * 
+	 * @param pAlgorithm
+	 *            The algorithm to be used for checksum calculation, see
+	 *            {@link Checksum#getAlgorithm()}
+	 * @param pSource
+	 *            The source where to read the data to be digested from, must
+	 *            not be {@code null}.
+	 * @return New {@link Checksum} instance, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
 	 */
-	String MD5 = "MD5";
+	UpdateableChecksum create(Algorithm pAlgorithm, StreamSource pSource);
 
 	/**
-	 * Constant for SHA-256 algorithm.
+	 * <p>
+	 * Creates a new {@link Checksum} instance. The necessary data is read from
+	 * the path specified. If the path is a directory, any contained data file
+	 * will be digested. Sub-directories will be scanned recursively. If the
+	 * path is a regular file, its content will be digested.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: the returned checksum is not updated yet. You need to call one of
+	 * the {@code update} methods on {@link UpdateableChecksum} before its first
+	 * usage.
+	 * </p>
+	 * 
+	 * @param pAlgorithm
+	 *            The algorithm to be used for checksum calculation, see
+	 *            {@link Checksum#getAlgorithm()}
+	 * @param pPath
+	 *            Path to the file or directory to be digested, must not be
+	 *            {@code null}.
+	 * @return New {@link Checksum} instance, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
 	 */
-	String SHA256 = "SHA-256";
+	UpdateableChecksum create(Algorithm pAlgorithm, Path pPath);
 
 	/**
-	 * Constant for SHA-384 algorithm.
+	 * <p>
+	 * Creates a new {@link Checksum} instance. The necessary data is read from
+	 * the {@link URL} specified.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: the returned checksum is not updated yet. You need to call one of
+	 * the {@code update} methods on {@link UpdateableChecksum} before its first
+	 * usage.
+	 * </p>
+	 *
+	 * @param pAlgorithm
+	 *            The algorithm to be used for checksum calculation, see
+	 *            {@link Checksum#getAlgorithm()}
+	 * @param pUrl
+	 *            {@link URL} of the content to be digested, must not be
+	 *            {@code null}.
+	 * @return New {@link Checksum} instance, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
 	 */
-	String SHA384 = "SHA-384";
-
-	/**
-	 * Constant for SHA-512 algorithm.
-	 */
-	String SHA512 = "SHA-512";
+	UpdateableChecksum create(Algorithm pAlgorithm, URL pUrl);
 
 	/**
 	 * <p>
@@ -53,8 +110,9 @@ public interface ChecksumFactory {
 	 * </p>
 	 * 
 	 * <p>
-	 * Note: the returned checksum is not updated yet. You need to call
-	 * {@link Checksum#update()} before its first usage.
+	 * Note: the returned checksum is not updated yet. You need to call one of
+	 * the {@code update} methods on {@link UpdateableChecksum} before its first
+	 * usage.
 	 * </p>
 	 * 
 	 * @param pAlgorithm
@@ -70,7 +128,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
+	UpdateableChecksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
 
 	/**
 	 * <p>
@@ -81,8 +139,9 @@ public interface ChecksumFactory {
 	 * </p>
 	 * 
 	 * <p>
-	 * Note: the returned checksum is not updated yet. You need to call
-	 * {@link Checksum#update()} before its first usage.
+	 * Note: the returned checksum is not updated yet. You need to call one of
+	 * the {@code update} methods on {@link UpdateableChecksum} before its first
+	 * usage.
 	 * </p>
 	 * 
 	 * @param pAlgorithm
@@ -98,7 +157,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
+	UpdateableChecksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
 
 	/**
 	 * <p>
@@ -107,8 +166,9 @@ public interface ChecksumFactory {
 	 * </p>
 	 * 
 	 * <p>
-	 * Note: the returned checksum is not updated yet. You need to call
-	 * {@link Checksum#update()} before its first usage.
+	 * Note: the returned checksum is not updated yet. You need to call one of
+	 * the {@code update} methods on {@link UpdateableChecksum} before its first
+	 * usage.
 	 * </p>
 	 *
 	 * @param pAlgorithm
@@ -124,5 +184,5 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
+	UpdateableChecksum create(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
 }

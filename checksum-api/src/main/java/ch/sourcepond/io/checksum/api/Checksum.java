@@ -14,8 +14,6 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
 import java.security.MessageDigest;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Abstracts a checksum based on a specific hashing algorithm (see
@@ -23,78 +21,6 @@ import java.util.concurrent.TimeUnit;
  * calculate, query and update the represented checksum value.
  */
 public interface Checksum {
-
-	/**
-	 * Cancels any ongoing calculation which has started through
-	 * {@link #update()} on this object. If a calculation is ongoing, it will be
-	 * cancelled, and, this object will remain in the state before the
-	 * calculation has been started. If no calculation is running, nothing
-	 * happens.
-	 * 
-	 * @return Returns this checksum object, never {@code null}
-	 */
-	Checksum cancel();
-
-	/**
-	 * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
-	 * 
-	 * @return Returns this checksum object, never {@code null}
-	 * @throws RejectedExecutionException
-	 *             Thrown, if the asynchronous update task could not be
-	 *             submitted.
-	 */
-	Checksum update();
-
-	/**
-	 * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
-	 * 
-	 * @param pIntervalInMilliseconds
-	 *            Time to wait in milliseconds.
-	 * @return Returns this checksum object, never {@code null}
-	 * @throws RejectedExecutionException
-	 *             Thrown, if the asynchronous update task could not be
-	 *             submitted.
-	 */
-	Checksum update(long pIntervalInMilliseconds);
-
-	/**
-	 * <p>
-	 * Updates this checksum in a non-blocking manner. After the new checksum
-	 * has been calculated, the old checksum will be saved and can later be
-	 * accessed through {@link #getPreviousValue()} or
-	 * {@link #getPreviousHexValue()}. The newly calculated checksum can be
-	 * accessed through {@link #getValue()} or {@link #getHexValue()}. If an
-	 * update is already running, then nothing happens.
-	 * </p>
-	 * 
-	 * <p>
-	 * If the end of the data-source has been reached, the update process waits
-	 * until the interval specified elapses. If more data is available, the
-	 * data-source will not be closed and the newly available data will be
-	 * digested. This happens until no more data can be read i.e. the interval
-	 * elapses and no more data is available.
-	 * </p>
-	 * 
-	 * @param pInterval
-	 *            Time to wait until the data-source should be closed when
-	 *            currently no more data is available. Must not be negative, 0
-	 *            indicates no wait.
-	 * @param pUnit
-	 *            Time-unit of the interval specified.
-	 * @return Returns this checksum object, never {@code null}
-	 * @throws RejectedExecutionException
-	 *             Thrown, if the asynchronous update task could not be
-	 *             submitted.
-	 */
-	Checksum update(long pInterval, TimeUnit pUnit);
-
-	/**
-	 * Checks whether an update is currently running (started through
-	 * {@link #update()}).
-	 * 
-	 * @return {@code true} if an update is running, {@code false} otherwise.
-	 */
-	boolean isUpdating();
 
 	/**
 	 * Returns the algorithm name used to calculate this checksum See <a href=
@@ -107,9 +33,10 @@ public interface Checksum {
 
 	/**
 	 * <p>
-	 * Gets the result of the latest completed calculation triggered through
-	 * {@link #update()}. If the latest calculation has been failed, the causing
-	 * exception will be re-thrown.
+	 * Gets the result of the latest completed calculation triggered through one
+	 * of the {@code update} methods on {@link UpdateableChecksum}. If the
+	 * latest calculation has been failed, the causing exception will be
+	 * re-thrown.
 	 * </p>
 	 * 
 	 * <p>
@@ -123,91 +50,77 @@ public interface Checksum {
 	 * </p>
 	 * 
 	 * <p>
-	 * If {@link #update()} has never been called an empty array will be
-	 * returned.
+	 * If none of the {@code update} methods on {@link UpdateableChecksum} has
+	 * ever been called an empty array will be returned.
 	 * </p>
 	 * 
 	 * @return The calculated checksum as byte array, never {@code null}
-	 * @throws InterruptedException
-	 *             Thrown, if the latest {@link #update()} operation has been
-	 *             interrupted (see {@link #cancel()}).
 	 * @throws ChecksumException
-	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             Thrown, if the latest {@code update} operation has been
 	 *             failed (necessary data could not read from its source for any
 	 *             reason, the calculating thread has been interrupted, or
 	 *             another unexpected exception has occurred)
 	 */
-	byte[] getValue() throws InterruptedException, ChecksumException;
+	byte[] getValue() throws ChecksumException;
 
 	/**
 	 * Returns the checksum as hex-string. See {@link #getValue()} for further
 	 * information.
 	 * 
 	 * @return The calculated checksum as string, never {@code null}
-	 * @throws InterruptedException
-	 *             Thrown, if the latest {@link #update()} operation has been
-	 *             interrupted (see {@link #cancel()}).
 	 * @throws ChecksumException
-	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             Thrown, if the latest {@code update} operation has been
 	 *             failed (necessary data could not read from its source for any
 	 *             reason, the calculating thread has been interrupted, or
 	 *             another unexpected exception has occurred)
 	 */
-	String getHexValue() throws InterruptedException, ChecksumException;
+	String getHexValue() throws ChecksumException;
 
 	/**
 	 * Checks whether the current checksum, i.e. the resulting checksum
-	 * <em>after</em> the latest {@link #update()} has been
-	 * <em>successfully</em> performed, is equal to the previous checksum, i.e.
-	 * the last <em>successfully</em> calculated checksum <em>before</em> the
-	 * latest {@link #update()} has been performed. If an update is currently
-	 * running ({@link #isUpdating()} returns {@code true}), this method blocks
-	 * until the update operation is done.
+	 * <em>after</em> the latest {@code update()} has been <em>successfully</em>
+	 * performed, is equal to the previous checksum, i.e. the last
+	 * <em>successfully</em> calculated checksum <em>before</em> the latest
+	 * {@code update()} has been performed. If an update is currently running (
+	 * {@link UpdateableChecksum#isUpdating()} returns {@code true}), this
+	 * method blocks until the update operation is done.
 	 * 
 	 * @return {@code true} if the current and previous checksum are equal,
 	 *         {@code false} otherwise.
-	 * @throws InterruptedException
-	 *             Thrown, if the latest {@link #update()} operation has been
-	 *             interrupted (see {@link #cancel()}).
 	 * @throws ChecksumException
-	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             Thrown, if the latest {@code update()} operation has been
 	 *             failed (necessary data could not read from its source for any
 	 *             reason, the calculating thread has been interrupted, or
 	 *             another unexpected exception has occurred)
 	 */
-	boolean equalsPrevious() throws InterruptedException, ChecksumException;
+	boolean equalsPrevious() throws ChecksumException;
 
 	/**
-	 * Returns the previous checksum before the latest {@link #update()} has
-	 * been performed. If {@link #update()} has never been called an empty array
-	 * will be returned.
+	 * Returns the previous checksum before the latest {@code update()} has been
+	 * performed. If none of the {@code update} methods on
+	 * {@link UpdateableChecksum} has ever been called an empty array will be
+	 * returned.
 	 * 
 	 * @return Previous checksum as byte array, never {@code null}
-	 * @throws InterruptedException
-	 *             Thrown, if the latest {@link #update()} operation has been
-	 *             interrupted (see {@link #cancel()}).
 	 * @throws ChecksumException
-	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             Thrown, if the latest {@code update()} operation has been
 	 *             failed (necessary data could not read from its source for any
 	 *             reason, the calculating thread has been interrupted, or
 	 *             another unexpected exception has occurred)
 	 */
-	byte[] getPreviousValue() throws InterruptedException, ChecksumException;
+	byte[] getPreviousValue() throws ChecksumException;
 
 	/**
-	 * Returns the previous checksum before the last {@link #update()} occurred
-	 * as hex-string. If {@link #update()} has not been called more than once,
-	 * an empty string will be returned.
+	 * Returns the previous checksum before the last {@code update()} occurred
+	 * as hex-string. If {@code update()} has not been called more than once, an
+	 * empty string will be returned.
 	 * 
 	 * @return Previous checksum as hex-string, never {@code null}
-	 * @throws InterruptedException
-	 *             Thrown, if the latest {@link #update()} operation has been
-	 *             interrupted (see {@link #cancel()}).
 	 * @throws ChecksumException
-	 *             Thrown, if the latest {@link #update()} operation has been
+	 *             Thrown, if the latest {@code update()} operation has been
 	 *             failed (necessary data could not read from its source for any
 	 *             reason, the calculating thread has been interrupted, or
 	 *             another unexpected exception has occurred)
 	 */
-	String getPreviousHexValue() throws InterruptedException, ChecksumException;
+	String getPreviousHexValue() throws ChecksumException;
 }
