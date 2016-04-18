@@ -106,11 +106,11 @@ class DefaultChecksum implements UpdateableChecksum {
 	private byte[] value = INITIAL;
 
 	/**
-	 * @param pDigester
+	 * @param pStrategy
 	 * @param pExecutor
 	 */
-	DefaultChecksum(final UpdateStrategy pDigester, final Executor pExecutor) {
-		strategy = pDigester;
+	DefaultChecksum(final UpdateStrategy pStrategy, final Executor pExecutor) {
+		strategy = pStrategy;
 		executor = pExecutor;
 	}
 
