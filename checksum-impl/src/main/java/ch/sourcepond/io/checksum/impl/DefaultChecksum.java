@@ -190,28 +190,28 @@ class DefaultChecksum implements UpdateableChecksum {
 	}
 
 	@Override
-	public Checksum cancel() {
+	public UpdateableChecksum cancel() {
 		updateLock.lock();
 		try {
 			strategy.cancel();
-			return this;
 		} finally {
 			updateLock.unlock();
 		}
+		return this;
 	}
 
 	@Override
-	public Checksum update() {
+	public UpdateableChecksum update() {
 		return update(0, MILLISECONDS);
 	}
 
 	@Override
-	public Checksum update(final long pIntervalInMilliseconds) {
+	public UpdateableChecksum update(final long pIntervalInMilliseconds) {
 		return update(pIntervalInMilliseconds, MILLISECONDS);
 	}
 
 	@Override
-	public Checksum update(final long pInterval, final TimeUnit pUnit) {
+	public UpdateableChecksum update(final long pInterval, final TimeUnit pUnit) {
 		updateLock.lock();
 		try {
 			if (observerLock.tryLock()) {
@@ -225,7 +225,6 @@ class DefaultChecksum implements UpdateableChecksum {
 					} else if (nextTask == null) {
 						nextTask = new UpdateTask(pInterval, pUnit);
 					}
-					return this;
 				} finally {
 					observerLock.unlock();
 				}
@@ -237,6 +236,7 @@ class DefaultChecksum implements UpdateableChecksum {
 		} finally {
 			updateLock.unlock();
 		}
+		return this;
 	}
 
 	@Override
@@ -310,25 +310,27 @@ class DefaultChecksum implements UpdateableChecksum {
 	}
 
 	@Override
-	public void addUpdateObserver(final UpdateObserver pObserver) {
+	public UpdateableChecksum addUpdateObserver(final UpdateObserver pObserver) {
 		observerLock.lock();
 		try {
 			observers.add(pObserver);
-			LOG.debug("Added observer {}", pObserver);
 		} finally {
 			observerLock.unlock();
 		}
+		LOG.debug("Added observer {}", pObserver);
+		return this;
 	}
 
 	@Override
-	public void removeUpdateObserver(final UpdateObserver pObserver) {
+	public UpdateableChecksum removeUpdateObserver(final UpdateObserver pObserver) {
 		observerLock.lock();
 		try {
 			observers.remove(pObserver);
-			LOG.debug("Removed observer {}", pObserver);
 		} finally {
 			observerLock.unlock();
 		}
+		LOG.debug("Removed observer {}", pObserver);
+		return this;
 	}
 
 }

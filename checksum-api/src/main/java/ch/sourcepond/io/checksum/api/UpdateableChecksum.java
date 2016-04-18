@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 
 public interface UpdateableChecksum extends Checksum {
 
-	void addUpdateObserver(UpdateObserver pObserver);
+	UpdateableChecksum addUpdateObserver(UpdateObserver pObserver);
 
-	void removeUpdateObserver(UpdateObserver pObserver);
+	UpdateableChecksum removeUpdateObserver(UpdateObserver pObserver);
 
 	/**
 	 * Cancels any ongoing calculation which has started through
@@ -31,7 +31,7 @@ public interface UpdateableChecksum extends Checksum {
 	 * 
 	 * @return Returns this checksum object, never {@code null}
 	 */
-	Checksum cancel();
+	UpdateableChecksum cancel();
 
 	/**
 	 * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
@@ -41,7 +41,7 @@ public interface UpdateableChecksum extends Checksum {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum update();
+	UpdateableChecksum update();
 
 	/**
 	 * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
@@ -53,7 +53,7 @@ public interface UpdateableChecksum extends Checksum {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum update(long pIntervalInMilliseconds);
+	UpdateableChecksum update(long pIntervalInMilliseconds);
 
 	/**
 	 * <p>
@@ -85,7 +85,7 @@ public interface UpdateableChecksum extends Checksum {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum update(long pInterval, TimeUnit pUnit);
+	UpdateableChecksum update(long pInterval, TimeUnit pUnit);
 
 	/**
 	 * Checks whether an update is currently running (started through
