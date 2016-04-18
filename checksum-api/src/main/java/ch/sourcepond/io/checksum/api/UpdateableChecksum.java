@@ -62,7 +62,8 @@ public interface UpdateableChecksum extends Checksum {
 	 * accessed through {@link #getPreviousValue()} or
 	 * {@link #getPreviousHexValue()}. The newly calculated checksum can be
 	 * accessed through {@link #getValue()} or {@link #getHexValue()}. If an
-	 * update is already running, then nothing happens.
+	 * update is already running and an further update is waiting for execution,
+	 * then calling this method has no effect.
 	 * </p>
 	 * 
 	 * <p>
