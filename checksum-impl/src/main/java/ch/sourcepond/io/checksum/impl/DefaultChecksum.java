@@ -77,11 +77,13 @@ class DefaultChecksum implements UpdateableChecksum {
 					throwable = th;
 				}
 			} finally {
+				updating = nextTask != null;
 				try {
-					if (--triggeredUpdates == 1) {
-						executor.execute(this);
+					if (updating) {
+						executor.execute(nextTask);
 					}
 				} finally {
+					nextTask = null;
 					updateDone.signalAll();
 					updateLock.unlock();
 				}
@@ -97,7 +99,8 @@ class DefaultChecksum implements UpdateableChecksum {
 	private final Set<UpdateObserver> observers = new HashSet<>();
 	private final UpdateStrategy strategy;
 	private final Executor executor;
-	private int triggeredUpdates;
+	private UpdateTask nextTask;
+	private boolean updating;
 	private Throwable throwable;
 	private byte[] previousValue = INITIAL;
 	private byte[] value = INITIAL;
@@ -129,9 +132,9 @@ class DefaultChecksum implements UpdateableChecksum {
 	 * @throws InterruptedException
 	 */
 	private void awaitCalculation() throws ChecksumException {
-		final boolean needsDigest = triggeredUpdates > 0;
+		final boolean needsDigest = updating;
 		try {
-			while (triggeredUpdates > 0) {
+			while (updating) {
 				updateDone.await();
 			}
 		} catch (final InterruptedException e) {
@@ -140,16 +143,22 @@ class DefaultChecksum implements UpdateableChecksum {
 		}
 
 		if (throwable != null) {
-			// Only throw an ordinary throwable if the caught throwable is
-			// NOT an error.
-			if (!(throwable instanceof Error)) {
-				final ChecksumException ex = new ChecksumException(throwable.getMessage(), throwable);
-				informObservers(FAILURE, ex);
-				throw ex;
+			try {
+				// Only throw an ordinary throwable if the caught throwable is
+				// NOT an error.
+				if (!(throwable instanceof Error)) {
+					final ChecksumException ex = new ChecksumException(throwable.getMessage(), throwable);
+					informObservers(FAILURE, ex);
+					throw ex;
+				}
+				throw new Error(throwable.getMessage(), throwable);
+			} finally {
+				// In any case set the throwable to null
+				throwable = null;
 			}
-			throw new Error(throwable.getMessage(), throwable);
 		} else if (needsDigest) {
-			// Finally, assign the new digester values if not cancelled
+			// Finally, assign the new digester values if not cancelled i.e. a
+			// null-value indicates that the calculation has been cancelled.
 			final byte[] newValue = strategy.digest();
 			if (newValue != null) {
 				previousValue = value;
@@ -176,7 +185,6 @@ class DefaultChecksum implements UpdateableChecksum {
 				}
 			}
 		} finally {
-			throwable = null;
 			observerLock.unlock();
 		}
 	}
@@ -208,16 +216,22 @@ class DefaultChecksum implements UpdateableChecksum {
 		try {
 			if (observerLock.tryLock()) {
 				try {
-					if (2 >= triggeredUpdates && ++triggeredUpdates == 1) {
+					// An update is only scheduled, if
+					// a) no update is currently running
+					// b) no update is waiting for execution.
+					if (!updating) {
 						executor.execute(new UpdateTask(pInterval, pUnit));
+						updating = true;
+					} else if (nextTask == null) {
+						nextTask = new UpdateTask(pInterval, pUnit);
 					}
 					return this;
 				} finally {
 					observerLock.unlock();
 				}
 			} else {
-				// This could happen if somewhere in an UpdateObserver update on
-				// this object is called
+				// This could happen if in an UpdateObserver the update method
+				// is called; this would cause a dead-lock.
 				throw new IllegalStateException("Observer-lock is already held by another thread!");
 			}
 		} finally {
@@ -229,7 +243,7 @@ class DefaultChecksum implements UpdateableChecksum {
 	public boolean isUpdating() {
 		updateLock.lock();
 		try {
-			return triggeredUpdates > 0;
+			return updating;
 		} finally {
 			updateLock.unlock();
 		}
@@ -297,23 +311,23 @@ class DefaultChecksum implements UpdateableChecksum {
 
 	@Override
 	public void addUpdateObserver(final UpdateObserver pObserver) {
-		updateLock.lock();
+		observerLock.lock();
 		try {
 			observers.add(pObserver);
 			LOG.debug("Added observer {}", pObserver);
 		} finally {
-			updateLock.unlock();
+			observerLock.unlock();
 		}
 	}
 
 	@Override
 	public void removeUpdateObserver(final UpdateObserver pObserver) {
-		updateLock.lock();
+		observerLock.lock();
 		try {
 			observers.remove(pObserver);
 			LOG.debug("Removed observer {}", pObserver);
 		} finally {
-			updateLock.unlock();
+			observerLock.unlock();
 		}
 	}
 

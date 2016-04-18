@@ -1,6 +1,6 @@
 package ch.sourcepond.io.checksum;
 
-import static ch.sourcepond.io.checksum.api.ChecksumFactory.SHA256;
+import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static ch.sourcepond.testing.OptionsHelper.blueprintBundles;
 import static ch.sourcepond.testing.OptionsHelper.defaultOptions;
 import static ch.sourcepond.testing.OptionsHelper.stubService;
@@ -34,6 +34,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.ChecksumFactory;
 import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.UpdateableChecksum;
 
 /**
  * @author rolandhauser
@@ -112,7 +113,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE).update();
+		final UpdateableChecksum chsm = factory.create(SHA256, TEST_FILE).update();
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -130,7 +131,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateUrlChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update();
+		final UpdateableChecksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update();
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 

@@ -59,13 +59,12 @@ public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStr
 	private static final String ALGORITHM = "SHA-256";
 	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", "first_content.txt");
 	private final InputStream in = mock(InputStream.class);
-	private final Cancellable cancellable = mock(Cancellable.class);
 	private final ScheduledExecutorService srv = newScheduledThreadPool(1);
 	private final Runnable cancelTask = new Runnable() {
 
 		@Override
 		public void run() {
-			when(cancellable.isCancelled()).thenReturn(true);
+
 		}
 	};
 	private MessageDigest digest;
