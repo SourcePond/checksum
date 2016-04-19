@@ -1,14 +1,20 @@
 package ch.sourcepond.io.checksum.impl;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 import org.junit.Test;
@@ -16,6 +22,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.ChecksumException;
 
 /**
  * @author rolandhauser
@@ -59,8 +66,47 @@ public class ConcurrencyTest {
 		assertArrayEquals(RESULT_2, chksum.update(0).getValue());
 	}
 
-	public void verifyInterruptFlagWhenAwaitCalcuationInterrupted() {
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void verifyInterruptFlagWhenAwaitCalcuationInterrupted() throws Throwable {
+		final Callable<ChecksumException> test = new Callable<ChecksumException>() {
 
+			@Override
+			public ChecksumException call() throws Exception {
+				doAnswer(new Answer<Object>() {
+
+					@Override
+					public Object answer(final InvocationOnMock invocation) throws Throwable {
+						sleep(100);
+						return null;
+					}
+
+				}).when(strategy).update(0, MILLISECONDS);
+				currentThread().interrupt();
+
+				ChecksumException expected = null;
+				try {
+					chksum.update().getValue();
+					fail("Exception expected!");
+				} catch (final ChecksumException e) {
+					expected = e;
+				}
+				return expected;
+			}
+		};
+
+		ChecksumException expected = null;
+		try {
+			expected = executor.submit(test).get();
+		} catch (final ExecutionException e) {
+			if (!(e.getCause() instanceof ChecksumException)) {
+				throw e.getCause();
+			}
+		}
+		assertNotNull(expected);
+		assertEquals(InterruptedException.class, expected.getCause().getClass());
 	}
 
 	public void verifyInformObserver_FailureCase() {
