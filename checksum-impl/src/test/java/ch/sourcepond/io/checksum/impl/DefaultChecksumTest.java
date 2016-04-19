@@ -281,7 +281,7 @@ public class DefaultChecksumTest {
 			checksum.getValue();
 			fail("Exception expected here");
 		} catch (final Error e) {
-			assertSame(expected, e.getCause());
+			assertSame(expected, e);
 		}
 	}
 

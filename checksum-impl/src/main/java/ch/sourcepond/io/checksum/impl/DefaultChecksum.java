@@ -45,12 +45,12 @@ import ch.sourcepond.io.checksum.api.UpdateObserver;
  * @author rolandhauser
  *
  */
-class DefaultChecksum implements Checksum {
+final class DefaultChecksum implements Checksum {
 
 	/**
 	 *
 	 */
-	private class UpdateTask implements Runnable {
+	private final class UpdateTask implements Runnable {
 		private final long interval;
 		private final TimeUnit unit;
 
@@ -73,7 +73,29 @@ class DefaultChecksum implements Checksum {
 			updateLock.lock();
 			try {
 				if (th != null) {
-					throwable = th;
+					// Only throw an ordinary throwable if the caught
+					// throwable is
+					// NOT an error.
+					if (th instanceof Error) {
+						throwable = th;
+					} else {
+						final ChecksumException ex = new ChecksumException(th.getMessage(), th);
+						informObservers(FAILURE, ex);
+						throwable = ex;
+					}
+				} else {
+					// Finally, assign the new digester values if not cancelled
+					// i.e. a
+					// null-value indicates that the calculation has been
+					// cancelled.
+					final byte[] newValue = strategy.digest();
+					if (newValue != null) {
+						previousValue = value;
+						value = newValue;
+						informObservers(SUCCESS);
+					} else {
+						informObservers(CANCELLED);
+					}
 				}
 			} finally {
 				updating = nextTask != null;
@@ -133,7 +155,6 @@ class DefaultChecksum implements Checksum {
 	 * @throws InterruptedException
 	 */
 	private void awaitCalculation() throws ChecksumException {
-		final boolean needsDigest = updating;
 		try {
 			while (updating) {
 				updateDone.await();
@@ -144,30 +165,10 @@ class DefaultChecksum implements Checksum {
 		}
 
 		if (throwable != null) {
-			try {
-				// Only throw an ordinary throwable if the caught throwable is
-				// NOT an error.
-				if (!(throwable instanceof Error)) {
-					final ChecksumException ex = new ChecksumException(throwable.getMessage(), throwable);
-					informObservers(FAILURE, ex);
-					throw ex;
-				}
-				throw new Error(throwable.getMessage(), throwable);
-			} finally {
-				// In any case set the throwable to null
-				throwable = null;
+			if (throwable instanceof Error) {
+				throw (Error) throwable;
 			}
-		} else if (needsDigest) {
-			// Finally, assign the new digester values if not cancelled i.e. a
-			// null-value indicates that the calculation has been cancelled.
-			final byte[] newValue = strategy.digest();
-			if (newValue != null) {
-				previousValue = value;
-				value = newValue;
-				informObservers(SUCCESS);
-			} else {
-				informObservers(CANCELLED);
-			}
+			throw (ChecksumException) throwable;
 		}
 	}
 
