@@ -14,6 +14,8 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
 import java.security.MessageDigest;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstracts a checksum based on a specific hashing algorithm (see
@@ -21,6 +23,83 @@ import java.security.MessageDigest;
  * calculate, query and update the represented checksum value.
  */
 public interface Checksum {
+
+	Checksum addUpdateObserver(UpdateObserver pObserver);
+
+	Checksum removeUpdateObserver(UpdateObserver pObserver);
+
+	/**
+	 * Cancels any ongoing calculation which has started through
+	 * {@link #update()} on this object. If a calculation is ongoing, it will be
+	 * cancelled, and, this object will remain in the state before the
+	 * calculation has been started. If no calculation is running, nothing
+	 * happens.
+	 * 
+	 * @return Returns this checksum object, never {@code null}
+	 */
+	Checksum cancel();
+
+	/**
+	 * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
+	 * 
+	 * @return Returns this checksum object, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
+	 */
+	Checksum update();
+
+	/**
+	 * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
+	 * 
+	 * @param pIntervalInMilliseconds
+	 *            Time to wait in milliseconds.
+	 * @return Returns this checksum object, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
+	 */
+	Checksum update(long pIntervalInMilliseconds);
+
+	/**
+	 * <p>
+	 * Updates this checksum in a non-blocking manner. After the new checksum
+	 * has been calculated, the old checksum will be saved and can later be
+	 * accessed through {@link #getPreviousValue()} or
+	 * {@link #getPreviousHexValue()}. The newly calculated checksum can be
+	 * accessed through {@link #getValue()} or {@link #getHexValue()}. If an
+	 * update is already running and an further update is waiting for execution,
+	 * then calling this method has no effect.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the end of the data-source has been reached, the update process waits
+	 * until the interval specified elapses. If more data is available, the
+	 * data-source will not be closed and the newly available data will be
+	 * digested. This happens until no more data can be read i.e. the interval
+	 * elapses and no more data is available.
+	 * </p>
+	 * 
+	 * @param pInterval
+	 *            Time to wait until the data-source should be closed when
+	 *            currently no more data is available. Must not be negative, 0
+	 *            indicates no wait.
+	 * @param pUnit
+	 *            Time-unit of the interval specified.
+	 * @return Returns this checksum object, never {@code null}
+	 * @throws RejectedExecutionException
+	 *             Thrown, if the asynchronous update task could not be
+	 *             submitted.
+	 */
+	Checksum update(long pInterval, TimeUnit pUnit);
+
+	/**
+	 * Checks whether an update is currently running (started through
+	 * {@link #update()}).
+	 * 
+	 * @return {@code true} if an update is running, {@code false} otherwise.
+	 */
+	boolean isUpdating();
 
 	/**
 	 * Returns the algorithm name used to calculate this checksum See <a href=
@@ -34,7 +113,7 @@ public interface Checksum {
 	/**
 	 * <p>
 	 * Gets the result of the latest completed calculation triggered through one
-	 * of the {@code update} methods on {@link UpdateableChecksum}. If the
+	 * of the {@code update} methods on {@link Checksum}. If the
 	 * latest calculation has been failed, the causing exception will be
 	 * re-thrown.
 	 * </p>
@@ -50,7 +129,7 @@ public interface Checksum {
 	 * </p>
 	 * 
 	 * <p>
-	 * If none of the {@code update} methods on {@link UpdateableChecksum} has
+	 * If none of the {@code update} methods on {@link Checksum} has
 	 * ever been called an empty array will be returned.
 	 * </p>
 	 * 
@@ -82,7 +161,7 @@ public interface Checksum {
 	 * performed, is equal to the previous checksum, i.e. the last
 	 * <em>successfully</em> calculated checksum <em>before</em> the latest
 	 * {@code update()} has been performed. If an update is currently running (
-	 * {@link UpdateableChecksum#isUpdating()} returns {@code true}), this
+	 * {@link Checksum#isUpdating()} returns {@code true}), this
 	 * method blocks until the update operation is done.
 	 * 
 	 * @return {@code true} if the current and previous checksum are equal,
@@ -98,7 +177,7 @@ public interface Checksum {
 	/**
 	 * Returns the previous checksum before the latest {@code update()} has been
 	 * performed. If none of the {@code update} methods on
-	 * {@link UpdateableChecksum} has ever been called an empty array will be
+	 * {@link Checksum} has ever been called an empty array will be
 	 * returned.
 	 * 
 	 * @return Previous checksum as byte array, never {@code null}

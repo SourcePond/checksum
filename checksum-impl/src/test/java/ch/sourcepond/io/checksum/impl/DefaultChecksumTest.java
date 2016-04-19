@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -58,7 +60,7 @@ public class DefaultChecksumTest {
 	private static final byte[] SECOND_VALUE = new byte[] { 98, 49, 53, 50 };
 	private final UpdateStrategy strategy = mock(UpdateStrategy.class);
 	private final ScheduledExecutorService delegate = newScheduledThreadPool(1);
-	private final Executor executor = new Executor() {
+	private final Executor updateExecutor = new Executor() {
 
 		@Override
 		public void execute(final Runnable command) {
@@ -67,11 +69,12 @@ public class DefaultChecksumTest {
 			delegate.schedule(command, 500, TimeUnit.MILLISECONDS);
 		}
 	};
+	private final ExecutorService listenerExecutor = Executors.newFixedThreadPool(1);
 
 	private static final String ANY_ALGORITHM = "anyAlgorith";
 	private static final String HEX_VALUE = "01030305";
 	private static final byte[] VALUE = new byte[] { 1, 3, 3, 5 };
-	private final DefaultChecksum checksum = new DefaultChecksum(strategy, executor);
+	private final DefaultChecksum checksum = new DefaultChecksum(strategy, updateExecutor, listenerExecutor);
 
 	@Before
 	public void setup() throws Exception {

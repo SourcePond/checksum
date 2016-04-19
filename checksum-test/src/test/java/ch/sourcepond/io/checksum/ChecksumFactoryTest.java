@@ -1,6 +1,8 @@
 package ch.sourcepond.io.checksum;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
+import static ch.sourcepond.io.checksum.api.ChecksumFactory.LISTENER_EXECUTOR_ATTRIBUTE;
+import static ch.sourcepond.io.checksum.api.ChecksumFactory.UPDATE_EXECUTOR_ATTRIBUTE;
 import static ch.sourcepond.testing.OptionsHelper.blueprintBundles;
 import static ch.sourcepond.testing.OptionsHelper.defaultOptions;
 import static ch.sourcepond.testing.OptionsHelper.stubService;
@@ -34,7 +36,6 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.ChecksumFactory;
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.api.UpdateableChecksum;
 
 /**
  * @author rolandhauser
@@ -65,7 +66,8 @@ public class ChecksumFactoryTest {
 	public Option[] config() throws Exception {
 		return options(defaultOptions(getClass().getPackage().getName()), blueprintBundles(),
 				stubService(ExecutorService.class).withFactory(ExecutorServiceFactory.class)
-						.addProperty("checksum-executor-service", "true").build(),
+						.addProperty(UPDATE_EXECUTOR_ATTRIBUTE, "true").addProperty(LISTENER_EXECUTOR_ATTRIBUTE, "true")
+						.build(),
 				mavenBundle("commons-codec", "commons-codec").versionAsInProject());
 	}
 
@@ -113,7 +115,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final UpdateableChecksum chsm = factory.create(SHA256, TEST_FILE).update();
+		final Checksum chsm = factory.create(SHA256, TEST_FILE).update();
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -131,7 +133,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateUrlChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final UpdateableChecksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update();
+		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update();
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 

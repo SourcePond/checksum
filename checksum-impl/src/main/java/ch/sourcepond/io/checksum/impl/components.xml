@@ -3,7 +3,8 @@
 	<bean id="digestFactory" class="ch.sourcepond.io.checksum.impl.UpdateStrategyFactory" />
 
 	<bean id="checksumFactory" class="ch.sourcepond.io.checksum.impl.DefaultChecksumFactory">
-		<argument ref="OSGi_service.checksumExecutor" />
+		<argument ref="OSGi_service.updateExecutor" />
+		<argument ref="OSGi_service.listenerExecutor" />
 		<argument ref="digestFactory" />
 	</bean>
 </blueprint>

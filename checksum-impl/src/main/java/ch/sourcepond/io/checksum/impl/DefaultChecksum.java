@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.ChecksumException;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
-import ch.sourcepond.io.checksum.api.UpdateableChecksum;
 
 /**
  * Default implementation of the {@link Checksum} interface.
@@ -46,7 +45,7 @@ import ch.sourcepond.io.checksum.api.UpdateableChecksum;
  * @author rolandhauser
  *
  */
-class DefaultChecksum implements UpdateableChecksum {
+class DefaultChecksum implements Checksum {
 
 	/**
 	 *
@@ -80,7 +79,7 @@ class DefaultChecksum implements UpdateableChecksum {
 				updating = nextTask != null;
 				try {
 					if (updating) {
-						executor.execute(nextTask);
+						updateExecutor.execute(nextTask);
 					}
 				} finally {
 					nextTask = null;
@@ -98,7 +97,8 @@ class DefaultChecksum implements UpdateableChecksum {
 	private final Condition updateDone = updateLock.newCondition();
 	private final Set<UpdateObserver> observers = new HashSet<>();
 	private final UpdateStrategy strategy;
-	private final Executor executor;
+	private final Executor updateExecutor;
+	private final Executor listenerExecutor;
 	private UpdateTask nextTask;
 	private boolean updating;
 	private Throwable throwable;
@@ -107,11 +107,12 @@ class DefaultChecksum implements UpdateableChecksum {
 
 	/**
 	 * @param pStrategy
-	 * @param pExecutor
+	 * @param pUpdateExecutor
 	 */
-	DefaultChecksum(final UpdateStrategy pStrategy, final Executor pExecutor) {
+	DefaultChecksum(final UpdateStrategy pStrategy, final Executor pUpdateExecutor, final Executor pListenerExecutor) {
 		strategy = pStrategy;
-		executor = pExecutor;
+		updateExecutor = pUpdateExecutor;
+		listenerExecutor = pListenerExecutor;
 	}
 
 	/**
@@ -178,11 +179,17 @@ class DefaultChecksum implements UpdateableChecksum {
 		observerLock.lock();
 		try {
 			for (final UpdateObserver observer : observers) {
-				try {
-					pCallback.inform(observer, this, pFailureOrNull);
-				} catch (final Exception th) {
-					LOG.warn(format("Listener %s has thrown an exception! See stacktrace"), th);
-				}
+				listenerExecutor.execute(new Runnable() {
+
+					@Override
+					public void run() {
+						try {
+							pCallback.inform(observer, DefaultChecksum.this, pFailureOrNull);
+						} catch (final Exception th) {
+							LOG.warn(format("Listener %s has thrown an exception! See stacktrace"), th);
+						}
+					}
+				});
 			}
 		} finally {
 			observerLock.unlock();
@@ -190,7 +197,7 @@ class DefaultChecksum implements UpdateableChecksum {
 	}
 
 	@Override
-	public UpdateableChecksum cancel() {
+	public Checksum cancel() {
 		updateLock.lock();
 		try {
 			strategy.cancel();
@@ -201,37 +208,27 @@ class DefaultChecksum implements UpdateableChecksum {
 	}
 
 	@Override
-	public UpdateableChecksum update() {
+	public Checksum update() {
 		return update(0, MILLISECONDS);
 	}
 
 	@Override
-	public UpdateableChecksum update(final long pIntervalInMilliseconds) {
+	public Checksum update(final long pIntervalInMilliseconds) {
 		return update(pIntervalInMilliseconds, MILLISECONDS);
 	}
 
 	@Override
-	public UpdateableChecksum update(final long pInterval, final TimeUnit pUnit) {
+	public Checksum update(final long pInterval, final TimeUnit pUnit) {
 		updateLock.lock();
 		try {
-			if (observerLock.tryLock()) {
-				try {
-					// An update is only scheduled, if
-					// a) no update is currently running
-					// b) no update is waiting for execution.
-					if (!updating) {
-						executor.execute(new UpdateTask(pInterval, pUnit));
-						updating = true;
-					} else if (nextTask == null) {
-						nextTask = new UpdateTask(pInterval, pUnit);
-					}
-				} finally {
-					observerLock.unlock();
-				}
-			} else {
-				// This could happen if in an UpdateObserver the update method
-				// is called; this would cause a dead-lock.
-				throw new IllegalStateException("Observer-lock is already held by another thread!");
+			// An update is only scheduled, if
+			// a) no update is currently running
+			// b) no update is waiting for execution.
+			if (!updating) {
+				updateExecutor.execute(new UpdateTask(pInterval, pUnit));
+				updating = true;
+			} else if (nextTask == null) {
+				nextTask = new UpdateTask(pInterval, pUnit);
 			}
 		} finally {
 			updateLock.unlock();
@@ -310,7 +307,7 @@ class DefaultChecksum implements UpdateableChecksum {
 	}
 
 	@Override
-	public UpdateableChecksum addUpdateObserver(final UpdateObserver pObserver) {
+	public Checksum addUpdateObserver(final UpdateObserver pObserver) {
 		observerLock.lock();
 		try {
 			observers.add(pObserver);
@@ -322,7 +319,7 @@ class DefaultChecksum implements UpdateableChecksum {
 	}
 
 	@Override
-	public UpdateableChecksum removeUpdateObserver(final UpdateObserver pObserver) {
+	public Checksum removeUpdateObserver(final UpdateObserver pObserver) {
 		observerLock.lock();
 		try {
 			observers.remove(pObserver);

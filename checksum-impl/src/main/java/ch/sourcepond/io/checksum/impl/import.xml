@@ -2,7 +2,9 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
 	<!-- Import services -->
-	<reference id="OSGi_service.checksumExecutor"
-		interface="java.util.concurrent.ExecutorService"
-		filter="(checksum-executor-service=true)" />
+	<reference id="OSGi_service.updateExecutor" interface="java.util.concurrent.ExecutorService"
+		filter="(sourcepond.io.checksum.updateexecutor=*)" />
+
+	<reference id="OSGi_service.listenerExecutor" interface="java.util.concurrent.ExecutorService"
+		filter="(sourcepond.io.checksum.listenerexecutor=*)" />
 </blueprint>

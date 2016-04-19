@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
@@ -27,6 +28,22 @@ import java.util.concurrent.RejectedExecutionException;
 public interface ChecksumFactory {
 
 	/**
+	 * OSGi service attribute-name to mark an {@link ExecutorService} as update-
+	 * executor. The update executor is used when any the {@code update} methods
+	 * on {@link Checksum} is called.
+	 */
+	String UPDATE_EXECUTOR_ATTRIBUTE = "sourcepond.io.checksum.updateexecutor";
+
+	/**
+	 * OSGi service attribute-name to mark an {@link ExecutorService} as
+	 * listener- executor. The listener-executor is used when the
+	 * {@link UpdateObserver} instances are informed after an update. Every
+	 * method call to {@link UpdateObserver} is wrapped into its own
+	 * {@link Runnable}.
+	 */
+	String LISTENER_EXECUTOR_ATTRIBUTE = "sourcepond.io.checksum.listenerexecutor";
+
+	/**
 	 * <p>
 	 * Creates a new {@link Checksum} instance. The necessary data is read from
 	 * the {@link InputStream} returned by {@link StreamSource#openStream()}.
@@ -34,8 +51,7 @@ public interface ChecksumFactory {
 	 * 
 	 * <p>
 	 * Note: the returned checksum is not updated yet. You need to call one of
-	 * the {@code update} methods on {@link UpdateableChecksum} before its first
-	 * usage.
+	 * the {@code update} methods on {@link Checksum} before its first usage.
 	 * </p>
 	 * 
 	 * @param pAlgorithm
@@ -49,7 +65,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	UpdateableChecksum create(Algorithm pAlgorithm, StreamSource pSource);
+	Checksum create(Algorithm pAlgorithm, StreamSource pSource);
 
 	/**
 	 * <p>
@@ -61,8 +77,7 @@ public interface ChecksumFactory {
 	 * 
 	 * <p>
 	 * Note: the returned checksum is not updated yet. You need to call one of
-	 * the {@code update} methods on {@link UpdateableChecksum} before its first
-	 * usage.
+	 * the {@code update} methods on {@link Checksum} before its first usage.
 	 * </p>
 	 * 
 	 * @param pAlgorithm
@@ -76,7 +91,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	UpdateableChecksum create(Algorithm pAlgorithm, Path pPath);
+	Checksum create(Algorithm pAlgorithm, Path pPath);
 
 	/**
 	 * <p>
@@ -86,8 +101,7 @@ public interface ChecksumFactory {
 	 * 
 	 * <p>
 	 * Note: the returned checksum is not updated yet. You need to call one of
-	 * the {@code update} methods on {@link UpdateableChecksum} before its first
-	 * usage.
+	 * the {@code update} methods on {@link Checksum} before its first usage.
 	 * </p>
 	 *
 	 * @param pAlgorithm
@@ -101,7 +115,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	UpdateableChecksum create(Algorithm pAlgorithm, URL pUrl);
+	Checksum create(Algorithm pAlgorithm, URL pUrl);
 
 	/**
 	 * <p>
@@ -111,8 +125,7 @@ public interface ChecksumFactory {
 	 * 
 	 * <p>
 	 * Note: the returned checksum is not updated yet. You need to call one of
-	 * the {@code update} methods on {@link UpdateableChecksum} before its first
-	 * usage.
+	 * the {@code update} methods on {@link Checksum} before its first usage.
 	 * </p>
 	 * 
 	 * @param pAlgorithm
@@ -128,7 +141,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	UpdateableChecksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
+	Checksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
 
 	/**
 	 * <p>
@@ -140,8 +153,7 @@ public interface ChecksumFactory {
 	 * 
 	 * <p>
 	 * Note: the returned checksum is not updated yet. You need to call one of
-	 * the {@code update} methods on {@link UpdateableChecksum} before its first
-	 * usage.
+	 * the {@code update} methods on {@link Checksum} before its first usage.
 	 * </p>
 	 * 
 	 * @param pAlgorithm
@@ -157,7 +169,7 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	UpdateableChecksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
+	Checksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
 
 	/**
 	 * <p>
@@ -167,8 +179,7 @@ public interface ChecksumFactory {
 	 * 
 	 * <p>
 	 * Note: the returned checksum is not updated yet. You need to call one of
-	 * the {@code update} methods on {@link UpdateableChecksum} before its first
-	 * usage.
+	 * the {@code update} methods on {@link Checksum} before its first usage.
 	 * </p>
 	 *
 	 * @param pAlgorithm
@@ -184,5 +195,5 @@ public interface ChecksumFactory {
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	UpdateableChecksum create(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
+	Checksum create(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
 }

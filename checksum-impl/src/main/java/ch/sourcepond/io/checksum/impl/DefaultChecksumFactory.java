@@ -23,9 +23,9 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 
 import ch.sourcepond.io.checksum.api.Algorithm;
+import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.ChecksumFactory;
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.api.UpdateableChecksum;
 
 /**
  * Default implementation of the {@link ChecksumFactory} interface. An instance
@@ -34,35 +34,40 @@ import ch.sourcepond.io.checksum.api.UpdateableChecksum;
  */
 public final class DefaultChecksumFactory implements ChecksumFactory {
 	private static final Logger LOG = getLogger(DefaultChecksumFactory.class);
-	private final ExecutorService executor;
+	private final ExecutorService updateExecutor;
+	private final ExecutorService listenerExecutor;
 	private final UpdateStrategyFactory updateStrategyFactory;
 
 	/**
-	 * @param pExecutor
+	 * @param pUpdateExecutor
 	 */
-	public DefaultChecksumFactory(final ExecutorService pExecutor, final UpdateStrategyFactory pDigestFactory) {
-		executor = pExecutor;
+	public DefaultChecksumFactory(final ExecutorService pUpdateExecutor, final ExecutorService pListenerExecutor,
+			final UpdateStrategyFactory pDigestFactory) {
+		updateExecutor = pUpdateExecutor;
+		listenerExecutor = pListenerExecutor;
 		updateStrategyFactory = pDigestFactory;
 	}
 
 	@Override
-	public UpdateableChecksum create(final String pAlgorithm, final StreamSource pSource)
-			throws NoSuchAlgorithmException {
-		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, pSource), executor);
+	public Checksum create(final String pAlgorithm, final StreamSource pSource) throws NoSuchAlgorithmException {
+		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, pSource), updateExecutor,
+				listenerExecutor);
 	}
 
 	@Override
-	public UpdateableChecksum create(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
-		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, pPath), executor);
+	public Checksum create(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException {
+		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, pPath), updateExecutor,
+				listenerExecutor);
 	}
 
 	@Override
-	public UpdateableChecksum create(final String pAlgorithm, final URL pUrl) throws NoSuchAlgorithmException {
-		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, new UrlStreamSource(pUrl)), executor);
+	public Checksum create(final String pAlgorithm, final URL pUrl) throws NoSuchAlgorithmException {
+		return new DefaultChecksum(updateStrategyFactory.newStrategy(pAlgorithm, new UrlStreamSource(pUrl)),
+				updateExecutor, listenerExecutor);
 	}
 
 	@Override
-	public UpdateableChecksum create(final Algorithm pAlgorithm, final StreamSource pSource) {
+	public Checksum create(final Algorithm pAlgorithm, final StreamSource pSource) {
 		try {
 			return create(pAlgorithm.toString(), pSource);
 		} catch (final NoSuchAlgorithmException e) {
@@ -73,7 +78,7 @@ public final class DefaultChecksumFactory implements ChecksumFactory {
 	}
 
 	@Override
-	public UpdateableChecksum create(final Algorithm pAlgorithm, final Path pPath) {
+	public Checksum create(final Algorithm pAlgorithm, final Path pPath) {
 		try {
 			return create(pAlgorithm.toString(), pPath);
 		} catch (final NoSuchAlgorithmException e) {
@@ -84,7 +89,7 @@ public final class DefaultChecksumFactory implements ChecksumFactory {
 	}
 
 	@Override
-	public UpdateableChecksum create(final Algorithm pAlgorithm, final URL pUrl) {
+	public Checksum create(final Algorithm pAlgorithm, final URL pUrl) {
 		try {
 			return create(pAlgorithm.toString(), pUrl);
 		} catch (final NoSuchAlgorithmException e) {
