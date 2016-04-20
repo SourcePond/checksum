@@ -16,11 +16,11 @@ package ch.sourcepond.io.checksum.impl;
 import static java.lang.Long.MAX_VALUE;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.channels.FileChannel.open;
+import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.TERMINATE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.StandardOpenOption.READ;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -35,6 +35,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.concurrent.GuardedBy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,16 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	 * Visitor to scan a directory structure for files to be digested.
 	 */
 	private final FileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+
+		private FileVisitResult state() {
+			return isCancelled() ? TERMINATE : CONTINUE;
+		}
+
+		@Override
+		public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+			return state();
+		}
+
 		/**
 		 * @param file
 		 * @param attrs
@@ -56,11 +68,8 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		 */
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-			if (!isCancelled()) {
-				performUpdate(file, 0l, MILLISECONDS);
-				return super.visitFile(file, attrs);
-			}
-			return TERMINATE;
+			performUpdate(file);
+			return state();
 		}
 	};
 
@@ -74,6 +83,12 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	// update it will be reset to null.
 	private ByteBuffer tempBuffer;
 
+	@GuardedBy("this")
+	private long interval;
+
+	@GuardedBy("this")
+	private TimeUnit unit;
+
 	/**
 	 * @param pBuffers
 	 * @param pDigest
@@ -84,14 +99,14 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}
 
-	private void performUpdate(final Path pFile, final long pInterval, final TimeUnit pUnit) throws IOException {
+	private void performUpdate(final Path pFile) throws IOException {
 		try (final FileChannel ch = open(pFile, READ)) {
 			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
 			try {
 				int read = ch.read(tempBuffer);
 				while (!isCancelled()) {
 					if (read == EOF) {
-						wait(pInterval, pUnit);
+						wait(interval, unit);
 						read = ch.read(tempBuffer);
 						if (read == EOF) {
 							break;
@@ -113,7 +128,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		}
 	}
 
-	protected ByteBuffer getTempBuffer() {
+	protected final ByteBuffer getTempBuffer() {
 		// Initialize the temporary hard reference to the tempBuffer; this must
 		// be set to null after the update has been performed.
 		tempBuffer = bufferRef.get();
@@ -130,16 +145,25 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	 * @throws InterruptedException
 	 */
 	@Override
-	protected void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException {
+	protected final void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException {
+		// Assign interval and time-unit to instance fields because they are
+		// also used by the directory visitor (if the source path is a
+		// directory)
+		interval = pInterval;
+		unit = pUnit;
+
+		// Get temp-buffer from weak-reference
 		tempBuffer = getTempBuffer();
 
 		try {
 			if (isDirectory(getSource())) {
 				walkFileTree(getSource(), visitor);
 			} else {
-				performUpdate(getSource(), pInterval, pUnit);
+				performUpdate(getSource());
 			}
 		} finally {
+			interval = 0;
+			unit = null;
 			tempBuffer = null;
 		}
 	}
