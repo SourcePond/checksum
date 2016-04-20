@@ -19,9 +19,11 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -68,6 +70,7 @@ public class BaseUpdateStrategyTest {
 		}
 	}
 
+	private static final byte[] ANY_DIGEST = new byte[] { 1, 2, 3 };
 	private final ExecutorService executor = newCachedThreadPool();
 	private final MessageDigest digest = mock(MessageDigest.class);
 	private BaseUpdateStrategy<Object> strategy;
@@ -194,13 +197,38 @@ public class BaseUpdateStrategyTest {
 	 * 
 	 */
 	@Test
-	public void verifyCancel() throws Exception {
+	public void verifyCancelUpdate() throws Exception {
 		assertFalse(strategy.isCancelled());
 		strategy.cancel();
 		assertTrue(strategy.isCancelled());
-		verify(digest).reset();
+		strategy.update(0, MILLISECONDS);
+		assertFalse(strategy.isCancelled());
 		strategy.update(0, MILLISECONDS);
 		assertFalse(strategy.isCancelled());
 	}
 
+	@Test
+	public void verifyDigest() throws Exception {
+		when(digest.digest()).thenReturn(ANY_DIGEST);
+		assertArrayEquals(ANY_DIGEST, strategy.digest());
+	}
+
+	@Test
+	public void verifyDigest_UpdateCancelled() throws Exception {
+		strategy.cancel();
+		assertNull(strategy.digest());
+	}
+
+	@Test
+	public void verifyCancel_ResetOnce() {
+		strategy.cancel();
+		strategy.cancel();
+		verify(digest).reset();
+	}
+
+	@Test
+	public void verifyFinalize() {
+		strategy.finalize();
+		verify(digest).reset();
+	}
 }

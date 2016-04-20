@@ -118,8 +118,8 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	public final void cancel() {
 		if (!cancelled) {
 			cancelled = true;
+			getDigest().reset();
 		}
-		getDigest().reset();
 	}
 
 	@Override
@@ -129,7 +129,7 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 
 	@GuardedBy("this")
 	@Override
-	protected synchronized final void finalize() throws Throwable {
+	protected synchronized final void finalize() {
 		cancel();
 	}
 }
