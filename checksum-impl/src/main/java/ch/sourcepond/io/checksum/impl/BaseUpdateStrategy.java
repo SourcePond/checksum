@@ -52,6 +52,12 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	private MessageDigest tmpDigest;
 
 	BaseUpdateStrategy(final String pAlgorithm, final T pSource) throws NoSuchAlgorithmException {
+		notNull(pAlgorithm, "Algorithm is null");
+		notNull(pSource, "Source is null");
+
+		// Insure the algorithm is known
+		getInstance(pAlgorithm);
+
 		algorithm = pAlgorithm;
 		source = pSource;
 		digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));

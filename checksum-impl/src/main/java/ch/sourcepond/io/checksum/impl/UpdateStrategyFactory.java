@@ -21,7 +21,7 @@ import ch.sourcepond.io.checksum.api.StreamSource;
 /**
  * Default implementation of the {@link UpdateStrategyFactory} interface.
  */
-public class UpdateStrategyFactory {
+class UpdateStrategyFactory {
 
 	/*
 	 * (non-Javadoc)

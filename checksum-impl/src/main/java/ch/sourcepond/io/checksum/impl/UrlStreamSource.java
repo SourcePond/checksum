@@ -23,11 +23,15 @@ import ch.sourcepond.io.checksum.api.StreamSource;
  * {@link StreamSource} implementation for URLs.
  *
  */
-class UrlStreamSource implements StreamSource {
+final class UrlStreamSource implements StreamSource {
 	private final URL url;
 
 	UrlStreamSource(final URL pUrl) {
 		url = pUrl;
+	}
+
+	URL getURL() {
+		return url;
 	}
 
 	@Override
