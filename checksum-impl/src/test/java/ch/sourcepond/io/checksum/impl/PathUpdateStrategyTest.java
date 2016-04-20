@@ -36,7 +36,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.spi.FileSystemProvider;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +53,7 @@ import org.mockito.stubbing.Answer;
  * @author rolandhauser
  *
  */
-public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStrategy> {
+public class PathUpdateStrategyTest {
 	public static final String EXPECTED_HASH = "40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778";
 	private static final String ALGORITHM = "SHA-256";
 	private final Path file = getDefault().getPath(USER_DIR, "src", "test", "resources", "first_content.txt");
@@ -67,11 +66,24 @@ public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStr
 
 		}
 	};
+	private UpdateStrategy strategy;
 	private MessageDigest digest;
 
-	@Override
-	protected PathUpdateStrategy newStrategy() throws NoSuchAlgorithmException {
-		return new PathUpdateStrategy(ALGORITHM, file);
+	/**
+	 * @throws Exception
+	 */
+	@Before
+	public void setup() throws Exception {
+		strategy = new PathUpdateStrategy(ALGORITHM, file);
+		digest = MessageDigest.getInstance("SHA-256");
+		when(in.read()).thenAnswer(new Answer<Integer>() {
+
+			@Override
+			public Integer answer(final InvocationOnMock invocation) throws Throwable {
+				sleep(10);
+				return 0;
+			}
+		});
 	}
 
 	/**
@@ -98,24 +110,6 @@ public class PathUpdateStrategyTest extends BaseUpdateStrategyTest<PathUpdateStr
 		strategy.update(0, MILLISECONDS);
 		final byte[] result = strategy.digest();
 		assertEquals(EXPECTED_HASH, encodeHexString(result));
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	@Override
-	@Before
-	public void setup() throws Exception {
-		super.setup();
-		digest = MessageDigest.getInstance("SHA-256");
-		when(in.read()).thenAnswer(new Answer<Integer>() {
-
-			@Override
-			public Integer answer(final InvocationOnMock invocation) throws Throwable {
-				sleep(10);
-				return 0;
-			}
-		});
 	}
 
 	/**

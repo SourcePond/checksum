@@ -28,10 +28,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 
@@ -61,30 +59,13 @@ final class DefaultChecksum implements Checksum {
 
 		@Override
 		public void run() {
-			// Do the calculation outside the mutex
-			Throwable th = null;
-			try {
-				strategy.update(interval, unit);
-			} catch (final Throwable e) {
-				th = e;
-			}
+			synchronized (strategy) {
+				// Do the calculation outside the mutex
+				try {
+					strategy.update(interval, unit);
 
-			// Do any assignment inside the mutex
-			updateLock.lock();
-			try {
-				if (th != null) {
-					// Only throw an ordinary throwable if the caught
-					// throwable is
-					// NOT an error.
-					if (th instanceof Error) {
-						throwable = th;
-					} else {
-						final ChecksumException ex = new ChecksumException(th.getMessage(), th);
-						informObservers(FAILURE, ex);
-						throwable = ex;
-					}
-				} else {
-					// Finally, assign the new digester values if not cancelled
+					// Finally, assign the new digester values if not
+					// cancelled
 					// i.e. a
 					// null-value indicates that the calculation has been
 					// cancelled.
@@ -96,17 +77,29 @@ final class DefaultChecksum implements Checksum {
 					} else {
 						informObservers(CANCELLED);
 					}
-				}
-			} finally {
-				updating = nextTask != null;
-				try {
-					if (updating) {
-						updateExecutor.execute(nextTask);
+				} catch (final Throwable e) {
+					// Only throw an ordinary throwable if the caught
+					// throwable is
+					// NOT an error.
+					if (e instanceof Error) {
+						throwable = e;
+					} else {
+						final ChecksumException ex = new ChecksumException(e.getMessage(), e);
+						informObservers(FAILURE, ex);
+						throwable = ex;
 					}
 				} finally {
-					nextTask = null;
-					updateDone.signalAll();
-					updateLock.unlock();
+					updating = nextTask != null;
+					try {
+						if (updating) {
+							updateExecutor.execute(nextTask);
+						}
+					} catch (final RejectedExecutionException e) {
+						LOG.warn(e.getMessage(), e);
+					} finally {
+						nextTask = null;
+						strategy.notifyAll();
+					}
 				}
 			}
 		}
@@ -114,13 +107,17 @@ final class DefaultChecksum implements Checksum {
 
 	private static final Logger LOG = getLogger(DefaultChecksum.class);
 	static final byte[] INITIAL = new byte[0];
-	private final Lock observerLock = new ReentrantLock();
-	private final Lock updateLock = new ReentrantLock();
-	private final Condition updateDone = updateLock.newCondition();
+	/**
+	 * Set of observers; this object is used as observer-monitor
+	 */
 	private final Set<UpdateObserver> observers = new HashSet<>();
+	/**
+	 * Strategy object to the actual digester work; this object is used as
+	 * update-monitor.
+	 */
 	private final UpdateStrategy strategy;
 	private final Executor updateExecutor;
-	private final Executor listenerExecutor;
+	private final Executor observerExecutor;
 	private UpdateTask nextTask;
 	private boolean updating;
 	private Throwable throwable;
@@ -134,7 +131,7 @@ final class DefaultChecksum implements Checksum {
 	DefaultChecksum(final UpdateStrategy pStrategy, final Executor pUpdateExecutor, final Executor pListenerExecutor) {
 		strategy = pStrategy;
 		updateExecutor = pUpdateExecutor;
-		listenerExecutor = pListenerExecutor;
+		observerExecutor = pListenerExecutor;
 	}
 
 	/**
@@ -157,7 +154,7 @@ final class DefaultChecksum implements Checksum {
 	private void awaitCalculation() throws ChecksumException {
 		try {
 			while (updating) {
-				updateDone.await();
+				strategy.wait();
 			}
 		} catch (final InterruptedException e) {
 			currentThread().interrupt();
@@ -177,10 +174,9 @@ final class DefaultChecksum implements Checksum {
 	}
 
 	private void informObservers(final ObserverCallback pCallback, final ChecksumException pFailureOrNull) {
-		observerLock.lock();
-		try {
+		synchronized (observers) {
 			for (final UpdateObserver observer : observers) {
-				listenerExecutor.execute(new Runnable() {
+				observerExecutor.execute(new Runnable() {
 
 					@Override
 					public void run() {
@@ -192,18 +188,13 @@ final class DefaultChecksum implements Checksum {
 					}
 				});
 			}
-		} finally {
-			observerLock.unlock();
 		}
 	}
 
 	@Override
 	public Checksum cancel() {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			strategy.cancel();
-		} finally {
-			updateLock.unlock();
 		}
 		return this;
 	}
@@ -220,8 +211,7 @@ final class DefaultChecksum implements Checksum {
 
 	@Override
 	public Checksum update(final long pInterval, final TimeUnit pUnit) {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			// An update is only scheduled, if
 			// a) no update is currently running
 			// b) no update is waiting for execution.
@@ -231,89 +221,67 @@ final class DefaultChecksum implements Checksum {
 			} else if (nextTask == null) {
 				nextTask = new UpdateTask(pInterval, pUnit);
 			}
-		} finally {
-			updateLock.unlock();
 		}
 		return this;
 	}
 
 	@Override
 	public boolean isUpdating() {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			return updating;
-		} finally {
-			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public String getAlgorithm() {
+		// Final value, no synchronization necessary
 		return strategy.getAlgorithm();
 	}
 
 	@Override
 	public byte[] getValue() throws ChecksumException {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			awaitCalculation();
 			return copyArray(value);
-		} finally {
-			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public String getHexValue() throws ChecksumException {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			awaitCalculation();
 			return encodeHexString(value);
-		} finally {
-			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public boolean equalsPrevious() throws ChecksumException {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			awaitCalculation();
 			return Arrays.equals(previousValue, value);
-		} finally {
-			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public byte[] getPreviousValue() throws ChecksumException {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			awaitCalculation();
 			return copyArray(previousValue);
-		} finally {
-			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public String getPreviousHexValue() throws ChecksumException {
-		updateLock.lock();
-		try {
+		synchronized (strategy) {
 			awaitCalculation();
 			return encodeHexString(previousValue);
-		} finally {
-			updateLock.unlock();
 		}
 	}
 
 	@Override
 	public Checksum addUpdateObserver(final UpdateObserver pObserver) {
-		observerLock.lock();
-		try {
+		synchronized (observers) {
 			observers.add(pObserver);
-		} finally {
-			observerLock.unlock();
 		}
 		LOG.debug("Added observer {}", pObserver);
 		return this;
@@ -321,11 +289,8 @@ final class DefaultChecksum implements Checksum {
 
 	@Override
 	public Checksum removeUpdateObserver(final UpdateObserver pObserver) {
-		observerLock.lock();
-		try {
+		synchronized (observers) {
 			observers.remove(pObserver);
-		} finally {
-			observerLock.unlock();
 		}
 		LOG.debug("Removed observer {}", pObserver);
 		return this;

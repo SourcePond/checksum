@@ -22,9 +22,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.concurrent.GuardedBy;
 
 import org.slf4j.Logger;
 
@@ -38,11 +37,9 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	 */
 	static final int DEFAULT_BUFFER_SIZE = 8192;
 	static final int EOF = -1;
-	private final Lock lock = new ReentrantLock();
-	private final Condition waitCondition = lock.newCondition();
 	private final String algorithm;
 	private final T source;
-	private volatile boolean cancelled;
+	private boolean cancelled;
 	private final MessageDigest digest;
 
 	BaseUpdateStrategy(final String pAlgorithm, final T pSource) throws NoSuchAlgorithmException {
@@ -51,10 +48,10 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 
 		algorithm = pAlgorithm;
 		source = pSource;
-		digest = getInstance(pAlgorithm);
+		digest = getInstance(algorithm);
 	}
 
-	protected final MessageDigest getDigest() {
+	protected MessageDigest getDigest() {
 		return digest;
 	}
 
@@ -64,24 +61,23 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
+	@GuardedBy("this")
 	protected final void wait(final long pInterval, final TimeUnit pUnit) throws IOException {
 		if (isCancelled()) {
 			LOG.debug("Checksum calculation cancelled by user.");
 		} else if (pInterval > 0) {
-			lock.lock();
 			try {
-				waitCondition.await(pInterval, pUnit);
+				wait(pUnit.toMillis(pInterval));
 			} catch (final InterruptedException e) {
 				currentThread().interrupt();
 				throw new IOException(e.getMessage(), e);
-			} finally {
-				lock.unlock();
 			}
 		}
 	}
 
-	protected abstract void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException;
+	protected abstract void doUpdate(long pInterval, TimeUnit pUnit) throws IOException;
 
+	@GuardedBy(value = "this")
 	@Override
 	public final void update(final long pInterval, final TimeUnit pUnit) throws IOException {
 		try {
@@ -93,6 +89,7 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		}
 	}
 
+	@GuardedBy(value = "this")
 	@Override
 	public final byte[] digest() {
 		byte[] digest = null;
@@ -102,7 +99,7 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		return digest;
 	}
 
-	public T getSource() {
+	public final T getSource() {
 		return source;
 	}
 
@@ -111,10 +108,12 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	 * 
 	 * @return {@code true} if cancelled, {@code false} otherwise.
 	 */
+	@GuardedBy("this")
 	protected final boolean isCancelled() {
 		return cancelled;
 	}
 
+	@GuardedBy("this")
 	@Override
 	public final void cancel() {
 		if (!cancelled) {
@@ -124,12 +123,13 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	}
 
 	@Override
-	public String getAlgorithm() {
+	public final String getAlgorithm() {
 		return algorithm;
 	}
 
+	@GuardedBy("this")
 	@Override
-	protected final void finalize() throws Throwable {
+	protected synchronized final void finalize() throws Throwable {
 		cancel();
 	}
 }
