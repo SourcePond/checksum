@@ -70,8 +70,8 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	// references to the tempBuffer.
 	private WeakReference<ByteBuffer> bufferRef;
 
-	// These fields will be initialized when an update is performed. After the
-	// update they will be set to null.
+	// This field will be initialized when an update is performed. After the
+	// update it will be reset to null.
 	private ByteBuffer tempBuffer;
 
 	/**
@@ -105,12 +105,23 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 				}
 
 				if (isCancelled()) {
-					LOG.debug("Checksum calculation cancelled by user.");
+					LOG.info("Checksum calculation cancelled by user.");
 				}
 			} finally {
 				fl.release();
 			}
 		}
+	}
+
+	protected ByteBuffer getTempBuffer() {
+		// Initialize the temporary hard reference to the tempBuffer; this must
+		// be set to null after the update has been performed.
+		tempBuffer = bufferRef.get();
+		if (tempBuffer == null) {
+			tempBuffer = allocateDirect(DEFAULT_BUFFER_SIZE);
+			bufferRef = new WeakReference<ByteBuffer>(tempBuffer);
+		}
+		return tempBuffer;
 	}
 
 	/**
@@ -120,13 +131,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	 */
 	@Override
 	protected void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException {
-		// Initialize the temporary hard reference to the tempBuffer; this must
-		// be set to null after the update has been performed.
-		tempBuffer = bufferRef.get();
-		if (tempBuffer == null) {
-			tempBuffer = allocateDirect(DEFAULT_BUFFER_SIZE);
-			bufferRef = new WeakReference<ByteBuffer>(tempBuffer);
-		}
+		tempBuffer = getTempBuffer();
 
 		try {
 			if (isDirectory(getSource())) {
