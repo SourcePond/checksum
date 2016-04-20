@@ -51,6 +51,10 @@ final class StreamSourceUpdateStrategy extends BaseUpdateStrategy<StreamSource> 
 				}
 				read = din.read(buf);
 			}
+
+			if (isCancelled()) {
+				LOG.info("Checksum calculation cancelled by user.");
+			}
 		}
 	}
 }
