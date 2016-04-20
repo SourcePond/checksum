@@ -37,7 +37,7 @@ final class StreamSourceUpdateStrategy extends BaseUpdateStrategy<StreamSource> 
 
 	@Override
 	protected void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException {
-		try (final DigestInputStream din = new DigestInputStream(getSource().openStream(), getTmpDigest())) {
+		try (final DigestInputStream din = new DigestInputStream(getSource().openStream(), getDigest())) {
 			final byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
 			int read = din.read(buf);
 

@@ -57,7 +57,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 			if (!isCancelled()) {
-				performUpdate(file, tempBuffer, 0l, MILLISECONDS);
+				performUpdate(file, 0l, MILLISECONDS);
 				return super.visitFile(file, attrs);
 			}
 			return TERMINATE;
@@ -84,27 +84,24 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 		bufferRef = new WeakReference<ByteBuffer>(allocateDirect(DEFAULT_BUFFER_SIZE));
 	}
 
-	private void performUpdate(final Path pFile, final ByteBuffer buffer, final long pInterval, final TimeUnit pUnit)
-			throws IOException {
+	private void performUpdate(final Path pFile, final long pInterval, final TimeUnit pUnit) throws IOException {
 		try (final FileChannel ch = open(pFile, READ)) {
 			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
 			try {
-				final byte[] tmp = new byte[DEFAULT_BUFFER_SIZE];
-				int read = ch.read(buffer);
+				int read = ch.read(tempBuffer);
 				while (!isCancelled()) {
 					if (read == EOF) {
 						wait(pInterval, pUnit);
-						read = ch.read(buffer);
+						read = ch.read(tempBuffer);
 						if (read == EOF) {
 							break;
 						}
 					}
 
-					buffer.flip();
-					buffer.get(tmp, 0, read);
-					getTmpDigest().update(tmp, 0, read);
-					buffer.clear();
-					read = ch.read(buffer);
+					tempBuffer.flip();
+					getDigest().update(tempBuffer);
+					tempBuffer.clear();
+					read = ch.read(tempBuffer);
 				}
 
 				if (isCancelled()) {
@@ -135,7 +132,7 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 			if (isDirectory(getSource())) {
 				walkFileTree(getSource(), visitor);
 			} else {
-				performUpdate(getSource(), tempBuffer, pInterval, pUnit);
+				performUpdate(getSource(), pInterval, pUnit);
 			}
 		} finally {
 			tempBuffer = null;

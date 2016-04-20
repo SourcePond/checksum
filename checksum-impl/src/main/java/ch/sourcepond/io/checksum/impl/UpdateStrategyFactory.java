@@ -21,7 +21,8 @@ import ch.sourcepond.io.checksum.api.StreamSource;
 /**
  * Default implementation of the {@link UpdateStrategyFactory} interface.
  */
-class UpdateStrategyFactory {
+// Must be public because Blueprint
+public class UpdateStrategyFactory {
 
 	/*
 	 * (non-Javadoc)

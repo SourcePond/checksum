@@ -19,7 +19,6 @@ import static org.apache.commons.lang3.Validate.notNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
@@ -44,27 +43,19 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	private final String algorithm;
 	private final T source;
 	private volatile boolean cancelled;
-	// To safe as much system resources as possible, we do not hold hard
-	// references to the digester.
-	private WeakReference<MessageDigest> digestRef;
-	// Temporary digest; this should only be initialized for consecutive
-	// sequence of update requests i.e. from a starting update until digest
-	private MessageDigest tmpDigest;
+	private final MessageDigest digest;
 
 	BaseUpdateStrategy(final String pAlgorithm, final T pSource) throws NoSuchAlgorithmException {
 		notNull(pAlgorithm, "Algorithm is null");
 		notNull(pSource, "Source is null");
 
-		// Insure the algorithm is known
-		getInstance(pAlgorithm);
-
 		algorithm = pAlgorithm;
 		source = pSource;
-		digestRef = new WeakReference<MessageDigest>(getInstance(pAlgorithm));
+		digest = getInstance(pAlgorithm);
 	}
 
-	protected final MessageDigest getTmpDigest() {
-		return tmpDigest;
+	protected final MessageDigest getDigest() {
+		return digest;
 	}
 
 	/**
@@ -89,33 +80,11 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		}
 	}
 
-	private MessageDigest getWeakDigest() {
-		// Initialize the temporary hard reference to the digester; this must be
-		// set to null after the update has been performed.
-		MessageDigest tempDigest = digestRef.get();
-		if (tempDigest == null) {
-			try {
-				tempDigest = getInstance(getAlgorithm());
-			} catch (final NoSuchAlgorithmException e) {
-				// This can never happen because it has already been validated
-				// during construction that the algorithm is available.
-			}
-			digestRef = new WeakReference<MessageDigest>(tempDigest);
-		}
-		return tempDigest;
-	}
-
 	protected abstract void doUpdate(final long pInterval, final TimeUnit pUnit) throws IOException;
 
 	@Override
 	public final void update(final long pInterval, final TimeUnit pUnit) throws IOException {
 		try {
-			// Initialize the temporary hard reference to the digester; this
-			// must be
-			// set to null after the update has been performed.
-			if (tmpDigest == null) {
-				tmpDigest = getWeakDigest();
-			}
 			doUpdate(pInterval, pUnit);
 		} finally {
 			if (cancelled) {
@@ -127,16 +96,8 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 	@Override
 	public final byte[] digest() {
 		byte[] digest = null;
-		try {
-			if (!cancelled) {
-				notNull(tmpDigest, "tmpDigest digest is null");
-				digest = tmpDigest.digest();
-			}
-		} finally {
-			// This is important; we need to clear the hard-reference to the
-			// digest. Otherwise it would not make any sense to hold a
-			// WeakReference ;-)
-			tmpDigest = null;
+		if (!cancelled) {
+			digest = getDigest().digest();
 		}
 		return digest;
 	}
@@ -159,12 +120,7 @@ abstract class BaseUpdateStrategy<T> implements UpdateStrategy {
 		if (!cancelled) {
 			cancelled = true;
 		}
-		// Important: clear the hard-reference to the digest object (if not
-		// already done).
-		if (tmpDigest != null) {
-			tmpDigest.reset();
-			tmpDigest = null;
-		}
+		getDigest().reset();
 	}
 
 	@Override
