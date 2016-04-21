@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.After;
@@ -37,6 +38,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import ch.sourcepond.io.checksum.api.Algorithm;
 import ch.sourcepond.io.checksum.api.StreamSource;
 
 /**
@@ -48,12 +50,18 @@ public class StreamSourceUpdateStrategyTest {
 	private final InputStream mockStream = mock(InputStream.class);
 	private final StreamSource source = mock(StreamSource.class);
 	private final ScheduledExecutorService executor = newScheduledThreadPool(1);
+	private final UpdateStrategyFactory strategyFactory = new UpdateStrategyFactory();
 	private StreamSourceUpdateStrategy strategy;
+
+	private StreamSourceUpdateStrategy newStrategy(final Algorithm pAlgorithm, final StreamSource pSource)
+			throws NoSuchAlgorithmException {
+		return (StreamSourceUpdateStrategy) strategyFactory.newStrategy(pAlgorithm.toString(), pSource);
+	}
 
 	@Before
 	public void setup() throws Exception {
 		when(source.openStream()).thenReturn(stream);
-		strategy = new StreamSourceUpdateStrategy(SHA256.toString(), source);
+		strategy = newStrategy(SHA256, source);
 	}
 
 	@After
@@ -71,7 +79,7 @@ public class StreamSourceUpdateStrategyTest {
 	@Test(timeout = 1000)
 	public void verifyUpdate_Cancelled() throws Exception {
 		when(source.openStream()).thenReturn(mockStream);
-		strategy = new StreamSourceUpdateStrategy(SHA256.toString(), source);
+		strategy = newStrategy(SHA256, source);
 		executor.schedule(new Runnable() {
 
 			@Override
@@ -95,7 +103,7 @@ public class StreamSourceUpdateStrategyTest {
 		deleteIfExists(testFile);
 		createFile(testFile);
 		try {
-			strategy = new StreamSourceUpdateStrategy(SHA256.toString(), source);
+			strategy = newStrategy(SHA256, source);
 			executor.schedule(new TestDataWriter(testFile, "abcdefg"), 500, MILLISECONDS);
 			executor.schedule(new TestDataWriter(testFile, "hijklmn"), 1000, MILLISECONDS);
 			executor.schedule(new TestDataWriter(testFile, "opqrstu"), 1500, MILLISECONDS);
