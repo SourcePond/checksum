@@ -17,7 +17,6 @@ import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.createFile;
 import static java.nio.file.Files.deleteIfExists;
-import static java.nio.file.StandardOpenOption.APPEND;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
@@ -26,13 +25,13 @@ import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.Test;
+
+import ch.sourcepond.io.checksum.api.Algorithm;
 
 /**
  * @author rolandhauser
@@ -40,39 +39,23 @@ import org.junit.Test;
  */
 public class PathUpdateStrategyTest {
 
-	/**
-	 *
-	 */
-	private static class TestDataWriter implements Runnable {
-		private final Path testFile;
-		private final String data;
-
-		public TestDataWriter(final Path pTestFile, final String pData) {
-			testFile = pTestFile;
-			data = pData;
-		}
-
-		@Override
-		public void run() {
-			try (final BufferedWriter wr = Files.newBufferedWriter(testFile, APPEND)) {
-				wr.write(data);
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private final ScheduledExecutorService executor = newSingleThreadScheduledExecutor();
 	private final Path resources = getDefault().getPath(USER_DIR, "src", "test", "resources");
 	private final Path realFile = resources.resolve("first_content.txt");
+	private final UpdateStrategyFactory strategyFactory = new UpdateStrategyFactory();
 	private PathUpdateStrategy strategy;
+
+	private PathUpdateStrategy newStrategy(final Algorithm pAlgorithm, final Path pPath)
+			throws NoSuchAlgorithmException {
+		return (PathUpdateStrategy) strategyFactory.newStrategy(pAlgorithm.toString(), pPath);
+	}
 
 	/**
 	 * @throws Exception
 	 */
 	@Test
 	public void verifyWalkDirectoryTree() throws Exception {
-		strategy = new PathUpdateStrategy(SHA256.toString(), resources);
+		strategy = newStrategy(SHA256, resources);
 		strategy.update(0, MILLISECONDS);
 		final byte[] result = strategy.digest();
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", encodeHexString(result));
@@ -83,7 +66,7 @@ public class PathUpdateStrategyTest {
 	 */
 	@Test
 	public void verifyUpdateDigestWithRealFile() throws Exception {
-		strategy = new PathUpdateStrategy(SHA256.toString(), realFile);
+		strategy = newStrategy(SHA256, realFile);
 		strategy.update(0, MILLISECONDS);
 		final byte[] result = strategy.digest();
 		assertEquals("40ab41c711d6979c8bfb9dae2022d79e4fa43b79bf5c74cc8d291936586a4778", encodeHexString(result));
@@ -94,7 +77,7 @@ public class PathUpdateStrategyTest {
 	 */
 	@Test(timeout = 2000)
 	public void verifyUpdateDigestGCRun() throws Exception {
-		strategy = new PathUpdateStrategy(SHA256.toString(), realFile);
+		strategy = newStrategy(SHA256, realFile);
 		final long objectIdentityBeforeGC = System.identityHashCode(strategy.getTempBuffer());
 
 		// Call to update will set the hard-reference tempBuffer to null. This
@@ -113,7 +96,7 @@ public class PathUpdateStrategyTest {
 		deleteIfExists(testFile);
 		createFile(testFile);
 		try {
-			strategy = new PathUpdateStrategy(SHA256.toString(), testFile);
+			strategy = newStrategy(SHA256, testFile);
 			executor.schedule(new TestDataWriter(testFile, "abcdefg"), 500, MILLISECONDS);
 			executor.schedule(new TestDataWriter(testFile, "hijklmn"), 1000, MILLISECONDS);
 			executor.schedule(new TestDataWriter(testFile, "opqrstu"), 1500, MILLISECONDS);
