@@ -107,7 +107,7 @@ public class PathUpdateStrategyMockTest {
 	/**
 	 * @throws Exception
 	 */
-	@Test(timeout = 2000)
+	@Test(timeout = 5000)
 	public void verifyCancelDuringPerformUpdated() throws Exception {
 		when(ch.read(strategy.getTempBuffer())).thenReturn(10);
 
