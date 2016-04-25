@@ -10,6 +10,7 @@ import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.junit.Assert.assertEquals;
@@ -103,7 +104,7 @@ public class ChecksumFactoryTest {
 			public InputStream openStream() throws IOException {
 				return asStream(FIRST_CONTENT_FILE_NAME);
 			}
-		}).update();
+		}).update(2, SECONDS);
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 	}
 
@@ -115,7 +116,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE).update();
+		final Checksum chsm = factory.create(SHA256, TEST_FILE).update(2, SECONDS);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -133,7 +134,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateUrlChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update();
+		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update(2, SECONDS);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -155,7 +156,7 @@ public class ChecksumFactoryTest {
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update();
+		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update(2, SECONDS);
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }
