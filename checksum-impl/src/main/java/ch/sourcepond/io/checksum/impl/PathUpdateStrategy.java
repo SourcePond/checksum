@@ -100,6 +100,8 @@ class PathUpdateStrategy extends BaseUpdateStrategy<Path> {
 	}
 
 	private void performUpdate(final Path pFile) throws IOException {
+		LOG.debug("Digesting path: {}", pFile);
+
 		try (final FileChannel ch = open(pFile, READ)) {
 			final FileLock fl = ch.lock(0l, MAX_VALUE, true);
 			try {
