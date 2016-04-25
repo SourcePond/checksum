@@ -156,7 +156,7 @@ public class ChecksumFactoryTest {
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update(3, SECONDS);
+		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update(5, SECONDS);
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }
