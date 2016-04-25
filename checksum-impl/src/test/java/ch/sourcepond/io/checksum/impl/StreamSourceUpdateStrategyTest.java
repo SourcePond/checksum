@@ -76,7 +76,7 @@ public class StreamSourceUpdateStrategyTest {
 		assertEquals("94ac0d8cfdc9093ce4b1a9967d72d44e9c3cd931ff92da4f1fe77ac44c1654fd", encodeHexString(result));
 	}
 
-	@Test(timeout = 1000)
+	@Test(timeout = 5000)
 	public void verifyUpdate_Cancelled() throws Exception {
 		when(source.openStream()).thenReturn(mockStream);
 		strategy = newStrategy(SHA256, source);
