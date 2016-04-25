@@ -56,7 +56,9 @@ public class PathUpdateStrategyTest {
 	@Test
 	public void verifyWalkDirectoryTree() throws Exception {
 		strategy = newStrategy(SHA256, resources);
-		strategy.update(0, MILLISECONDS);
+		synchronized (strategy) {
+			strategy.update(5000, MILLISECONDS);
+		}
 		final byte[] result = strategy.digest();
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", encodeHexString(result));
 	}
