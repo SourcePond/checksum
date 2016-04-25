@@ -104,7 +104,7 @@ public class ChecksumFactoryTest {
 			public InputStream openStream() throws IOException {
 				return asStream(FIRST_CONTENT_FILE_NAME);
 			}
-		}).update(2, SECONDS);
+		}).update(3, SECONDS);
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 	}
 
@@ -116,7 +116,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateFileChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE).update(2, SECONDS);
+		final Checksum chsm = factory.create(SHA256, TEST_FILE).update(3, SECONDS);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -134,7 +134,7 @@ public class ChecksumFactoryTest {
 	@Test
 	public void verifyCreateUrlChecksum() throws Exception {
 		copyContent(FIRST_CONTENT_FILE_NAME);
-		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update(2, SECONDS);
+		final Checksum chsm = factory.create(SHA256, TEST_FILE.toUri().toURL()).update(3, SECONDS);
 		assertEquals(EMPTY, chsm.getPreviousHexValue());
 		assertEquals(FIRST_EXPECTED_HASH, chsm.getHexValue());
 
@@ -156,7 +156,7 @@ public class ChecksumFactoryTest {
 	 */
 	@Test
 	public void verifyDirectoryChecksum() throws Exception {
-		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update(2, SECONDS);
+		final Checksum chsm = factory.create(SHA256, resolveResourcesDirectory()).update(3, SECONDS);
 		assertEquals("dd3e119c99983d19b13fd51020f0f2562cde3788e5d36b7666b961bb159f16c8", chsm.getHexValue());
 	}
 }
