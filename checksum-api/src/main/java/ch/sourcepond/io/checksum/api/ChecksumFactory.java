@@ -60,12 +60,12 @@ public interface ChecksumFactory {
 	 * @param pSource
 	 *            The source where to read the data to be digested from, must
 	 *            not be {@code null}.
-	 * @return New {@link Checksum} instance, never {@code null}
+	 * @return New {@link MutableChecksum} instance, never {@code null}
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(Algorithm pAlgorithm, StreamSource pSource);
+	MutableChecksum create(Algorithm pAlgorithm, StreamSource pSource);
 
 	/**
 	 * <p>
@@ -86,12 +86,12 @@ public interface ChecksumFactory {
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
-	 * @return New {@link Checksum} instance, never {@code null}
+	 * @return New {@link MutableChecksum} instance, never {@code null}
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(Algorithm pAlgorithm, Path pPath);
+	MutableChecksum create(Algorithm pAlgorithm, Path pPath);
 
 	/**
 	 * <p>
@@ -110,12 +110,12 @@ public interface ChecksumFactory {
 	 * @param pUrl
 	 *            {@link URL} of the content to be digested, must not be
 	 *            {@code null}.
-	 * @return New {@link Checksum} instance, never {@code null}
+	 * @return New {@link MutableChecksum} instance, never {@code null}
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(Algorithm pAlgorithm, URL pUrl);
+	MutableChecksum create(Algorithm pAlgorithm, URL pUrl);
 
 	/**
 	 * <p>
@@ -134,14 +134,14 @@ public interface ChecksumFactory {
 	 * @param pSource
 	 *            The source where to read the data to be digested from, must
 	 *            not be {@code null}.
-	 * @return New {@link Checksum} instance, never {@code null}
+	 * @return New {@link MutableChecksum} instance, never {@code null}
 	 * @throws NoSuchAlgorithmException
 	 *             Thrown, if the hashing algorithm specified is unknown.
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
+	MutableChecksum create(String pAlgorithm, StreamSource pSource) throws NoSuchAlgorithmException;
 
 	/**
 	 * <p>
@@ -162,14 +162,14 @@ public interface ChecksumFactory {
 	 * @param pPath
 	 *            Path to the file or directory to be digested, must not be
 	 *            {@code null}.
-	 * @return New {@link Checksum} instance, never {@code null}
+	 * @return New {@link MutableChecksum} instance, never {@code null}
 	 * @throws NoSuchAlgorithmException
 	 *             Thrown, if the hashing algorithm specified is unknown.
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
+	MutableChecksum create(String pAlgorithm, Path pPath) throws NoSuchAlgorithmException;
 
 	/**
 	 * <p>
@@ -188,12 +188,12 @@ public interface ChecksumFactory {
 	 * @param pUrl
 	 *            {@link URL} of the content to be digested, must not be
 	 *            {@code null}.
-	 * @return New {@link Checksum} instance, never {@code null}
+	 * @return New {@link MutableChecksum} instance, never {@code null}
 	 * @throws NoSuchAlgorithmException
 	 *             Thrown, if the hashing algorithm specified is unknown.
 	 * @throws RejectedExecutionException
 	 *             Thrown, if the asynchronous update task could not be
 	 *             submitted.
 	 */
-	Checksum create(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
+	MutableChecksum create(String pAlgorithm, URL pUrl) throws NoSuchAlgorithmException;
 }

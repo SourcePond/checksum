@@ -4,3 +4,8 @@
 /.classpath
 /.project
 /.DS_Store
+.idea
+.classpath
+.project
+*.log
+*.iml

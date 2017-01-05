@@ -1,10 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<groupId>ch.sourcepond</groupId>
-		<artifactId>bundle</artifactId>
-		<version>0.6.1</version>
-		<relativePath />
+		<groupId>ch.sourcepond.io</groupId>
+		<artifactId>checksum</artifactId>
+		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.sourcepond.io</groupId>
@@ -14,20 +13,16 @@
 	<packaging>bundle</packaging>
 	<description>Provides an implementation for the checksum-api bundle.</description>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>ch.sourcepond.io</groupId>
-				<artifactId>checksum-api</artifactId>
-				<version>0.1-SNAPSHOT</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>ch.sourcepond.io</groupId>
 			<artifactId>checksum-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.sourcepond.commons</groupId>
+			<artifactId>smartswitch-api</artifactId>
+			<version>${smartswitch.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>

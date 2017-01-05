@@ -23,6 +23,7 @@ import java.io.InputStream;
  * {@link Checksum} instances which fetch their data from a custom source.
  *
  */
+@FunctionalInterface
 public interface StreamSource {
 
 	/**
