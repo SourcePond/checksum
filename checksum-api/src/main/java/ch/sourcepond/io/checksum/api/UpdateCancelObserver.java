@@ -3,7 +3,7 @@ package ch.sourcepond.io.checksum.api;
 /**
  * Created by roland on 04.01.17.
  */
-public interface UpdateCancelObserver extends UpdateObserver {
+public interface UpdateCancelObserver<T> extends UpdateObserver<T> {
 
-    void updateSucceeded(Checksum pChecksum);
+    void updateSucceeded(T pSource, Checksum pChecksum);
 }

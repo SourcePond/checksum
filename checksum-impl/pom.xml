@@ -6,9 +6,7 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>ch.sourcepond.io</groupId>
 	<artifactId>checksum-impl</artifactId>
-	<version>0.1-SNAPSHOT</version>
 	<inceptionYear>2015</inceptionYear>
 	<packaging>bundle</packaging>
 	<description>Provides an implementation for the checksum-api bundle.</description>
@@ -32,10 +30,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>

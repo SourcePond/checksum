@@ -1,7 +1,7 @@
 package ch.sourcepond.io.checksum.api;
 
 /**
- * Base interface for all observer types which can be added to an {@link MutableChecksum} instance.
+ * Base interface for all observer types which can be added to an {@link ObservedResource} instance.
  */
-public interface UpdateObserver {
+public interface UpdateObserver<T> {
 }

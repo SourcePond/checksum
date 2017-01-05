@@ -14,8 +14,8 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
-import static ch.sourcepond.io.checksum.api.ChecksumFactory.LISTENER_EXECUTOR_ATTRIBUTE;
-import static ch.sourcepond.io.checksum.api.ChecksumFactory.UPDATE_EXECUTOR_ATTRIBUTE;
+import static ch.sourcepond.io.checksum.api.ObservedResourcesRegistry.LISTENER_EXECUTOR_ATTRIBUTE;
+import static ch.sourcepond.io.checksum.api.ObservedResourcesRegistry.UPDATE_EXECUTOR_ATTRIBUTE;
 import static ch.sourcepond.testing.OptionsHelper.blueprintBundles;
 import static ch.sourcepond.testing.OptionsHelper.defaultOptions;
 import static ch.sourcepond.testing.OptionsHelper.stubService;
@@ -48,7 +48,7 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.ChecksumFactory;
+import ch.sourcepond.io.checksum.api.ObservedResourcesRegistry;
 import ch.sourcepond.io.checksum.api.StreamSource;
 
 /**
@@ -70,7 +70,7 @@ public class ChecksumFactoryTest {
 	 * 
 	 */
 	@Inject
-	private ChecksumFactory factory;
+	private ObservedResourcesRegistry factory;
 
 	/**
 	 * @return

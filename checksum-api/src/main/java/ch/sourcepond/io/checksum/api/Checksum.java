@@ -18,7 +18,7 @@ import java.security.MessageDigest;
 /**
  * Abstracts a checksum based on a specific hashing algorithm (see
  * {@link MessageDigest} for further information) and provides the ability to
- * calculate, query and update the represented checksum value.
+ * query the represented checksum value.
  */
 public interface Checksum {
 
@@ -34,9 +34,7 @@ public interface Checksum {
 	/**
 	 * <p>
 	 * Gets the result of the latest completed calculation triggered through one
-	 * of the {@code update} methods on {@link Checksum}. If the
-	 * latest calculation has been failed, the causing exception will be
-	 * re-thrown.
+	 * of the {@code update} methods on {@link ObservedResource}.
 	 * </p>
 	 * 
 	 * <p>
@@ -55,72 +53,14 @@ public interface Checksum {
 	 * </p>
 	 * 
 	 * @return The calculated checksum as byte array, never {@code null}
-	 * @throws ChecksumException
-	 *             Thrown, if the latest {@code update} operation has been
-	 *             failed (necessary data could not read from its source for any
-	 *             reason, the calculating thread has been interrupted, or
-	 *             another unexpected exception has occurred)
 	 */
-	byte[] getValue() throws ChecksumException;
+	byte[] getValue();
 
 	/**
 	 * Returns the checksum as hex-string. See {@link #getValue()} for further
 	 * information.
 	 * 
 	 * @return The calculated checksum as string, never {@code null}
-	 * @throws ChecksumException
-	 *             Thrown, if the latest {@code update} operation has been
-	 *             failed (necessary data could not read from its source for any
-	 *             reason, the calculating thread has been interrupted, or
-	 *             another unexpected exception has occurred)
 	 */
-	String getHexValue() throws ChecksumException;
-
-	/**
-	 * Checks whether the current checksum, i.e. the resulting checksum
-	 * <em>after</em> the latest {@code update()} has been <em>successfully</em>
-	 * performed, is equal to the previous checksum, i.e. the last
-	 * <em>successfully</em> calculated checksum <em>before</em> the latest
-	 * {@code update()} has been performed. If an update is currently running (
-	 * {@link Checksum#isUpdating()} returns {@code true}), this
-	 * method blocks until the update operation is done.
-	 * 
-	 * @return {@code true} if the current and previous checksum are equal,
-	 *         {@code false} otherwise.
-	 * @throws ChecksumException
-	 *             Thrown, if the latest {@code update()} operation has been
-	 *             failed (necessary data could not read from its source for any
-	 *             reason, the calculating thread has been interrupted, or
-	 *             another unexpected exception has occurred)
-	 */
-	boolean equalsPrevious() throws ChecksumException;
-
-	/**
-	 * Returns the previous checksum before the latest {@code update()} has been
-	 * performed. If none of the {@code update} methods on
-	 * {@link Checksum} has ever been called an empty array will be
-	 * returned.
-	 * 
-	 * @return Previous checksum as byte array, never {@code null}
-	 * @throws ChecksumException
-	 *             Thrown, if the latest {@code update()} operation has been
-	 *             failed (necessary data could not read from its source for any
-	 *             reason, the calculating thread has been interrupted, or
-	 *             another unexpected exception has occurred)
-	 */
-	byte[] getPreviousValue() throws ChecksumException;
-
-	/**
-	 * Returns the previous checksum before the last {@code update()} occurred
-	 * as hex-string. If {@code update()} has not been called more than once, an
-	 * empty string will be returned.
-	 * 
-	 * @return Previous checksum as hex-string, never {@code null}
-	 * @throws ChecksumException
-	 *             Thrown, if the latest {@code update()} operation has been
-	 *             failed (necessary data could not read from its source for any
-	 *             reason, the calculating thread has been interrupted, or
-	 *             another unexpected exception has occurred)
-	 */
-	String getPreviousHexValue() throws ChecksumException;
+	String getHexValue();
 }

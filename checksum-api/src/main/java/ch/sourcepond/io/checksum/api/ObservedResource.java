@@ -1,15 +1,15 @@
 package ch.sourcepond.io.checksum.api;
 
-import java.security.MessageDigest;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 
 /**
- * Enhances the {@link Checksum} interface with the ability to calculate/update the represented checksum
- * value, and, to add/remove observers.
+ *
  */
-public interface MutableChecksum extends Checksum {
+public interface ObservedResource<T> {
+
+    void dispose();
 
     /**
      * Adds the observer specified to this checksum object. If the observer
@@ -19,7 +19,7 @@ public interface MutableChecksum extends Checksum {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    MutableChecksum addUpdateObserver(UpdateObserver pObserver);
+    ObservedResource<T> addUpdateObserver(UpdateObserver<T> pObserver);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -29,7 +29,7 @@ public interface MutableChecksum extends Checksum {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    MutableChecksum removeUpdateObserver(UpdateObserver pObserverOrNull);
+    ObservedResource<T> removeUpdateObserver(UpdateObserver<T> pObserverOrNull);
 
     /**
      * Cancels any ongoing calculation which has started through
@@ -40,7 +40,7 @@ public interface MutableChecksum extends Checksum {
      *
      * @return Returns this checksum object, never {@code null}
      */
-    Checksum cancel();
+    ObservedResource<T> cancel();
 
     /**
      * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
@@ -50,7 +50,7 @@ public interface MutableChecksum extends Checksum {
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    Checksum update();
+    ObservedResource<T> update();
 
     /**
      * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
@@ -62,7 +62,7 @@ public interface MutableChecksum extends Checksum {
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    Checksum update(long pIntervalInMilliseconds);
+    ObservedResource<T> update(long pIntervalInMilliseconds);
 
     /**
      * <p>
@@ -92,5 +92,5 @@ public interface MutableChecksum extends Checksum {
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    Checksum update(long pInterval, TimeUnit pUnit);
+    ObservedResource<T> update(long pInterval, TimeUnit pUnit);
 }

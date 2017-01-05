@@ -12,10 +12,9 @@
 		OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 		the specific language governing permissions and limitations under the License. -->
 	<parent>
-		<groupId>ch.sourcepond</groupId>
-		<artifactId>bundle</artifactId>
-		<version>0.6.1</version>
-		<relativePath />
+		<groupId>ch.sourcepond.io</groupId>
+		<artifactId>checksum</artifactId>
+		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.sourcepond.io</groupId>
