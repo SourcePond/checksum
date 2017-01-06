@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ObservedResource<T> {
 
-    void dispose();
+    void release();
 
     /**
      * Adds the observer specified to this checksum object. If the observer
@@ -19,7 +19,27 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> addUpdateObserver(UpdateObserver<T> pObserver);
+    ObservedResource<T> addCancelObserver(CancelObserver<T> pObserver);
+
+    /**
+     * Adds the observer specified to this checksum object. If the observer
+     * specified is already registered nothing happens.
+     *
+     * @param pObserver Observer to be added to this checksum, must not be {@code null}.
+     * @return Returns this checksum object, never {@code null}
+     * @throws NullPointerException Thrown, if the observer is {@code null}
+     */
+    ObservedResource<T> addFailureObserver(FailureObserver<T> pObserver);
+
+    /**
+     * Adds the observer specified to this checksum object. If the observer
+     * specified is already registered nothing happens.
+     *
+     * @param pObserver Observer to be added to this checksum, must not be {@code null}.
+     * @return Returns this checksum object, never {@code null}
+     * @throws NullPointerException Thrown, if the observer is {@code null}
+     */
+    ObservedResource<T> addSuccessObserver(SuccessObserver<T> pObserver);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -29,7 +49,27 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> removeUpdateObserver(UpdateObserver<T> pObserverOrNull);
+    ObservedResource<T> removeCancelObserver(CancelObserver<T> pObserverOrNull);
+
+    /**
+     * Removes the observer specified from this checksum object. If the observer
+     * is not registered or is {@code null} nothing happens.
+     *
+     * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
+     * @return Returns this checksum object, never {@code null}
+     * @throws NullPointerException Thrown, if the observer is {@code null}
+     */
+    ObservedResource<T> removeFailureObserver(FailureObserver<T> pObserverOrNull);
+
+    /**
+     * Removes the observer specified from this checksum object. If the observer
+     * is not registered or is {@code null} nothing happens.
+     *
+     * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
+     * @return Returns this checksum object, never {@code null}
+     * @throws NullPointerException Thrown, if the observer is {@code null}
+     */
+    ObservedResource<T> removeSuccessObserver(FailureObserver<T> pObserverOrNull);
 
     /**
      * Cancels any ongoing calculation which has started through

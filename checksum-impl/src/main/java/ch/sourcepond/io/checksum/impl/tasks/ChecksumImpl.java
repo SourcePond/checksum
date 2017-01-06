@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 
@@ -6,12 +6,10 @@ import ch.sourcepond.io.checksum.api.Checksum;
  * Created by rolandhauser on 05.01.17.
  */
 final class ChecksumImpl implements Checksum {
-    private final String algorithm;
     private final byte[] value;
     private final String hexValue;
 
-    public ChecksumImpl(final String algorithm, final byte[] value) {
-        this.algorithm = algorithm;
+    public ChecksumImpl(final byte[] value) {
         this.value = value;
         final StringBuilder b = new StringBuilder();
         for (int i = 0; i < value.length; i++) {
@@ -24,11 +22,6 @@ final class ChecksumImpl implements Checksum {
             }
         }
         hexValue = b.toString();
-    }
-
-    @Override
-    public String getAlgorithm() {
-        return algorithm;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
 

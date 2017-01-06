@@ -1,11 +1,10 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.pools;
 
-import org.junit.Assert;
+import ch.sourcepond.io.checksum.impl.tasks.ChecksumImpl;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.security.MessageDigest;
 
 import static org.junit.Assert.assertEquals;

@@ -23,15 +23,6 @@ import java.security.MessageDigest;
 public interface Checksum {
 
 	/**
-	 * Returns the algorithm name used to calculate this checksum See <a href=
-	 * "http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
-	 * MessageDigest Algorithms</a> for further information.
-	 * 
-	 * @return Algorithm name, never {@code null}
-	 */
-	String getAlgorithm();
-
-	/**
 	 * <p>
 	 * Gets the result of the latest completed calculation triggered through one
 	 * of the {@code update} methods on {@link ObservedResource}.
