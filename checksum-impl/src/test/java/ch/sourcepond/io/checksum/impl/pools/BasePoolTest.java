@@ -8,19 +8,19 @@ import static org.junit.Assert.*;
 /**
  * Created by rolandhauser on 06.01.17.
  */
-public abstract class BasePoolTest<T extends BasePool> {
-    protected T pool;
+public abstract class BasePoolTest<T> {
+    protected Pool<T> pool;
 
     @Before
     public void setup() throws Exception {
         pool = newTestPool();
     }
 
-    protected abstract T newTestPool() throws Exception;
+    protected abstract Pool<T> newTestPool() throws Exception;
 
     @Test
     public void verifyGetAndRelease() {
-        final Object pooledObject = pool.get();
+        final T pooledObject = pool.get();
         assertNotNull(pooledObject);
         pool.release(pooledObject);
         assertSame(pooledObject, pool.get());
@@ -28,7 +28,7 @@ public abstract class BasePoolTest<T extends BasePool> {
 
     @Test
     public void verifyGetAndReleaseWithGC() throws Exception {
-        Object pooledObject = pool.get();
+        T pooledObject = pool.get();
         assertNotNull(pooledObject);
         final int pooledObjectHashCode = System.identityHashCode(pooledObject);
         pool.release(pooledObject);

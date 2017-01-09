@@ -1,41 +1,52 @@
+/*Copyright (C) 2017 Roland Hauser, <sourcepond@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
-import ch.sourcepond.io.checksum.impl.ResourceCallback;
-import ch.sourcepond.io.checksum.impl.pools.BufferPool;
+import ch.sourcepond.io.checksum.impl.ResourceContext;
+import ch.sourcepond.io.checksum.impl.pools.Pool;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Created by rolandhauser on 06.01.17.
+ * Updater-task which fetches its data from a {@link ReadableByteChannel} instance.
  */
 final class ChannelUpdateTask extends UpdateTask {
     private final ChannelSource channelSource;
 
-    public ChannelUpdateTask(final ResourceCallback pResource, final long pInterval, final TimeUnit pUnit, final ChannelSource pChannelSource) {
-        super(pResource, pInterval, pUnit);
-        this.channelSource = pChannelSource;
+    ChannelUpdateTask(final ResourceContext pResource,
+                      final ChannelSource pChannelSource,
+                      final DataReader pReader) {
+        super(pResource, pReader);
+        channelSource = pChannelSource;
     }
 
     @Override
-    void newDigest(final MessageDigest pDigest) throws IOException {
+    void updateDigest(final MessageDigest pDigest) throws CancelException, IOException {
+        final Pool<ByteBuffer> bufferPool = resource.getBufferPool();
+        final ByteBuffer buffer = bufferPool.get();
         try (final ReadableByteChannel ch = channelSource.openChannel()) {
-            final BufferPool bufferPool = resource.getBufferPool();
-            final ByteBuffer buffer = bufferPool.get();
-            try {
-                while (availability.available()) {
-                    if (availability.readBytes(ch.read(buffer)) != -1) {
-                        pDigest.update(buffer);
-                        buffer.clear();
-                    }
-                }
-            } finally {
-                bufferPool.release(buffer);
-            }
+            reader.read(() -> ch.read(buffer), readBytes -> {
+                buffer.flip();
+                pDigest.update(buffer);
+                buffer.clear();
+            });
+        } finally {
+            bufferPool.release(buffer);
         }
     }
 }

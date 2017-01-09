@@ -1,6 +1,6 @@
-package ch.sourcepond.io.checksum.impl.pools;
+package ch.sourcepond.io.checksum.impl;
 
-import ch.sourcepond.io.checksum.impl.tasks.ChecksumImpl;
+import ch.sourcepond.io.checksum.impl.ChecksumImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +14,6 @@ import static org.junit.Assert.assertSame;
  * Created by rolandhauser on 05.01.17.
  */
 public class ChecksumImplTest {
-    private static final String EXPECTED_ALGORITHM = "SHA-256";
     private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
     private byte[] expectedBytes;
     private ChecksumImpl checksum;
@@ -30,12 +29,11 @@ public class ChecksumImplTest {
             }
         }
         expectedBytes = digest.digest();
-        checksum = new ChecksumImpl(EXPECTED_ALGORITHM, expectedBytes);
+        checksum = new ChecksumImpl(expectedBytes);
     }
 
     @Test
     public void verifyChecksum() throws Exception {
-        assertEquals(EXPECTED_ALGORITHM, checksum.getAlgorithm());
         assertSame(expectedBytes, checksum.getValue());
         assertEquals(EXPECTED_SHA_256_HASH, checksum.getHexValue());
     }

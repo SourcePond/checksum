@@ -1,8 +1,6 @@
 package ch.sourcepond.io.checksum.impl.pools;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -10,13 +8,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by rolandhauser on 06.01.17.
  */
-public class DigesterPoolTest extends BasePoolTest<DigesterPool> {
+public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
     private final byte[] EXPECTED_CLEAN_BYTES = new byte[]{
             -29, -80, -60, 66, -104, -4, 28, 20,
             -102, -5, -12, -56, -103, 111, -71, 36,
@@ -26,7 +22,7 @@ public class DigesterPoolTest extends BasePoolTest<DigesterPool> {
     private final DigesterPoolFactory poolFactory = new DigesterPoolFactory();
 
     @Override
-    protected DigesterPool newTestPool() throws Exception {
+    protected Pool<MessageDigest> newTestPool() throws Exception {
         return poolFactory.newPool("SHA-256");
     }
 
