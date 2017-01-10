@@ -18,14 +18,13 @@ public class ChannelUpdateTaskTest extends UpdateTaskTest {
 
     @Override
     protected UpdateTask newTask() {
-        return new ChannelUpdateTask(resource, new FileChannelSource(
-                FileSystems.getDefault().getPath( getClass().getResource("/testfile_01.txt").getFile())), reader);
+        return new ChannelUpdateTask(digesterPool, resource, reader, new FileChannelSource(
+                FileSystems.getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())), bufferPool);
     }
 
     @Before
     public void setup() throws Exception {
         super.setup();
-        when(resource.getBufferPool()).thenReturn(bufferPool);
         when(bufferPool.get()).thenReturn(buffer);
     }
 }

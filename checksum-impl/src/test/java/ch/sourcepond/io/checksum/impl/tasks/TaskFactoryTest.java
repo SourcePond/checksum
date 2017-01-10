@@ -1,14 +1,16 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.impl.ResourceContext;
+import ch.sourcepond.io.checksum.impl.resources.Observable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -19,7 +21,7 @@ import static org.mockito.Mockito.mock;
  */
 public class TaskFactoryTest {
     private final TaskFactory factory = new TaskFactory();
-    private final ResourceContext resource = mock(ResourceContext.class);
+    private final Observable resource = mock(Observable.class);
     private URL anyUrl;
 
     @Before
@@ -27,7 +29,7 @@ public class TaskFactoryTest {
         anyUrl = new URL("file:///any/path");
     }
 
-    private void assertNotSame(final Runnable first, final Runnable second) {
+    private void assertNotSame(final Callable<Checksum> first, final Callable<Checksum> second) {
         assertNotNull(first);
         assertNotNull(second);
         Assert.assertNotSame(first, second);

@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  */
-public interface ObservedResource<T> {
+public interface Resource<T> {
 
     void release();
 
@@ -32,7 +33,7 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> addCancelObserver(CancelObserver<T> pObserver);
+    Resource<T> addCancelObserver(CancelObserver<T> pObserver);
 
     /**
      * Adds the observer specified to this checksum object. If the observer
@@ -42,7 +43,7 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> addFailureObserver(FailureObserver<T> pObserver);
+    Resource<T> addFailureObserver(FailureObserver<T> pObserver);
 
     /**
      * Adds the observer specified to this checksum object. If the observer
@@ -52,7 +53,7 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> addSuccessObserver(SuccessObserver<T> pObserver);
+    Resource<T> addSuccessObserver(SuccessObserver<T> pObserver);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -62,7 +63,7 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> removeCancelObserver(CancelObserver<T> pObserverOrNull);
+    Resource<T> removeCancelObserver(CancelObserver<T> pObserverOrNull);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -72,7 +73,7 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> removeFailureObserver(FailureObserver<T> pObserverOrNull);
+    Resource<T> removeFailureObserver(FailureObserver<T> pObserverOrNull);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -82,18 +83,7 @@ public interface ObservedResource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    ObservedResource<T> removeSuccessObserver(FailureObserver<T> pObserverOrNull);
-
-    /**
-     * Cancels any ongoing calculation which has started through
-     * {@link #update()} on this object. If a calculation is ongoing, it will be
-     * cancelled, and, this object will remain in the state before the
-     * calculation has been started. If no calculation is running, nothing
-     * happens.
-     *
-     * @return Returns this checksum object, never {@code null}
-     */
-    ObservedResource<T> cancel();
+    Resource<T> removeSuccessObserver(SuccessObserver<T> pObserverOrNull);
 
     /**
      * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
@@ -103,7 +93,7 @@ public interface ObservedResource<T> {
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    ObservedResource<T> update();
+    Future<Checksum> update();
 
     /**
      * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
@@ -115,7 +105,7 @@ public interface ObservedResource<T> {
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    ObservedResource<T> update(long pIntervalInMilliseconds);
+    Future<Checksum> update(long pIntervalInMilliseconds);
 
     /**
      * <p>
@@ -145,5 +135,5 @@ public interface ObservedResource<T> {
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    ObservedResource<T> update(long pInterval, TimeUnit pUnit);
+    Future<Checksum> update(long pInterval, TimeUnit pUnit);
 }

@@ -1,6 +1,7 @@
 package ch.sourcepond.io.checksum.impl;
 
 import ch.sourcepond.io.checksum.api.*;
+import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,8 +14,8 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Created by rolandhauser on 05.01.17.
  */
-public class ObservedResourcesRegistryImpl implements ObservedResourcesRegistry {
-    private final ConcurrentMap<Object, BaseResource> resources = new ConcurrentHashMap<>();
+public class ResourcesRegistryImpl implements ResourcesRegistry, DisposeCallback {
+    private final ConcurrentMap<Object, Resource<?>> resources = new ConcurrentHashMap<>();
 
     /**
      *
@@ -43,8 +44,8 @@ public class ObservedResourcesRegistryImpl implements ObservedResourcesRegistry 
         }
     }
 
-    private ObservedResource get(Key pKey) {
-        BaseResource resource = resources.get(pKey);
+    private Resource get(Key pKey) {
+        Resource<?> resource = resources.get(pKey);
         if (resource == null) {
             resource = new BaseResource(this);
             final BaseResource previous = resources.putIfAbsent(pKey, resource);
@@ -64,46 +65,47 @@ public class ObservedResourcesRegistryImpl implements ObservedResourcesRegistry 
     }
 
     @Override
-    public ObservedResource<ChannelSource> get(final Algorithm pAlgorithm, final ChannelSource pSource) {
+    public Resource<ChannelSource> get(final Algorithm pAlgorithm, final ChannelSource pSource) {
         return get(key(pAlgorithm, pSource));
     }
 
     @Override
-    public ObservedResource<StreamSource> get(final Algorithm pAlgorithm, final StreamSource pSource) {
+    public Resource<StreamSource> get(final Algorithm pAlgorithm, final StreamSource pSource) {
         return get(key(pAlgorithm, pSource));
     }
 
     @Override
-    public ObservedResource<Path> get(final Algorithm pAlgorithm, final Path pPath) throws IOException {
+    public Resource<Path> get(final Algorithm pAlgorithm, final Path pPath) throws IOException {
         return get(key(pAlgorithm, pPath));
     }
 
     @Override
-    public ObservedResource<URL> get(final Algorithm pAlgorithm, final URL pUrl) {
+    public Resource<URL> get(final Algorithm pAlgorithm, final URL pUrl) {
         return get(key(pAlgorithm, pUrl));
     }
 
     @Override
-    public ObservedResource<ChannelSource> get(final String pAlgorithm, final ChannelSource pSource) throws NoSuchAlgorithmException {
+    public Resource<ChannelSource> get(final String pAlgorithm, final ChannelSource pSource) throws NoSuchAlgorithmException {
         return get(key(pAlgorithm, pSource));
     }
 
     @Override
-    public ObservedResource<StreamSource> get(final String pAlgorithm, final StreamSource pSource) throws NoSuchAlgorithmException {
+    public Resource<StreamSource> get(final String pAlgorithm, final StreamSource pSource) throws NoSuchAlgorithmException {
         return get(key(pAlgorithm, pSource));
     }
 
     @Override
-    public ObservedResource<Path> get(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException, IOException {
+    public Resource<Path> get(final String pAlgorithm, final Path pPath) throws NoSuchAlgorithmException, IOException {
         return get(key(pAlgorithm, pPath));
     }
 
     @Override
-    public ObservedResource<URL> get(final String pAlgorithm, final URL pUrl) throws NoSuchAlgorithmException {
+    public Resource<URL> get(final String pAlgorithm, final URL pUrl) throws NoSuchAlgorithmException {
         return get(key(pAlgorithm, pUrl));
     }
 
-    void remove(final BaseResource resourceToBeRemoved) {
+    @Override
+    public void dispose(final Resource<?> resourceToBeRemoved) {
         resources.remove(resourceToBeRemoved);
     }
 }

@@ -1,5 +1,6 @@
 package ch.sourcepond.io.checksum.impl.pools;
 
+import ch.sourcepond.io.checksum.api.Algorithm;
 import org.junit.Test;
 import sun.misc.Unsafe;
 
@@ -19,11 +20,11 @@ public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
             39, -82, 65, -28, 100, -101, -109, 76,
             -92, -107, -103, 27, 120, 82, -72, 85
     };
-    private final DigesterPoolFactory poolFactory = new DigesterPoolFactory();
+    private final DigesterPoolRegistry poolFactory = new DigesterPoolRegistry();
 
     @Override
     protected Pool<MessageDigest> newTestPool() throws Exception {
-        return poolFactory.newPool("SHA-256");
+        return poolFactory.getPool(Algorithm.SHA256);
     }
 
     @Test

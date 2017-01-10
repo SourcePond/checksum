@@ -14,14 +14,29 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
 /**
- * @author rolandhauser
- *
+ * Constants for algorithms described here:
+ * <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#MessageDigest">MessageDigest Algorithms</a>
  */
 public enum Algorithm {
+	/**
+	 * Constant for MD2 algorithm
+	 */
+	MD2("MD2"),
+
 	/**
 	 * Constant for MD5 algorithm.
 	 */
 	MD5("MD5"),
+
+	/**
+	 * Constant for SHA-1 algorithm.
+	 */
+	SHA1("SHA-1"),
+
+	/**
+	 * Constant for SHA-224 algorithm.
+	 */
+	SHA224("SHA-224"),
 
 	/**
 	 * Constant for SHA-256 algorithm.

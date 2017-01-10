@@ -22,7 +22,7 @@ import java.net.URL;
 /**
  * Created by rolandhauser on 05.01.17.
  */
-final class URLStreamSource implements StreamSource {
+public final class URLStreamSource implements StreamSource {
     private final URL url;
 
     public URLStreamSource(final URL url) {

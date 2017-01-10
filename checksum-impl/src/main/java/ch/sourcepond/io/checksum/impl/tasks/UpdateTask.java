@@ -13,47 +13,44 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import ch.sourcepond.io.checksum.impl.ResourceContext;
+import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.impl.pools.Pool;
-import org.slf4j.Logger;
+import ch.sourcepond.io.checksum.impl.resources.Observable;
 
 import java.io.IOException;
 import java.security.MessageDigest;
-
-import static org.slf4j.LoggerFactory.getLogger;
+import java.util.concurrent.Callable;
 
 /**
  * Base task for updating a {@link MessageDigest}.
  */
-abstract class UpdateTask implements Runnable {
-    private static final Logger LOG = getLogger(UpdateTask.class);
-    static final byte[] CANCEL_DIGEST = new byte[0];
-    protected final ResourceContext resource;
+public abstract class UpdateTask<S, A> implements Callable<Checksum> {
+    private final Pool<MessageDigest> digesterPool;
+    protected final Observable<S, A> resource;
     protected final DataReader reader;
-    private volatile boolean cancelled;
 
-    UpdateTask(final ResourceContext pResource, final DataReader pReader) {
+    UpdateTask(final Pool<MessageDigest> pDigesterPool, final Observable<S, A> pResource, final DataReader pReader) {
+        digesterPool = pDigesterPool;
         resource = pResource;
         reader = pReader;
     }
 
-    public final void cancel() {
-        reader.cancel();
-    }
-
-    abstract void updateDigest(MessageDigest pDigest) throws IOException, CancelException;
+    abstract void updateDigest(MessageDigest pDigest) throws InterruptedException, IOException;
 
     @Override
-    public final void run() {
-        final Pool<MessageDigest> digesterPool = resource.getDigesterPool();
+    public final Checksum call() throws Exception {
         final MessageDigest digest = digesterPool.get();
         try {
             updateDigest(digest);
-            resource.informSuccessObservers(resource.newChecksum(digest.digest()));
-        } catch (final CancelException e) {
+            final Checksum checksum = new ChecksumImpl(digest.digest());
+            resource.informSuccessObservers(checksum);
+            return checksum;
+        } catch (final InterruptedException e) {
             resource.informCancelObservers();
+            throw e;
         } catch (final IOException e) {
             resource.informFailureObservers(e);
+            throw e;
         } finally {
             digesterPool.release(digest);
         }

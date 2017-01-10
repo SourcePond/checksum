@@ -1,7 +1,7 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.impl.ResourceContext;
+import ch.sourcepond.io.checksum.impl.resources.Observable;
 import ch.sourcepond.io.checksum.impl.pools.Pool;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +10,8 @@ import org.mockito.InOrder;
 import java.io.IOException;
 import java.security.MessageDigest;
 
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -18,17 +20,17 @@ import static org.mockito.Mockito.*;
 public class BaseUpdateTaskTest {
 
     private static class TestUpdateTask extends UpdateTask {
-        CancelException cancelException;
+        InterruptedException interruptedException;
         IOException ioException;
 
-        public TestUpdateTask(final ResourceContext pResource, final DataReader pAvailability) {
-            super(pResource, pAvailability);
+        public TestUpdateTask(final Pool<MessageDigest> pDigesterPool, final Observable pResource, final DataReader pReader) {
+            super(pDigesterPool, pResource, pReader);
         }
 
         @Override
-        void updateDigest(final MessageDigest pDigest) throws IOException, CancelException {
-            if (cancelException != null) {
-                throw cancelException;
+        void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
+            if (interruptedException != null) {
+                throw interruptedException;
             }
             if (ioException != null) {
                 throw ioException;
@@ -41,33 +43,36 @@ public class BaseUpdateTaskTest {
     private final DataReader reader = mock(DataReader.class);
     private final Pool<MessageDigest> digesterPool = mock(Pool.class);
     private final MessageDigest digest = mock(MessageDigest.class);
-    private final ResourceContext resource = mock(ResourceContext.class);
+    private final Observable resource = mock(Observable.class);
     private final Checksum checksum = mock(Checksum.class);
-    private final TestUpdateTask task = new TestUpdateTask(resource, reader);
+    private final TestUpdateTask task = new TestUpdateTask(digesterPool, resource, reader);
 
     @Before
     public void setup() {
-        when(resource.getDigesterPool()).thenReturn(digesterPool);
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
-        when(resource.newChecksum(ANY_DATA)).thenReturn(checksum);
     }
 
     @Test
-    public void verifySuccess() {
-        task.run();
+    public void verifySuccess() throws Exception {
+        task.call();
         final InOrder order = inOrder(digesterPool, digest, resource);
         order.verify(digesterPool).get();
         order.verify(digest).update(ANY_DATA);
         order.verify(digest).digest();
-        order.verify(resource).informSuccessObservers(checksum);
+        order.verify(resource).informSuccessObservers(notNull());
         order.verify(digesterPool).release(digest);
     }
 
     @Test
-    public void verifyCancel() {
-        task.cancelException = new CancelException();
-        task.run();
+    public void verifyCancel() throws Exception {
+        task.interruptedException = new InterruptedException();
+        try {
+            task.call();
+            fail("Exception expected");
+        } catch (final InterruptedException e) {
+            // Noop
+        }
         final InOrder order = inOrder(digest, resource, digesterPool);
         order.verify(digesterPool).get();
         order.verify(resource).informCancelObservers();
@@ -75,18 +80,17 @@ public class BaseUpdateTaskTest {
     }
 
     @Test
-    public void verifyFailure() {
+    public void verifyFailure() throws Exception {
         task.ioException = new IOException();
-        task.run();
+        try {
+            task.call();
+            fail("Exception expected");
+        } catch (final IOException e) {
+            // Noop
+        }
         final InOrder order = inOrder(digest, resource, digesterPool);
         order.verify(digesterPool).get();
         order.verify(resource).informFailureObservers(task.ioException);
         order.verify(digesterPool).release(digest);
-    }
-
-    @Test
-    public void cancel() throws Exception {
-        task.cancel();
-        verify(reader).cancel();
     }
 }

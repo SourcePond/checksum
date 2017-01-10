@@ -14,31 +14,38 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.impl.ResourceContext;
+import ch.sourcepond.io.checksum.impl.pools.Pool;
+import ch.sourcepond.io.checksum.impl.resources.Observable;
 
-import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by rolandhauser on 06.01.17.
  */
 public class TaskFactory {
+    private final Pool<MessageDigest> digesterPool;
+    private final Pool<ByteBuffer> bufferPool;
 
-    Runnable newFileTask(final ResourceContext pResource, final TimeUnit pUnit, final long pInterval, final Path pFile) {
-        return newChannelTask(pResource, pUnit, pInterval, new FileChannelSource(pFile));
+    public TaskFactory(final Pool<MessageDigest> pDigesterPool, final Pool<ByteBuffer> pBufferPool) {
+        digesterPool = pDigesterPool;
+        bufferPool = pBufferPool;
     }
 
-    Runnable newChannelTask(final ResourceContext pResource, final TimeUnit pUnit, final long pInterval, final ChannelSource pChannelSource) {
-        return new ChannelUpdateTask(pResource, pChannelSource, new DataReader(pUnit, pInterval));
+    public Callable<Checksum> newChannelTask(final Observable<ChannelSource, ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) {
+        return new ChannelUpdateTask<ChannelSource>(digesterPool, pResource, new DataReader(pUnit, pInterval), bufferPool);
     }
 
-    Runnable newStreamTask(final ResourceContext pResource, final TimeUnit pUnit, final long pInterval, final StreamSource pStreamSource) {
-        return new StreamUpdateTask(pResource, pStreamSource, new DataReader(pUnit, pInterval));
+    public Callable<Checksum> newFileTask(final Observable<Path, ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) {
+        return new ChannelUpdateTask<Path>(digesterPool, pResource, new DataReader(pUnit, pInterval), bufferPool);
     }
 
-    Runnable newURLTask(final ResourceContext pResource, final TimeUnit pUnit, final long pInterval, final URL pUrl) {
-        return newStreamTask(pResource, pUnit, pInterval, new URLStreamSource(pUrl));
+    public Callable<Checksum> newStreamTask(final Observable<StreamSource, StreamSource> pResource, final TimeUnit pUnit, final long pInterval) {
+        return new StreamUpdateTask(digesterPool, pResource, new DataReader(pUnit, pInterval));
     }
 }

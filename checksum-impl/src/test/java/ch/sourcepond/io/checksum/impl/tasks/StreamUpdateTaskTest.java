@@ -7,6 +7,6 @@ public class StreamUpdateTaskTest extends UpdateTaskTest {
 
     @Override
     protected UpdateTask newTask() {
-        return new StreamUpdateTask(resource, new URLStreamSource(getClass().getResource("/testfile_01.txt")), reader);
+        return new StreamUpdateTask(digesterPool, resource, reader, new URLStreamSource(getClass().getResource("/testfile_01.txt")));
     }
 }

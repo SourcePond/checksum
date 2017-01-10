@@ -14,7 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
-import ch.sourcepond.io.checksum.impl.ResourceContext;
+import ch.sourcepond.io.checksum.impl.resources.Observable;
 import ch.sourcepond.io.checksum.impl.pools.Pool;
 
 import java.io.IOException;
@@ -25,21 +25,21 @@ import java.security.MessageDigest;
 /**
  * Updater-task which fetches its data from a {@link ReadableByteChannel} instance.
  */
-final class ChannelUpdateTask extends UpdateTask {
-    private final ChannelSource channelSource;
+class ChannelUpdateTask<S> extends UpdateTask<S, ChannelSource> {
+    private final Pool<ByteBuffer> bufferPool;
 
-    ChannelUpdateTask(final ResourceContext pResource,
-                      final ChannelSource pChannelSource,
-                      final DataReader pReader) {
-        super(pResource, pReader);
-        channelSource = pChannelSource;
+    ChannelUpdateTask(final Pool<MessageDigest> pDigesterPool,
+                      final Observable<S, ChannelSource> pResource,
+                      final DataReader pReader,
+                      final Pool<ByteBuffer> pBufferPool) {
+        super(pDigesterPool, pResource, pReader);
+        bufferPool = pBufferPool;
     }
 
     @Override
-    void updateDigest(final MessageDigest pDigest) throws CancelException, IOException {
-        final Pool<ByteBuffer> bufferPool = resource.getBufferPool();
+    void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
         final ByteBuffer buffer = bufferPool.get();
-        try (final ReadableByteChannel ch = channelSource.openChannel()) {
+        try (final ReadableByteChannel ch = resource.getAccessor().openChannel()) {
             reader.read(() -> ch.read(buffer), readBytes -> {
                 buffer.flip();
                 pDigest.update(buffer);

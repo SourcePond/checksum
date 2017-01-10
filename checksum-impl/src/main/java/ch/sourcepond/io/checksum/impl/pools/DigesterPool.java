@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.pools;
 
+import ch.sourcepond.io.checksum.api.Algorithm;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -20,23 +22,19 @@ import java.security.NoSuchAlgorithmException;
  * Pool for caching {@link MessageDigest} instances.
  */
 final class DigesterPool extends BasePool<MessageDigest> {
-    private final String algorithm;
+    private final Algorithm algorithm;
 
-    DigesterPool(final String pAlgorithm) throws NoSuchAlgorithmException {
-        // First of all, create and add a new MessageDigest; this insures that the
-        // algorithm specified is valid. Otherwise, an IllegalArgumentException will
-        // be caused to be thrown.
-        addToPool(MessageDigest.getInstance(pAlgorithm));
+    DigesterPool(final Algorithm pAlgorithm) {
         algorithm = pAlgorithm;
     }
 
     @Override
     MessageDigest newPooledObject() {
         try {
-            return MessageDigest.getInstance(algorithm);
+            return MessageDigest.getInstance(algorithm.toString());
         } catch (final NoSuchAlgorithmException e) {
-            // This can never happen because it's already validated that the algorithm is valid
-            // (was done during construction of this object).
+            // This can never happen because it's already validated that the algorithm specified by the Algorithm
+            // enum is valid
             throw new IllegalStateException(e.getMessage(), e);
         }
     }

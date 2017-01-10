@@ -36,46 +36,55 @@ public class DataReaderTest {
     private static final int ANY_READ_BYTES = 10;
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
     private final DataReader reader = new DataReader(TimeUnit.MILLISECONDS, 500l);
+    private volatile Exception expectedInterruptedException;
 
     @After
     public void tearDown() {
         executor.shutdown();
     }
 
+    @Test(timeout = 200)
+    public void skipWaitWhenIntervalIsLowerOrEqualZero() throws Exception {
+        final DataReader reader = new DataReader(TimeUnit.MILLISECONDS, 0);
+        final FiniteDataReader source = new FiniteDataReader(5);
+        reader.read(() -> source.getReadBytes(), readBytes -> {
+        });
+    }
+
     @Test(timeout = 3000)
     public void doNotWaitWhenDataIsAvailable() throws Exception {
-        final FiniteDataReader source = new FiniteDataReader();
+        final FiniteDataReader source = new FiniteDataReader(5);
         executor.submit(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
-                reader.read(() -> source.getReadBytes(), readBytes -> {});
+                reader.read(() -> source.getReadBytes(), readBytes -> {
+                });
                 return null;
             }
         }).get();
     }
 
     @Test(timeout = 3000)
-    public void throwCancelExceptionWhenCancelled() throws Exception {
+    public void throwInterruptedExceptionWhenCancelled() throws Exception {
         final FiniteDataReader source = new FiniteDataReader();
-        final Future<Object> f = executor.submit(new Callable<Object>() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        executor.execute(new Runnable() {
             @Override
-            public Object call() throws Exception {
-                reader.read(() -> -1, readBytes -> {});
-                return null;
+            public void run() {
+                currentThread().interrupt();
+                try {
+                    reader.read(() -> source.getReadBytes(), readBytes -> {
+                    });
+                } catch (Exception e) {
+                    expectedInterruptedException = e;
+                }
+                latch.countDown();
             }
         });
 
-        // Cancel explicitly
-        reader.cancel();
-
-        try {
-            f.get();
-            fail("Exception expected");
-        } catch (final ExecutionException e) {
-            assertTrue(e.getCause() instanceof CancelException);
-            final CancelException c = (CancelException) e.getCause();
-            assertNull(c.getCause());
-        }
+        latch.await();
+        assertNotNull(expectedInterruptedException);
+        assertTrue(expectedInterruptedException instanceof InterruptedException);
     }
 
     @Test(timeout = 3000)
@@ -91,7 +100,8 @@ public class DataReaderTest {
                         outer.interrupt();
                     }
                 }, 100L, TimeUnit.MILLISECONDS);
-                reader.read(() -> source.getReadBytes(), readBytes -> {});
+                reader.read(() -> source.getReadBytes(), readBytes -> {
+                });
                 return null;
             }
         });
@@ -100,9 +110,6 @@ public class DataReaderTest {
             f.get();
             fail("Exception expected");
         } catch (final ExecutionException e) {
-            assertTrue(e.getCause() instanceof CancelException);
-            final CancelException c = (CancelException) e.getCause();
-            assertTrue(c.getCause() instanceof InterruptedException);
         }
     }
 }

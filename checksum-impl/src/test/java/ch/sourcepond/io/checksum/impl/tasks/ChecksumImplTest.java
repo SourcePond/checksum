@@ -1,14 +1,12 @@
-package ch.sourcepond.io.checksum.impl;
+package ch.sourcepond.io.checksum.impl.tasks;
 
-import ch.sourcepond.io.checksum.impl.ChecksumImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.security.MessageDigest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 /**
  * Created by rolandhauser on 05.01.17.
@@ -21,7 +19,7 @@ public class ChecksumImplTest {
     @Before
     public void setup() throws Exception {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (final BufferedInputStream in = new BufferedInputStream(getClass().getResourceAsStream("/testfile_01.txt"))) {
+        try (final InputStream in = getClass().getResourceAsStream("/testfile_01.txt")) {
             final byte[] buffer = new byte[1024];
             int readBytes;
             while ((readBytes = in.read(buffer)) != -1) {
@@ -36,5 +34,16 @@ public class ChecksumImplTest {
     public void verifyChecksum() throws Exception {
         assertSame(expectedBytes, checksum.getValue());
         assertEquals(EXPECTED_SHA_256_HASH, checksum.getHexValue());
+    }
+
+    @Test
+    public void verifyEquals() {
+        assertTrue(checksum.equals(checksum));
+        assertFalse(checksum.equals(null));
+        assertFalse(checksum.equals(new Object()));
+
+        final ChecksumImpl second = new ChecksumImpl(checksum.getValue());
+        assertTrue(checksum.equals(second));
+        assertEquals(checksum.hashCode(), second.hashCode());
     }
 }

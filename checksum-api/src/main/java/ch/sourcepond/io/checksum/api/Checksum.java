@@ -25,7 +25,7 @@ public interface Checksum {
 	/**
 	 * <p>
 	 * Gets the result of the latest completed calculation triggered through one
-	 * of the {@code update} methods on {@link ObservedResource}.
+	 * of the {@code update} methods on {@link Resource}.
 	 * </p>
 	 * 
 	 * <p>

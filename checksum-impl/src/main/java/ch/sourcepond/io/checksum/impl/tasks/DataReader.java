@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.currentThread;
+import static java.lang.Thread.interrupted;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -41,7 +42,6 @@ class DataReader {
     private static final Logger LOG = getLogger(DataReader.class);
     private final TimeUnit unit;
     private final long interval;
-    private volatile boolean cancelled;
     private int iterations;
 
     public DataReader(final TimeUnit pUnit, final long pInterval) {
@@ -49,13 +49,9 @@ class DataReader {
         interval = pInterval;
     }
 
-    void cancel() {
-        cancelled = true;
-    }
-
-    private boolean readData(final Reader pReader, final Updater pUpdater) throws CancelException, IOException {
-        if (cancelled) {
-            throw new CancelException();
+    private boolean readData(final Reader pReader, final Updater pUpdater) throws InterruptedException, IOException {
+        if (interrupted()) {
+            throw new InterruptedException();
         }
 
         final int readBytes = pReader.read();
@@ -70,19 +66,24 @@ class DataReader {
             pUpdater.update(readBytes);
         }
 
-        iterations = readBytes != -1 ? 0 : iterations + 1;
         return readBytes != -1 || 1 >= iterations;
     }
 
-    void read(final Reader pReader, final Updater pUpdater) throws CancelException, IOException {
+    void read(final Reader pReader, final Updater pUpdater) throws InterruptedException, IOException {
         while (readData(pReader, pUpdater)) {
             // If currently no data is available wait for a specific
             // amount of time.
+            delay();
+        }
+    }
+
+    private void delay() throws InterruptedException {
+        if (interval > 0) {
             try {
                 unit.sleep(interval);
             } catch (final InterruptedException e) {
                 currentThread().interrupt();
-                throw new CancelException(e);
+                throw e;
             }
         }
     }
