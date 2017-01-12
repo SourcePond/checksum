@@ -1,8 +1,9 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.Observable;
-import ch.sourcepond.io.checksum.impl.pools.Pool;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -19,11 +20,11 @@ import static org.mockito.Mockito.*;
  */
 public class BaseUpdateTaskTest {
 
-    private static class TestUpdateTask extends UpdateTask {
+    private static class TestUpdateTask extends UpdateTask<StreamSource, StreamSource> {
         InterruptedException interruptedException;
         IOException ioException;
 
-        public TestUpdateTask(final Pool<MessageDigest> pDigesterPool, final Observable pResource, final DataReader pReader) {
+        public TestUpdateTask(final DigesterPool pDigesterPool, final Observable<StreamSource, StreamSource> pResource, final DataReader pReader) {
             super(pDigesterPool, pResource, pReader);
         }
 
@@ -41,9 +42,9 @@ public class BaseUpdateTaskTest {
 
     private static final byte[] ANY_DATA = new byte[0];
     private final DataReader reader = mock(DataReader.class);
-    private final Pool<MessageDigest> digesterPool = mock(Pool.class);
+    private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final MessageDigest digest = mock(MessageDigest.class);
-    private final Observable resource = mock(Observable.class);
+    private final Observable<StreamSource, StreamSource> resource = mock(Observable.class);
     private final Checksum checksum = mock(Checksum.class);
     private final TestUpdateTask task = new TestUpdateTask(digesterPool, resource, reader);
 

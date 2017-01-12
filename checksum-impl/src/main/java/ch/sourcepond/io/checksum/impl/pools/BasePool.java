@@ -19,24 +19,45 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 
 /**
- * Base implementation of the {@link Pool} interface.
+ * Base pool implementation. This pool stores objects withing an {@link LinkedList}. When
+ * an object is requested, the first object is removed from the list an returned. Clients of this
+ * class should ensure that leased objects will be put back after usage, otherwise,
+ * a serious performance impact could rise.
  */
-abstract class BasePool<T> implements Pool<T> {
+abstract class BasePool<T> {
     private final ReferenceQueue<T> clearedReferences = new ReferenceQueue<>();
-    private final LinkedList<WeakReference<T>> pool = new LinkedList<>();
+    private final LinkedList<WeakReference<? extends T>> pool = new LinkedList<>();
 
+    /**
+     * Creates a new pooled object.
+     *
+     * @return New object, never {@code null}
+     */
     abstract T newPooledObject();
 
+    /**
+     * Indicates that an object has been released through {@link #release(Object)}. This
+     * method is called <em>before</em> the object is re-added to the pool.
+     *
+     * @param pPooledObject Release object, never {@code null}
+     */
     abstract void pooledObjectReleased(T pPooledObject);
 
-    void addToPool(final T pPooledObject) {
-        pool.add(new WeakReference<T>(pPooledObject, clearedReferences));
+    private void addToPool(final T pPooledObject) {
+        pool.add(new WeakReference<>(pPooledObject, clearedReferences));
     }
 
-    @Override
-    public final synchronized T get() {
-        Reference<?> ref = clearedReferences.poll();
-        while (ref != null) {
+    /**
+     * Removes the first item from the pool and returns it. If the pool is empty, a
+     * new object will be created and returned. Ensure that you release the object
+     * returned by this method with {@link #release(Object)} after usage.
+     *
+     * @return Pooled object, never {@code null}
+     */
+    @SuppressWarnings("SuspiciousMethodCalls")
+    public synchronized T get() {
+        Reference<? extends T> ref = clearedReferences.poll();
+        while (null != ref) {
             pool.remove(ref);
             ref = clearedReferences.poll();
         }
@@ -53,8 +74,16 @@ abstract class BasePool<T> implements Pool<T> {
         return pooledObject;
     }
 
-    @Override
-    public final synchronized void release(final T pPooledObject) {
+    /**
+     * Re-adds the object specified to the pool.
+     *
+     * @param pPooledObject Object to release, must not be {@code null}
+     * @throws NullPointerException Thrown if the object specified is {@code null}.
+     */
+    public synchronized void release(final T pPooledObject) {
+        if (pPooledObject == null) {
+            throw new NullPointerException("Object to be released is null");
+        }
         pooledObjectReleased(pPooledObject);
         addToPool(pPooledObject);
     }

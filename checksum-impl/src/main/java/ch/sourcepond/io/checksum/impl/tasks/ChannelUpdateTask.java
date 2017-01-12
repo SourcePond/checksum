@@ -14,8 +14,9 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.impl.pools.BufferPool;
+import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.Observable;
-import ch.sourcepond.io.checksum.impl.pools.Pool;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -26,12 +27,12 @@ import java.security.MessageDigest;
  * Updater-task which fetches its data from a {@link ReadableByteChannel} instance.
  */
 class ChannelUpdateTask<S> extends UpdateTask<S, ChannelSource> {
-    private final Pool<ByteBuffer> bufferPool;
+    private final BufferPool bufferPool;
 
-    ChannelUpdateTask(final Pool<MessageDigest> pDigesterPool,
+    ChannelUpdateTask(final DigesterPool pDigesterPool,
                       final Observable<S, ChannelSource> pResource,
                       final DataReader pReader,
-                      final Pool<ByteBuffer> pBufferPool) {
+                      final BufferPool pBufferPool) {
         super(pDigesterPool, pResource, pReader);
         bufferPool = pBufferPool;
     }

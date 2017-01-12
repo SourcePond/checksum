@@ -25,6 +25,10 @@ public interface Resource<T> {
 
     void release();
 
+    T getSource();
+
+    Algorithm getAlgorithm();
+
     /**
      * Adds the observer specified to this checksum object. If the observer
      * specified is already registered nothing happens.
@@ -124,16 +128,16 @@ public interface Resource<T> {
      * elapses and no more data is available.
      * </p>
      *
+     * @param pUnit
+     *            Time-unit of the interval specified.
      * @param pInterval
      *            Time to wait until the data-source should be closed when
      *            currently no more data is available. Must not be negative, 0
      *            indicates no wait.
-     * @param pUnit
-     *            Time-unit of the interval specified.
      * @return Returns this checksum object, never {@code null}
      * @throws RejectedExecutionException
      *             Thrown, if the asynchronous update task could not be
      *             submitted.
      */
-    Future<Checksum> update(long pInterval, TimeUnit pUnit);
+    Future<Checksum> update(TimeUnit pUnit, long pInterval);
 }

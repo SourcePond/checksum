@@ -14,7 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.impl.pools.Pool;
+import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.Observable;
 
 import java.io.IOException;
@@ -25,11 +25,11 @@ import java.util.concurrent.Callable;
  * Base task for updating a {@link MessageDigest}.
  */
 public abstract class UpdateTask<S, A> implements Callable<Checksum> {
-    private final Pool<MessageDigest> digesterPool;
+    private final DigesterPool digesterPool;
     protected final Observable<S, A> resource;
     protected final DataReader reader;
 
-    UpdateTask(final Pool<MessageDigest> pDigesterPool, final Observable<S, A> pResource, final DataReader pReader) {
+    UpdateTask(final DigesterPool pDigesterPool, final Observable<S, A> pResource, final DataReader pReader) {
         digesterPool = pDigesterPool;
         resource = pResource;
         reader = pReader;

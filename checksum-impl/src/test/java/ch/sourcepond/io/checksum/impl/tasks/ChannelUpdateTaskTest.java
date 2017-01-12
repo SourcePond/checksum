@@ -1,10 +1,13 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import ch.sourcepond.io.checksum.impl.pools.Pool;
+import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.impl.pools.BufferPool;
+import ch.sourcepond.io.checksum.impl.resources.FileChannelSource;
 import org.junit.Before;
 
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,14 +15,15 @@ import static org.mockito.Mockito.when;
 /**
  * Created by rolandhauser on 09.01.17.
  */
-public class ChannelUpdateTaskTest extends UpdateTaskTest {
+public class ChannelUpdateTaskTest extends UpdateTaskTest<Path, ChannelSource> {
     private final ByteBuffer buffer = ByteBuffer.allocate(1024);
-    private final Pool<ByteBuffer> bufferPool = mock(Pool.class);
+    private final BufferPool bufferPool = mock(BufferPool.class);
 
     @Override
-    protected UpdateTask newTask() {
-        return new ChannelUpdateTask(digesterPool, resource, reader, new FileChannelSource(
-                FileSystems.getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())), bufferPool);
+    protected UpdateTask<Path, ChannelSource> newTask() {
+        when(resource.getAccessor()).thenReturn(new FileChannelSource(
+                FileSystems.getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())));
+        return new ChannelUpdateTask<Path>(digesterPool, resource, reader, bufferPool);
     }
 
     @Before

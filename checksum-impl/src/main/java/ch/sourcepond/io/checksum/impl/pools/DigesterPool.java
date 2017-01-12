@@ -19,13 +19,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Pool for caching {@link MessageDigest} instances.
+ * Pool of {@link MessageDigest} instances.
  */
-final class DigesterPool extends BasePool<MessageDigest> {
+public class DigesterPool extends BasePool<MessageDigest> {
     private final Algorithm algorithm;
 
-    DigesterPool(final Algorithm pAlgorithm) {
+    public DigesterPool(final Algorithm pAlgorithm) {
         algorithm = pAlgorithm;
+    }
+
+    public Algorithm getAlgorithm() {
+        return algorithm;
     }
 
     @Override
@@ -33,7 +37,7 @@ final class DigesterPool extends BasePool<MessageDigest> {
         try {
             return MessageDigest.getInstance(algorithm.toString());
         } catch (final NoSuchAlgorithmException e) {
-            // This can never happen because it's already validated that the algorithm specified by the Algorithm
+            // This can never happen because the algorithm specified by the Algorithm
             // enum is valid
             throw new IllegalStateException(e.getMessage(), e);
         }

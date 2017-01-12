@@ -11,16 +11,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.pools;
+package ch.sourcepond.io.checksum.impl.resources;
 
-import java.lang.ref.Reference;
+import ch.sourcepond.io.checksum.api.Resource;
 
 /**
- * Simple facade for pooling objects which are expensive to create.
+ *
  */
-public interface Pool<T> {
+public interface LeasableResource<S> extends Resource<S> {
 
-    T get();
-
-    void release(T pPooledObject);
+    <T> Resource<T> lease();
 }

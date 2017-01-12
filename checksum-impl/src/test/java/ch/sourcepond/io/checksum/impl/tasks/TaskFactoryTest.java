@@ -1,15 +1,14 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.impl.pools.BufferPool;
+import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.Observable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +19,9 @@ import static org.mockito.Mockito.mock;
  * Created by rolandhauser on 09.01.17.
  */
 public class TaskFactoryTest {
-    private final TaskFactory factory = new TaskFactory();
+    private final DigesterPool digesterPool = mock(DigesterPool.class);
+    private final BufferPool bufferPool = mock(BufferPool.class);
+    private final TaskFactory factory = new TaskFactory(bufferPool);
     private final Observable resource = mock(Observable.class);
     private URL anyUrl;
 
@@ -37,13 +38,9 @@ public class TaskFactoryTest {
 
     @Test
     public void verifyFactoryMethods() {
-        assertNotSame(factory.newChannelTask(resource, TimeUnit.SECONDS, 1L, mock(ChannelSource.class)),
-                factory.newChannelTask(resource, TimeUnit.SECONDS, 1L, mock(ChannelSource.class)));
-        assertNotSame(factory.newFileTask(resource, TimeUnit.SECONDS, 1L, mock(Path.class)),
-                factory.newFileTask(resource, TimeUnit.SECONDS, 1L, mock(Path.class)));
-        assertNotSame(factory.newStreamTask(resource, TimeUnit.SECONDS, 1L, mock(StreamSource.class)),
-                factory.newStreamTask(resource, TimeUnit.SECONDS, 1L, mock(StreamSource.class)));
-        assertNotSame(factory.newURLTask(resource, TimeUnit.SECONDS, 1L, anyUrl),
-                factory.newURLTask(resource, TimeUnit.SECONDS, 1L, anyUrl));
+        assertNotSame(factory.newChannelTask(digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newChannelTask(digesterPool, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newStreamTask(digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newStreamTask(digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 }

@@ -16,12 +16,10 @@ package ch.sourcepond.io.checksum.impl.tasks;
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.impl.pools.Pool;
+import ch.sourcepond.io.checksum.impl.pools.BufferPool;
+import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.Observable;
 
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.security.MessageDigest;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -29,23 +27,17 @@ import java.util.concurrent.TimeUnit;
  * Created by rolandhauser on 06.01.17.
  */
 public class TaskFactory {
-    private final Pool<MessageDigest> digesterPool;
-    private final Pool<ByteBuffer> bufferPool;
+    private final BufferPool bufferPool;
 
-    public TaskFactory(final Pool<MessageDigest> pDigesterPool, final Pool<ByteBuffer> pBufferPool) {
-        digesterPool = pDigesterPool;
+    public TaskFactory(final BufferPool pBufferPool) {
         bufferPool = pBufferPool;
     }
 
-    public Callable<Checksum> newChannelTask(final Observable<ChannelSource, ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) {
-        return new ChannelUpdateTask<ChannelSource>(digesterPool, pResource, new DataReader(pUnit, pInterval), bufferPool);
+    public <S> Callable<Checksum> newChannelTask(final DigesterPool digesterPool, final Observable<S, ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) {
+        return new ChannelUpdateTask<S>(digesterPool, pResource, new DataReader(pUnit, pInterval), bufferPool);
     }
 
-    public Callable<Checksum> newFileTask(final Observable<Path, ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) {
-        return new ChannelUpdateTask<Path>(digesterPool, pResource, new DataReader(pUnit, pInterval), bufferPool);
-    }
-
-    public Callable<Checksum> newStreamTask(final Observable<StreamSource, StreamSource> pResource, final TimeUnit pUnit, final long pInterval) {
-        return new StreamUpdateTask(digesterPool, pResource, new DataReader(pUnit, pInterval));
+    public <S> Callable<Checksum> newStreamTask(final DigesterPool digesterPool, final Observable<S, StreamSource> pResource, final TimeUnit pUnit, final long pInterval) {
+        return new StreamUpdateTask<S>(digesterPool, pResource, new DataReader(pUnit, pInterval));
     }
 }

@@ -11,26 +11,25 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.tasks;
+package ch.sourcepond.io.checksum.impl.store;
 
-import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.Algorithm;
+import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by rolandhauser on 05.01.17.
+ * Created by rolandhauser on 11.01.17.
  */
-public final class URLStreamSource implements StreamSource {
-    private final URL url;
+final class ResourceMap extends ConcurrentHashMap<Object, LeasableResource<?>> {
+    private final DigesterPool pool;
 
-    public URLStreamSource(final URL url) {
-        this.url = url;
+    ResourceMap(final Algorithm pAlgorithm) {
+        pool = new DigesterPool(pAlgorithm);
     }
 
-    @Override
-    public InputStream openStream() throws IOException {
-        return url.openStream();
+    DigesterPool getPool() {
+        return pool;
     }
 }

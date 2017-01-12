@@ -1,13 +1,23 @@
+/*Copyright (C) 2017 Roland Hauser, <sourcepond@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.pools;
 
-import ch.sourcepond.io.checksum.api.Algorithm;
 import org.junit.Test;
-import sun.misc.Unsafe;
 
-import java.lang.reflect.Field;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
+import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static org.junit.Assert.*;
 
 /**
@@ -20,11 +30,10 @@ public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
             39, -82, 65, -28, 100, -101, -109, 76,
             -92, -107, -103, 27, 120, 82, -72, 85
     };
-    private final DigesterPoolRegistry poolFactory = new DigesterPoolRegistry();
 
     @Override
-    protected Pool<MessageDigest> newTestPool() throws Exception {
-        return poolFactory.getPool(Algorithm.SHA256);
+    protected DigesterPool newTestPool() throws Exception {
+        return new DigesterPool(SHA256);
     }
 
     @Test
@@ -35,24 +44,5 @@ public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
         digest.update(new byte[]{2, 3, 4, 5, 6});
         pool.release(digest);
         assertArrayEquals(EXPECTED_CLEAN_BYTES, digest.digest());
-    }
-
-    @Test
-    public void verifyImpossibleCaseThatAlgorithmIsInvalid() throws Exception {
-        final Field f = Unsafe.class.getDeclaredField("theUnsafe");
-        f.setAccessible(true);
-        final Unsafe unsafe = (Unsafe)f.get(Unsafe.class);
-
-        Field algorithmField = DigesterPool.class.getDeclaredField("algorithm");
-        algorithmField.setAccessible(true);
-        final DigesterPool pool = (DigesterPool) unsafe.allocateInstance(DigesterPool.class);
-        algorithmField.set(pool, "UNKNOWN");
-
-        try {
-            pool.newPooledObject();
-            fail("Exception expected here");
-        } catch (final IllegalStateException e) {
-            assertSame(NoSuchAlgorithmException.class, e.getCause().getClass());
-        }
     }
 }

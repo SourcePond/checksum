@@ -11,25 +11,15 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.pools;
+package ch.sourcepond.io.checksum.impl.store;
 
-import java.nio.ByteBuffer;
+import ch.sourcepond.io.checksum.api.Resource;
 
 /**
- * Pool of direct {@link ByteBuffer} instances.
+ *
  */
-public class BufferPool extends BasePool<ByteBuffer> {
+@FunctionalInterface
+public interface DisposeCallback {
 
-    BufferPool() {
-    }
-
-    @Override
-    ByteBuffer newPooledObject() {
-        return ByteBuffer.allocateDirect(8192);
-    }
-
-    @Override
-    void pooledObjectReleased(final ByteBuffer pPooledObject) {
-        pPooledObject.clear();
-    }
+    void dispose(Resource<?> pResource);
 }
