@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>ch.sourcepond</groupId>
+		<artifactId>bundle-test</artifactId>
+		<version>0.6.12</version>
+		<relativePath />
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<inceptionYear>2017</inceptionYear>
+	<groupId>ch.sourcepond.io</groupId>
+	<artifactId>checksum-tests</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<description>
+		OSGi integration tests for checksum-impl.
+	</description>
+
+	<properties>
+		<repo.project>checksum</repo.project>
+		<smartswitch.version>1.0.2</smartswitch.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<scope>test</scope>
+			<groupId>ch.sourcepond.commons</groupId>
+			<artifactId>smartswitch-api</artifactId>
+			<version>${smartswitch.version}</version>
+		</dependency>
+		<dependency>
+			<scope>test</scope>
+			<groupId>ch.sourcepond.commons</groupId>
+			<artifactId>smartswitch-impl</artifactId>
+			<version>${smartswitch.version}</version>
+		</dependency>
+		<dependency>
+			<scope>test</scope>
+			<groupId>ch.sourcepond.io</groupId>
+			<artifactId>checksum-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<scope>test</scope>
+			<groupId>ch.sourcepond.io</groupId>
+			<artifactId>checksum-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<scope>test</scope>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!-- Remove this when MNG-3244, MNG-5951 are resolved -->
+	<url>https://sourcepond.github.io/${repo.project}</url>
+
+	<!-- Remove this when MNG-3244, MNG-5951 are resolved -->
+	<scm>
+		<url>https://${repo.domain}/${repo.path}</url>
+		<connection>scm:git:${project.scm.url}.git</connection>
+		<developerConnection>scm:git:ssh://git@${repo.domain}/${repo.path}.git</developerConnection>
+	</scm>
+
+	<ciManagement>
+		<url>${jenkins.baseurl}/job/${repo.project}</url>
+		<system>Jenkins</system>
+	</ciManagement>
+
+	<distributionManagement>
+		<site>
+			<id>www.sourcepond.ch</id>
+			<url>${site.distribution.url}/${project.groupId}/${project.artifactId}/${project.version}/</url>
+		</site>
+	</distributionManagement>
+</project>
