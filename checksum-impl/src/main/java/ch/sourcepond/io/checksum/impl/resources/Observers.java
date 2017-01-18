@@ -19,6 +19,7 @@ import ch.sourcepond.io.checksum.api.FailureObserver;
 import ch.sourcepond.io.checksum.api.SuccessObserver;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +36,11 @@ class Observers<S, A> implements Observable<S, A> {
      */
     static final Checksum INITIAL_CHECKSUM = new Checksum() {
         private final byte[] value = new byte[0];
+
+        @Override
+        public Instant getTimestamp() {
+            return Instant.MIN;
+        }
 
         @Override
         public byte[] getValue() {

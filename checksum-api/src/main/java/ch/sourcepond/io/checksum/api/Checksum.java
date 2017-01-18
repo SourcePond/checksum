@@ -14,6 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
 import java.security.MessageDigest;
+import java.time.Instant;
 
 /**
  * Abstracts a checksum based on a specific hashing algorithm (see
@@ -22,36 +23,43 @@ import java.security.MessageDigest;
  */
 public interface Checksum {
 
-	/**
-	 * <p>
-	 * Gets the result of the latest completed calculation triggered through one
-	 * of the {@code update} methods on {@link Resource}.
-	 * </p>
-	 * 
-	 * <p>
-	 * If the latest calculation was successful, the checksum will be returned
-	 * as byte array. The length of the array depends on the used hashing
-	 * algorithm (see <a href=
-	 * "http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
-	 * MessageDigest Algorithms</a> for further information). Note: the returned
-	 * array is a copy i.e. changing the returned value will have no effect on
-	 * the internal state of this object.
-	 * </p>
-	 * 
-	 * <p>
-	 * If none of the {@code update} methods on {@link Checksum} has
-	 * ever been called an empty array will be returned.
-	 * </p>
-	 * 
-	 * @return The calculated checksum as byte array, never {@code null}
-	 */
-	byte[] getValue();
+    /**
+     * Returns the timestamp when the calculation of this checksum successfully completed.
+     *
+     * @return Timestamp, never {@code null}
+     */
+    Instant getTimestamp();
 
-	/**
-	 * Returns the checksum as hex-string. See {@link #getValue()} for further
-	 * information.
-	 * 
-	 * @return The calculated checksum as string, never {@code null}
-	 */
-	String getHexValue();
+    /**
+     * <p>
+     * Gets the result of the latest completed calculation triggered through one
+     * of the {@code update} methods on {@link Resource}.
+     * </p>
+     * <p>
+     * <p>
+     * If the latest calculation was successful, the checksum will be returned
+     * as byte array. The length of the array depends on the used hashing
+     * algorithm (see <a href=
+     * "http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest">
+     * MessageDigest Algorithms</a> for further information). Note: the returned
+     * array is a copy i.e. changing the returned value will have no effect on
+     * the internal state of this object.
+     * </p>
+     * <p>
+     * <p>
+     * If none of the {@code update} methods on {@link Checksum} has
+     * ever been called an empty array will be returned.
+     * </p>
+     *
+     * @return The calculated checksum as byte array, never {@code null}
+     */
+    byte[] getValue();
+
+    /**
+     * Returns the checksum as hex-string. See {@link #getValue()} for further
+     * information.
+     *
+     * @return The calculated checksum as string, never {@code null}
+     */
+    String getHexValue();
 }

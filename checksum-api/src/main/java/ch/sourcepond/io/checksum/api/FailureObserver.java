@@ -16,7 +16,8 @@ package ch.sourcepond.io.checksum.api;
 import java.io.IOException;
 
 /**
- * Created by roland on 04.01.17.
+ * Observer being triggered when a checksum calculation has been cancelled because
+ * data read failed for some reason.
  */
 public interface FailureObserver<T> {
 

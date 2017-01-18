@@ -19,14 +19,47 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
+ * <p>
+ * A resource represents an abstraction layer for checksum calculation on some content.
+ * If a change on the content (the "source", see {@link #getSource()}) object is detected,
+ * the observing client should call one of the {@code update} method on this interface. This will
+ * trigger a new {@link Checksum} being calculated which then can be accessed through {@link Future#get()} or
+ * through an {@link SuccessObserver}. It's also possible to register observers for cancel and failure
+ * cases (see {@link CancelObserver} and {@link FailureObserver}).
+ * </p>
  *
+ * <p>
+ * The used algorithm {@link #getAlgorithm()} and the source {@link #getSource()} uniquely identify
+ * a resource. This means that for a particular combination of those attributes exactly one
+ * resource exists in the {@link ResourcesRegistry}.
+ * </p>
+ *
+ * <p>When a resource is not needed anymore by the client, it should should release the resource
+ * through its {@link #release()} method.</p>
+ *
+ * @param <T> Type of the source object, i.e. type of the object being observed through this resource
+ *            (check the second argument of the {@code get} methods on {@link ResourcesRegistry}).
  */
 public interface Resource<T> {
 
+    /**
+     * Releases this resource. If this object is not referenced by any client anymore,
+     * the {@link ResourcesRegistry} will dispose it freeing all held system resources like buffers etc..
+     */
     void release();
 
+    /**
+     * Returns the source object where the data to be digested is read from.
+     *
+     * @return Source object, never {@code null}
+     */
     T getSource();
 
+    /**
+     * The algorithm being used for checksum calculation.
+     *
+     * @return Algorithm, never {@code null}
+     */
     Algorithm getAlgorithm();
 
     /**
@@ -65,7 +98,6 @@ public interface Resource<T> {
      *
      * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
      * @return Returns this checksum object, never {@code null}
-     * @throws NullPointerException Thrown, if the observer is {@code null}
      */
     Resource<T> removeCancelObserver(CancelObserver<T> pObserverOrNull);
 
@@ -75,7 +107,6 @@ public interface Resource<T> {
      *
      * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
      * @return Returns this checksum object, never {@code null}
-     * @throws NullPointerException Thrown, if the observer is {@code null}
      */
     Resource<T> removeFailureObserver(FailureObserver<T> pObserverOrNull);
 
@@ -85,41 +116,39 @@ public interface Resource<T> {
      *
      * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
      * @return Returns this checksum object, never {@code null}
-     * @throws NullPointerException Thrown, if the observer is {@code null}
      */
     Resource<T> removeSuccessObserver(SuccessObserver<T> pObserverOrNull);
 
     /**
      * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
      *
-     * @return Returns this checksum object, never {@code null}
-     * @throws RejectedExecutionException
-     *             Thrown, if the asynchronous update task could not be
-     *             submitted.
+     * @return Returns a future representing the newly calculated checksum object, never {@code null}
+     * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
+     *                                    submitted.
      */
     Future<Checksum> update();
 
     /**
      * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
      *
-     * @param pIntervalInMilliseconds
-     *            Time to wait in milliseconds.
-     * @return Returns this checksum object, never {@code null}
-     * @throws RejectedExecutionException
-     *             Thrown, if the asynchronous update task could not be
-     *             submitted.
+     * @param pIntervalInMilliseconds Time to wait in milliseconds.
+     * @return Returns a future representing the newly calculated checksum object, never {@code null}
+     * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
+     *                                    submitted.
+     * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
     Future<Checksum> update(long pIntervalInMilliseconds);
 
     /**
      * <p>
-     * Updates this checksum in a non-blocking manner. After the new checksum
-     * has been calculated, the old checksum will be saved and can later be
-     * accessed through {@link #getPreviousValue()} or
-     * {@link #getPreviousHexValue()}. The newly calculated checksum can be
-     * accessed through {@link #getValue()} or {@link #getHexValue()}.
+     * Updates this checksum in an asynchronous manner. After the new checksum
+     * has been calculated, the registered {@link SuccessObserver} will be
+     * informed. If the update has been cancelled through {@link Future#cancel(boolean)} with
+     * argument {@code true} then all registered {@link CancelObserver} will be informed. In case of
+     * a failure because the data necessary could not be read from the source, the causing
+     * {@link java.io.IOException} will be passed to all registered {@link FailureObserver} instances.
      * </p>
-     *
+
      * <p>
      * If the end of the data-source has been reached, the update process waits
      * until the interval specified elapses. If more data is available, the
@@ -128,16 +157,15 @@ public interface Resource<T> {
      * elapses and no more data is available.
      * </p>
      *
-     * @param pUnit
-     *            Time-unit of the interval specified.
-     * @param pInterval
-     *            Time to wait until the data-source should be closed when
-     *            currently no more data is available. Must not be negative, 0
-     *            indicates no wait.
-     * @return Returns this checksum object, never {@code null}
-     * @throws RejectedExecutionException
-     *             Thrown, if the asynchronous update task could not be
-     *             submitted.
+     * @param pUnit     Time-unit of the interval specified.
+     * @param pInterval Time to wait until the data-source should be closed when
+     *                  currently no more data is available. Must not be negative, 0
+     *                  indicates no wait.
+     * @return Returns a future representing the newly calculated checksum object, never {@code null}
+     * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
+     *                                    submitted.
+     * @throws NullPointerException       Thrown, if the time-unit specified is {@code null}
+     * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
     Future<Checksum> update(TimeUnit pUnit, long pInterval);
 }

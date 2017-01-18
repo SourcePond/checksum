@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
+import ch.sourcepond.commons.smartswitch.api.SmartSwitchFactory;
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
@@ -23,6 +24,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
+import static java.util.concurrent.Executors.newFixedThreadPool;
+
 /**
  * Factory to {@link LeasableResource} instances for different sources.
  */
@@ -31,9 +34,15 @@ public class ResourceFactory {
     private final ExecutorService observerExecutor;
     private final TaskFactory taskFactory;
 
-    ResourceFactory(final ExecutorService pUpdateExecutor, final ExecutorService pObserverExecutor, final TaskFactory pTaskFactory) {
-        updateExecutor = pUpdateExecutor;
-        observerExecutor = pObserverExecutor;
+    public ResourceFactory(final SmartSwitchFactory pSmartSwitch, final TaskFactory pTaskFactory) {
+        updateExecutor = pSmartSwitch.whenService(ExecutorService.class).
+                withFilter("(sourcepond.io.checksum.updateexecutor=*)").
+                isUnavailableThenUse(() -> newFixedThreadPool(3)).
+                insteadAndExecuteWhenAvailable(e -> e.shutdown());
+        observerExecutor = pSmartSwitch.whenService(ExecutorService.class).
+                withFilter("(sourcepond.io.checksum.observerexecutor=*)").
+                isUnavailableThenUse(() -> newFixedThreadPool(5)).
+                insteadAndExecuteWhenAvailable(e -> e.shutdown());;
         taskFactory = pTaskFactory;
     }
 

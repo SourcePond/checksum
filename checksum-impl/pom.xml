@@ -3,13 +3,17 @@
 	<parent>
 		<groupId>ch.sourcepond.io</groupId>
 		<artifactId>checksum</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>checksum-impl</artifactId>
 	<inceptionYear>2015</inceptionYear>
 	<packaging>bundle</packaging>
 	<description>Provides an implementation for the checksum-api bundle.</description>
+
+	<properties>
+		<smartswitch.version>1.0.2</smartswitch.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -23,8 +27,10 @@
 			<version>${smartswitch.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
+			<scope>test</scope>
+			<groupId>ch.sourcepond.commons</groupId>
+			<artifactId>smartswitch-testing</artifactId>
+			<version>${smartswitch.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -38,7 +44,11 @@
 						<Bundle-Blueprint>
 							ch/sourcepond/io/checksum/impl/components.xml,
 							ch/sourcepond/io/checksum/impl/import.xml,
-							ch/sourcepond/io/checksum/impl/export.xml
+							ch/sourcepond/io/checksum/impl/export.xml,
+							ch/sourcepond/io/checksum/impl/pools/components.xml,
+							ch/sourcepond/io/checksum/impl/resources/components.xml,
+							ch/sourcepond/io/checksum/impl/store/components.xml,
+							ch/sourcepond/io/checksum/impl/tasks/components.xml
 						</Bundle-Blueprint>
 					</instructions>
 				</configuration>

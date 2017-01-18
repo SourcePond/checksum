@@ -26,7 +26,7 @@ import java.util.Map;
 public class ResourceStore implements DisposeCallback {
     final Map<Algorithm, ResourceMap> resources = new EnumMap<>(Algorithm.class);
 
-    ResourceStore() {
+    public ResourceStore() {
         for (final Algorithm algorithm : Algorithm.values()) {
             resources.put(algorithm, new ResourceMap(algorithm));
         }

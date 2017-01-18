@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
  */
 public class BufferPool extends BasePool<ByteBuffer> {
 
-    BufferPool() {
+    public BufferPool() {
     }
 
     @Override

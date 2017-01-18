@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.Callable;
 
+import static java.time.Instant.now;
+
 /**
  * Base task for updating a {@link MessageDigest}.
  */
@@ -42,7 +44,7 @@ public abstract class UpdateTask<S, A> implements Callable<Checksum> {
         final MessageDigest digest = digesterPool.get();
         try {
             updateDigest(digest);
-            final Checksum checksum = new ChecksumImpl(digest.digest());
+            final Checksum checksum = new ChecksumImpl(now(), digest.digest());
             resource.informSuccessObservers(checksum);
             return checksum;
         } catch (final InterruptedException e) {

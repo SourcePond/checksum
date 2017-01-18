@@ -23,11 +23,11 @@ import java.nio.file.Path;
 /**
  * Created by rolandhauser on 05.01.17.
  */
-final class ResourcesRegistryImpl implements ResourcesRegistry {
+public final class ResourcesRegistryImpl implements ResourcesRegistry {
     private final ResourceFactory resourceFactory;
     private final ResourceStore store;
 
-    ResourcesRegistryImpl(final ResourceFactory pResourceFactory,
+    public ResourcesRegistryImpl(final ResourceFactory pResourceFactory,
                           final ResourceStore pStore) {
         resourceFactory = pResourceFactory;
         store = pStore;

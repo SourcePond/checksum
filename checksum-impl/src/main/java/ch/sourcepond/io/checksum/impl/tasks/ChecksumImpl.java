@@ -15,18 +15,22 @@ package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 
+import java.time.Instant;
+
 /**
- * Created by rolandhauser on 05.01.17.
+ * Default implementation of the {@link Checksum} interface.
  */
 final class ChecksumImpl implements Checksum {
+    private final Instant timestamp;
     private final byte[] value;
     private final String hexValue;
 
-    public ChecksumImpl(final byte[] value) {
-        this.value = value;
+    public ChecksumImpl(final Instant pTimestamp, final byte[] pValue) {
+        timestamp = pTimestamp;
+        value = pValue;
         final StringBuilder b = new StringBuilder();
-        for (int i = 0; i < value.length; i++) {
-            int temp = 0xFF & value[i];
+        for (int i = 0; i < pValue.length; i++) {
+            int temp = 0xFF & pValue[i];
             String s = Integer.toHexString(temp);
             if (temp <= 0x0F) {
                 b.append('0').append(s);
@@ -35,6 +39,11 @@ final class ChecksumImpl implements Checksum {
             }
         }
         hexValue = b.toString();
+    }
+
+    @Override
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
     @Override

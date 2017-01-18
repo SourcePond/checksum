@@ -13,14 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Utility class for uniting timeout and cancel handling.
@@ -39,7 +36,6 @@ class DataReader {
         void update(int pReadBytes);
     }
 
-    private static final Logger LOG = getLogger(DataReader.class);
     private final TimeUnit unit;
     private final long interval;
     private int iterations;
