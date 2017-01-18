@@ -30,7 +30,7 @@ import static org.ops4j.pax.exam.CoreOptions.*;
  * Created by rolandhauser on 17.01.17.
  */
 @RunWith(PaxExam.class)
-public class ResourcesTests {
+public class ResourcesTest {
     private static final String FIRST_EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
     private static final String SECOND_EXPECTED_SHA_256_HASH = "6c0f8adc6aac283543b974b395a8f9bb61e837076b2118fb9fbec71e1540b28e";
     private final File testfile = new File("target", "testfile_01.txt");
