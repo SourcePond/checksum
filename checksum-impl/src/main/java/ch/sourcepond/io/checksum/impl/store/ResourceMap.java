@@ -18,11 +18,13 @@ import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
- * Created by rolandhauser on 11.01.17.
+ * Thread-safe store for {@link LeasableResource} instances.
  */
-final class ResourceMap extends ConcurrentHashMap<Object, LeasableResource<?>> {
+final class ResourceMap {
+    private final ConcurrentMap<Object, LeasableResource<?>> map = new ConcurrentHashMap<>();
     private final DigesterPool pool;
 
     ResourceMap(final Algorithm pAlgorithm) {
@@ -31,5 +33,19 @@ final class ResourceMap extends ConcurrentHashMap<Object, LeasableResource<?>> {
 
     DigesterPool getPool() {
         return pool;
+    }
+
+    void remove(final Object pSource) {
+        map.remove(pSource);
+    }
+
+    @SuppressWarnings("unchecked")
+    <T> LeasableResource<T> get(final T pSource) {
+        return (LeasableResource<T>)map.get(pSource);
+    }
+
+    @SuppressWarnings("unchecked")
+    <T> LeasableResource<T> putIfAbsent(final T pSource, final LeasableResource<?> pValue) {
+        return (LeasableResource<T>)map.putIfAbsent(pSource, pValue);
     }
 }
