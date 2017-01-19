@@ -9,7 +9,7 @@ import java.nio.file.FileSystems;
 import static org.junit.Assert.*;
 
 /**
- * Created by rolandhauser on 11.01.17.
+ *
  */
 public class FileChannelSourceTest {
     private FileChannelSource source;

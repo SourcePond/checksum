@@ -25,13 +25,13 @@ import static java.lang.Thread.interrupted;
 class DataReader {
 
     @FunctionalInterface
-    static interface Reader {
+    interface Reader {
 
         int read() throws IOException;
     }
 
     @FunctionalInterface
-    static interface Updater {
+    interface Updater {
 
         void update(int pReadBytes);
     }

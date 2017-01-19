@@ -16,8 +16,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
- * Created by rolandhauser on 09.01.17.
+ *
  */
+@SuppressWarnings({"unchecked", "FieldCanBeLocal"})
 public class TaskFactoryTest {
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final BufferPool bufferPool = mock(BufferPool.class);

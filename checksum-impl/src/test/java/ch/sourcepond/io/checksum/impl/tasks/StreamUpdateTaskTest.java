@@ -8,8 +8,9 @@ import java.net.URL;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by rolandhauser on 09.01.17.
+ *
  */
+@SuppressWarnings("unchecked")
 public class StreamUpdateTaskTest extends UpdateTaskTest<URL, StreamSource> {
 
     @Override

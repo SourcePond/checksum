@@ -53,7 +53,8 @@ abstract class BaseResource<S, A> implements LeasableResource<S> {
         taskFactory = pTaskFactory;
     }
 
-    public final Resource lease() {
+    @SuppressWarnings("unchecked")
+    public final Resource<S> lease() {
         usages.incrementAndGet();
         return this;
     }

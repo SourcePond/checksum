@@ -17,7 +17,7 @@ import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 
 /**
- * Created by rolandhauser on 11.01.17.
+ *
  */
 @FunctionalInterface
 public interface ResourceSupplier<T> {

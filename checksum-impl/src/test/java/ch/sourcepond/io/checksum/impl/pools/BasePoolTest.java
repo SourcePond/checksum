@@ -19,17 +19,17 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by rolandhauser on 06.01.17.
+ *
  */
 public abstract class BasePoolTest<T> {
-    protected BasePool<T> pool;
+    BasePool<T> pool;
 
     @Before
     public void setup() throws Exception {
         pool = newTestPool();
     }
 
-    protected abstract BasePool<T> newTestPool() throws Exception;
+    protected abstract BasePool<T> newTestPool();
 
     @Test(expected = NullPointerException.class)
     public void nullPointerIfObjectToBeReleasedIsNull() {
@@ -44,6 +44,7 @@ public abstract class BasePoolTest<T> {
         assertSame(pooledObject, pool.get());
     }
 
+    @SuppressWarnings("UnusedAssignment")
     @Test
     public void verifyGetAndReleaseWithGC() throws Exception {
         T pooledObject = pool.get();

@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by rolandhauser on 06.01.17.
+ *
  */
 public class BufferPoolTest extends BasePoolTest<ByteBuffer> {
 

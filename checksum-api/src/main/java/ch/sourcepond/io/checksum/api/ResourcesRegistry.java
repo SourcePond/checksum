@@ -21,6 +21,7 @@ import java.nio.file.Path;
  * entry-point to use the checksum API.
  *
  */
+@SuppressWarnings("ALL")
 public interface ResourcesRegistry {
 
 	/**

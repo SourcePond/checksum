@@ -55,7 +55,7 @@ public enum Algorithm {
 
 	private final String name;
 
-	private Algorithm(final String pName) {
+	Algorithm(final String pName) {
 		name = pName;
 	}
 

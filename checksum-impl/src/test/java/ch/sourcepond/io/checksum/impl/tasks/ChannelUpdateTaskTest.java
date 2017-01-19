@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by rolandhauser on 09.01.17.
+ *
  */
 public class ChannelUpdateTaskTest extends UpdateTaskTest<Path, ChannelSource> {
     private final ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -23,7 +23,7 @@ public class ChannelUpdateTaskTest extends UpdateTaskTest<Path, ChannelSource> {
     protected UpdateTask<Path, ChannelSource> newTask() {
         when(resource.getAccessor()).thenReturn(new FileChannelSource(
                 FileSystems.getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())));
-        return new ChannelUpdateTask<Path>(digesterPool, resource, reader, bufferPool);
+        return new ChannelUpdateTask<>(digesterPool, resource, reader, bufferPool);
     }
 
     @Before

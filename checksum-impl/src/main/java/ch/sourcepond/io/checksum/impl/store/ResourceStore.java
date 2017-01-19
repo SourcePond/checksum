@@ -21,8 +21,9 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * Created by rolandhauser on 11.01.17.
+ *
  */
+@SuppressWarnings("unchecked")
 public class ResourceStore implements DisposeCallback {
     final Map<Algorithm, ResourceMap> resources = new EnumMap<>(Algorithm.class);
 
@@ -49,7 +50,6 @@ public class ResourceStore implements DisposeCallback {
                 rc = current;
             }
         }
-        rc.lease();
-        return (Resource<T>) rc;
+        return (Resource<T>) rc.lease();
     }
 }

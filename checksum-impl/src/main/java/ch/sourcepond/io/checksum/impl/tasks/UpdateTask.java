@@ -28,8 +28,8 @@ import static java.time.Instant.now;
  */
 public abstract class UpdateTask<S, A> implements Callable<Checksum> {
     private final DigesterPool digesterPool;
-    protected final Observable<S, A> resource;
-    protected final DataReader reader;
+    final Observable<S, A> resource;
+    final DataReader reader;
 
     UpdateTask(final DigesterPool pDigesterPool, final Observable<S, A> pResource, final DataReader pReader) {
         digesterPool = pDigesterPool;

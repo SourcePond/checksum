@@ -21,7 +21,7 @@ import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static org.junit.Assert.*;
 
 /**
- * Created by rolandhauser on 06.01.17.
+ *
  */
 public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
     private final byte[] EXPECTED_CLEAN_BYTES = new byte[]{
@@ -32,7 +32,7 @@ public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
     };
 
     @Override
-    protected DigesterPool newTestPool() throws Exception {
+    protected DigesterPool newTestPool() {
         return new DigesterPool(SHA256);
     }
 

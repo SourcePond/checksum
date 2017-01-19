@@ -16,6 +16,7 @@ package ch.sourcepond.io.checksum.api;
 /**
  * Created by roland on 04.01.17.
  */
+@SuppressWarnings("ALL")
 public interface CancelObserver<T> {
 
     void updateCancelled(T pSource);

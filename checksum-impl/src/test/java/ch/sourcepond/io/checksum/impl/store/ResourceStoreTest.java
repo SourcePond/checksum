@@ -21,7 +21,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,6 +33,7 @@ import static org.mockito.Mockito.*;
 /**
  *
  */
+@SuppressWarnings("unchecked")
 public class ResourceStoreTest {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
     private final StreamSource source = mock(StreamSource.class);
@@ -84,30 +84,25 @@ public class ResourceStoreTest {
     public void ignoreNewResourceIfAnotherIsAlreadyRegistered() throws Exception {
         final LeasableResource<StreamSource> toBeIgnored = mock(LeasableResource.class);
         final CountDownLatch latch = new CountDownLatch(2);
-        executor.submit(new Callable<Resource<StreamSource>>() {
-
-            @Override
-            public Resource<StreamSource> call() throws Exception {
-                store.get(SHA256, source, pool -> {
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return toBeIgnored;
-                });
-                latch.countDown();
-                return null;
-            }
-        });
-        executor.schedule(new Callable<Resource<StreamSource>>() {
-            @Override
-            public Resource<StreamSource> call() throws Exception {
-                store.get(SHA256, source, pool -> resource);
-                latch.countDown();
-                return null;
-            }
-        }, 100L, MILLISECONDS);
+        executor.submit(() -> {
+                    store.get(SHA256, source, pool -> {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        return toBeIgnored;
+                    });
+                    latch.countDown();
+                    return null;
+                }
+        );
+        executor.schedule(() -> {
+                    store.get(SHA256, source, pool -> resource);
+                    latch.countDown();
+                    return null;
+                }
+                , 100L, MILLISECONDS);
         latch.await();
         assertSame(resource, store.get(SHA256, source, supplier));
     }

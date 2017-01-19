@@ -34,19 +34,20 @@ import static org.mockito.Mockito.*;
 /**
  *
  */
+@SuppressWarnings("unchecked")
 public abstract class BaseResourceTest<S, A> {
-    protected final Future<Checksum> checksumFuture = mock(Future.class);
-    protected final Callable<Checksum> updateTask = mock(Callable.class);
-    protected final DisposeCallback disposeCallback = mock(DisposeCallback.class);
-    protected final ExecutorService updateExecutor = mock(ExecutorService.class);
-    protected final DigesterPool digesterPool = mock(DigesterPool.class);
-    protected final Observers<S, A> observers = mock(Observers.class);
-    protected final TaskFactory taskFactory = mock(TaskFactory.class);
-    protected final CancelObserver<S> cancelObserver = mock(CancelObserver.class);
-    protected final FailureObserver<S> failureObserver = mock(FailureObserver.class);
-    protected final SuccessObserver<S> successObserver = mock(SuccessObserver.class);
-    protected S source;
-    protected LeasableResource<S> resource;
+    final Future<Checksum> checksumFuture = mock(Future.class);
+    final Callable<Checksum> updateTask = mock(Callable.class);
+    final DisposeCallback disposeCallback = mock(DisposeCallback.class);
+    final ExecutorService updateExecutor = mock(ExecutorService.class);
+    final DigesterPool digesterPool = mock(DigesterPool.class);
+    final Observers<S, A> observers = mock(Observers.class);
+    final TaskFactory taskFactory = mock(TaskFactory.class);
+    private final CancelObserver<S> cancelObserver = mock(CancelObserver.class);
+    private final FailureObserver<S> failureObserver = mock(FailureObserver.class);
+    private final SuccessObserver<S> successObserver = mock(SuccessObserver.class);
+    S source;
+    LeasableResource<S> resource;
 
     @Before
     public void setup() {

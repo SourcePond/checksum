@@ -14,11 +14,13 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.ReadableByteChannel;
 
 /**
- * Created by rolandhauser on 05.01.17.
+ * Implementations of this interface allow to open an {@link ReadableByteChannel} from a
+ * specific source. Use implementations of this interface in conjunction with
+ * {@link ResourcesRegistry#get(Algorithm, ChannelSource)} to create
+ * {@link Checksum} instances which fetch their data from a custom source.
  */
 public interface ChannelSource {
 

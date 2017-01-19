@@ -37,10 +37,10 @@ import java.util.concurrent.TimeUnit;
  * <p>When a resource is not needed anymore by the client, it should should release the resource
  * through its {@link #release()} method.</p>
  *
- * @param <T> Type of the source object, i.e. type of the object being observed through this resource
+ * @param <S> Type of the source object, i.e. type of the object being observed through this resource
  *            (check the second argument of the {@code get} methods on {@link ResourcesRegistry}).
  */
-public interface Resource<T> {
+public interface Resource<S> {
 
     /**
      * Releases this resource. If this object is not referenced by any client anymore,
@@ -53,7 +53,7 @@ public interface Resource<T> {
      *
      * @return Source object, never {@code null}
      */
-    T getSource();
+    S getSource();
 
     /**
      * The algorithm being used for checksum calculation.
@@ -70,7 +70,7 @@ public interface Resource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    Resource<T> addCancelObserver(CancelObserver<T> pObserver);
+    Resource<S> addCancelObserver(CancelObserver<S> pObserver);
 
     /**
      * Adds the observer specified to this checksum object. If the observer
@@ -80,7 +80,7 @@ public interface Resource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    Resource<T> addFailureObserver(FailureObserver<T> pObserver);
+    Resource<S> addFailureObserver(FailureObserver<S> pObserver);
 
     /**
      * Adds the observer specified to this checksum object. If the observer
@@ -90,7 +90,7 @@ public interface Resource<T> {
      * @return Returns this checksum object, never {@code null}
      * @throws NullPointerException Thrown, if the observer is {@code null}
      */
-    Resource<T> addSuccessObserver(SuccessObserver<T> pObserver);
+    Resource<S> addSuccessObserver(SuccessObserver<S> pObserver);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -99,7 +99,7 @@ public interface Resource<T> {
      * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
      * @return Returns this checksum object, never {@code null}
      */
-    Resource<T> removeCancelObserver(CancelObserver<T> pObserverOrNull);
+    Resource<S> removeCancelObserver(CancelObserver<S> pObserverOrNull);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -108,7 +108,7 @@ public interface Resource<T> {
      * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
      * @return Returns this checksum object, never {@code null}
      */
-    Resource<T> removeFailureObserver(FailureObserver<T> pObserverOrNull);
+    Resource<S> removeFailureObserver(FailureObserver<S> pObserverOrNull);
 
     /**
      * Removes the observer specified from this checksum object. If the observer
@@ -117,7 +117,7 @@ public interface Resource<T> {
      * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
      * @return Returns this checksum object, never {@code null}
      */
-    Resource<T> removeSuccessObserver(SuccessObserver<T> pObserverOrNull);
+    Resource<S> removeSuccessObserver(SuccessObserver<S> pObserverOrNull);
 
     /**
      * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.

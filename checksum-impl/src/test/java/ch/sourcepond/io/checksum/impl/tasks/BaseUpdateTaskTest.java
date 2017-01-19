@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.security.MessageDigest;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by rolandhauser on 09.01.17.
+ *
  */
+@SuppressWarnings("unchecked")
 public class BaseUpdateTaskTest {
 
     private static class TestUpdateTask extends UpdateTask<StreamSource, StreamSource> {

@@ -18,8 +18,10 @@ import org.junit.Test;
 
 import java.io.InputStream;
 
+import static org.junit.Assert.*;
+
 /**
- * Created by rolandhauser on 11.01.17.
+ *
  */
 public class URLStreamSourceTest {
     private URLStreamSource source;
@@ -32,7 +34,7 @@ public class URLStreamSourceTest {
     @Test
     public void openStream() throws Exception {
         try (final InputStream in = source.openStream()) {
-            // noop
+            assertNotNull(in);
         }
     }
 }

@@ -38,11 +38,11 @@ public class ResourceFactory {
         updateExecutor = pSmartSwitch.whenService(ExecutorService.class).
                 withFilter("(sourcepond.io.checksum.updateexecutor=*)").
                 isUnavailableThenUse(() -> newFixedThreadPool(3)).
-                insteadAndExecuteWhenAvailable(e -> e.shutdown());
+                insteadAndExecuteWhenAvailable(ExecutorService::shutdown);
         observerExecutor = pSmartSwitch.whenService(ExecutorService.class).
                 withFilter("(sourcepond.io.checksum.observerexecutor=*)").
                 isUnavailableThenUse(() -> newFixedThreadPool(5)).
-                insteadAndExecuteWhenAvailable(e -> e.shutdown());;
+                insteadAndExecuteWhenAvailable(ExecutorService::shutdown);
         taskFactory = pTaskFactory;
     }
 

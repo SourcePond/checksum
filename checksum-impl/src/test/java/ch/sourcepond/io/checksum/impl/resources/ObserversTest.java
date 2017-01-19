@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 /**
  *
  */
+@SuppressWarnings("unchecked")
 public class ObserversTest {
 
     public class TestCancelObserver implements CancelObserver<Path> {

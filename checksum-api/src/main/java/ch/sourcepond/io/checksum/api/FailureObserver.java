@@ -19,6 +19,7 @@ import java.io.IOException;
  * Observer being triggered when a checksum calculation has been cancelled because
  * data read failed for some reason.
  */
+@SuppressWarnings("ALL")
 public interface FailureObserver<T> {
 
     void updateFailed(T pSource, IOException pFailure);

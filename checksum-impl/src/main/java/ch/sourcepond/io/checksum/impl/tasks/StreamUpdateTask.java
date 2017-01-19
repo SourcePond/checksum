@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 /**
- * Created by rolandhauser on 06.01.17.
+ *
  */
 final class StreamUpdateTask<S> extends UpdateTask<S, StreamSource> {
 

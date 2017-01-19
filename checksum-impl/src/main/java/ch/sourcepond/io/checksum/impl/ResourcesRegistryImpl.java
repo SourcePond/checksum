@@ -21,7 +21,7 @@ import java.net.URL;
 import java.nio.file.Path;
 
 /**
- * Created by rolandhauser on 05.01.17.
+ *
  */
 public final class ResourcesRegistryImpl implements ResourcesRegistry {
     private final ResourceFactory resourceFactory;

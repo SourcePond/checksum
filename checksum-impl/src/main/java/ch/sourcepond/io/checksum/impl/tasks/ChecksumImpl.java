@@ -25,6 +25,7 @@ final class ChecksumImpl implements Checksum {
     private final byte[] value;
     private final String hexValue;
 
+    @SuppressWarnings("ForLoopReplaceableByForEach")
     public ChecksumImpl(final Instant pTimestamp, final byte[] pValue) {
         timestamp = pTimestamp;
         value = pValue;

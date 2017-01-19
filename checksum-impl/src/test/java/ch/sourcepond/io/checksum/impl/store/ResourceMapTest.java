@@ -24,8 +24,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
- * Created by rolandhauser on 12.01.17.
+ *
  */
+@SuppressWarnings("unchecked")
 public class ResourceMapTest {
     private final Path key = mock(Path.class);
     private final LeasableResource<Path> value = mock(LeasableResource.class);

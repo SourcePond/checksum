@@ -11,7 +11,7 @@ import static java.time.Instant.now;
 import static org.junit.Assert.*;
 
 /**
- * Created by rolandhauser on 05.01.17.
+ *
  */
 public class ChecksumImplTest {
     private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
@@ -40,6 +40,7 @@ public class ChecksumImplTest {
         assertSame(timestamp, checksum.getTimestamp());
     }
 
+    @SuppressWarnings({"ObjectEqualsNull", "EqualsWithItself"})
     @Test
     public void verifyEquals() {
         assertTrue(checksum.equals(checksum));

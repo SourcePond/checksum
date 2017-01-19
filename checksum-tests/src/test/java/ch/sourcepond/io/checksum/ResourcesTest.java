@@ -3,7 +3,6 @@ package ch.sourcepond.io.checksum;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.ResourcesRegistry;
-import ch.sourcepond.io.checksum.api.SuccessObserver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +15,7 @@ import javax.inject.Inject;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 /**
- * Created by rolandhauser on 17.01.17.
+ *
  */
 @RunWith(PaxExam.class)
 public class ResourcesTest {
@@ -35,6 +35,7 @@ public class ResourcesTest {
     private static final String SECOND_EXPECTED_SHA_256_HASH = "6c0f8adc6aac283543b974b395a8f9bb61e837076b2118fb9fbec71e1540b28e";
     private final File testfile = new File("target", "testfile_01.txt");
 
+    @SuppressWarnings("CanBeFinal")
     @Inject
     private ResourcesRegistry registry;
 
@@ -68,6 +69,7 @@ public class ResourcesTest {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @After
     public void tearDown() throws IOException {
         testfile.delete();
@@ -78,14 +80,12 @@ public class ResourcesTest {
         final CountDownLatch latch = new CountDownLatch(2);
         final List<Checksum> observerChecksums = new CopyOnWriteArrayList<>();
         final Resource<Path> resource = registry.get(SHA256, testfile.toPath());
-        resource.addSuccessObserver(new SuccessObserver<Path>() {
-            @Override
-            public void updateSucceeded(final Path pSource, final Checksum pPrevious, final Checksum pCurrent) {
+        resource.addSuccessObserver((pSource, pPrevious, pCurrent) -> {
                 observerChecksums.add(pPrevious);
                 observerChecksums.add(pCurrent);
                 latch.countDown();
             }
-        });
+        );
         final Checksum firstChecksum = resource.update().get();
         appendToTestFile();
         final Checksum secondChecksum = resource.update().get();
@@ -94,7 +94,7 @@ public class ResourcesTest {
 
         latch.await();
         assertEquals(4, observerChecksums.size());
-        observerChecksums.sort((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()));
+        observerChecksums.sort(Comparator.comparing(Checksum::getTimestamp));
 
         assertEquals("", observerChecksums.get(0).getHexValue());
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(1).getHexValue());

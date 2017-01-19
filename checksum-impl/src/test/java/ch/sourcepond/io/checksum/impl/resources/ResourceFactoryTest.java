@@ -30,13 +30,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by rolandhauser on 11.01.17.
+ *
  */
+@SuppressWarnings({"unchecked", "FieldCanBeLocal"})
 public class ResourceFactoryTest {
     private final Callable<Checksum> task = mock(Callable.class);
     private final TaskFactory taskFactory = mock(TaskFactory.class);
