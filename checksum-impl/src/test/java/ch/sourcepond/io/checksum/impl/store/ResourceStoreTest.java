@@ -47,6 +47,7 @@ public class ResourceStoreTest {
         store = new ResourceStore();
         pool = store.resources.get(SHA256).getPool();
         when(supplier.supply(pool)).thenReturn(resource);
+        when(resource.lease()).thenReturn((Resource) resource);
     }
 
     @After
@@ -60,6 +61,7 @@ public class ResourceStoreTest {
         assertNotNull(res1);
         verify(resource).lease();
         reset(resource);
+        when(resource.lease()).thenReturn((Resource) resource);
         final Resource<StreamSource> res2 = store.get(SHA256, source, supplier);
         assertNotNull(res2);
         assertSame(res1, res2);
@@ -74,6 +76,8 @@ public class ResourceStoreTest {
         when(res2.getAlgorithm()).thenReturn(SHA256);
         when(res1.getSource()).thenReturn(source);
         when(res2.getSource()).thenReturn(source);
+        when(res1.lease()).thenReturn((Resource) res1);
+        when(res2.lease()).thenReturn((Resource) res2);
         when(supplier.supply(pool)).thenReturn(res1).thenReturn(res2);
         assertSame(res1, store.get(SHA256, source, supplier));
         store.dispose(res1);

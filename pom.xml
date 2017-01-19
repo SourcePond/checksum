@@ -25,12 +25,17 @@
     <inceptionYear>2015</inceptionYear>
     <packaging>pom</packaging>
     <description>
-        Provides a simple API to calculate checksums for the content of any input-stream, file or directory.
+        Provides a simple API to calculate checksums for the content of any stream or channel source.
     </description>
+
+    <properties>
+        <smartswitch.version>[1.0.0,2.0.0)</smartswitch.version>
+    </properties>
 
     <modules>
         <module>checksum-api</module>
         <module>checksum-impl</module>
         <module>checksum-tests</module>
+        <module>checksum-feature</module>
     </modules>
 </project>

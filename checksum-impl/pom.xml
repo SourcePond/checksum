@@ -11,10 +11,6 @@
 	<packaging>bundle</packaging>
 	<description>Provides an implementation for the checksum-api bundle.</description>
 
-	<properties>
-		<smartswitch.version>1.0.2</smartswitch.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>ch.sourcepond.io</groupId>
