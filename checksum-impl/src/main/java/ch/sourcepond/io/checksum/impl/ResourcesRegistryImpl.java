@@ -35,21 +35,21 @@ public final class ResourcesRegistryImpl implements ResourcesRegistry {
 
     @Override
     public Resource<ChannelSource> get(final Algorithm pAlgorithm, final ChannelSource pSource) {
-        return store.get(pAlgorithm, pSource, pool -> resourceFactory.newResource(store, pool, pSource));
+        return store.get(pAlgorithm, pSource, pool -> resourceFactory.newResource(pool, pSource));
     }
 
     @Override
     public Resource<StreamSource> get(final Algorithm pAlgorithm, final StreamSource pSource) {
-        return store.get(pAlgorithm, pSource, pool -> resourceFactory.newResource(store, pool, pSource));
+        return store.get(pAlgorithm, pSource, pool -> resourceFactory.newResource(pool, pSource));
     }
 
     @Override
     public Resource<Path> get(final Algorithm pAlgorithm, final Path pPath) {
-        return store.get(pAlgorithm, pPath, pool -> resourceFactory.newResource(store, pool, pPath));
+        return store.get(pAlgorithm, pPath, pool -> resourceFactory.newResource(pool, pPath));
     }
 
     @Override
     public Resource<URL> get(final Algorithm pAlgorithm, final URL pUrl) {
-        return store.get(pAlgorithm, pUrl, pool -> resourceFactory.newResource(store, pool, pUrl));
+        return store.get(pAlgorithm, pUrl, pool -> resourceFactory.newResource(pool, pUrl));
     }
 }

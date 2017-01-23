@@ -15,9 +15,9 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.commons.smartswitch.api.SmartSwitchFactory;
 import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.store.DisposeCallback;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
 import java.net.URL;
@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 /**
- * Factory to {@link LeasableResource} instances for different sources.
+ * Factory to create {@link Resource} instances for different sources.
  */
 public class ResourceFactory {
     private final ExecutorService updateExecutor;
@@ -46,36 +46,32 @@ public class ResourceFactory {
         taskFactory = pTaskFactory;
     }
 
-    public LeasableResource<ChannelSource> newResource(final DisposeCallback pDisposeCallback, final DigesterPool pDigesterPool, final ChannelSource pSource) {
+    public Resource<ChannelSource> newResource(final DigesterPool pDigesterPool, final ChannelSource pSource) {
         return new ChannelResource<>(
-                pDisposeCallback,
                 updateExecutor,
                 pDigesterPool,
                 new Observers<>(observerExecutor, pSource, pSource),
                 taskFactory);
     }
 
-    public LeasableResource<Path> newResource(final DisposeCallback pDisposeCallback, final DigesterPool pDigesterPool, final Path pSource) {
+    public Resource<Path> newResource(final DigesterPool pDigesterPool, final Path pSource) {
         return new ChannelResource<>(
-                pDisposeCallback,
                 updateExecutor,
                 pDigesterPool,
                 new Observers<>(observerExecutor, pSource, new FileChannelSource(pSource)),
                 taskFactory);
     }
 
-    public LeasableResource<StreamSource> newResource(final DisposeCallback pDisposeCallback, final DigesterPool pDigesterPool, final StreamSource pSource) {
+    public Resource<StreamSource> newResource(final DigesterPool pDigesterPool, final StreamSource pSource) {
         return new StreamResource<>(
-                pDisposeCallback,
                 updateExecutor,
                 pDigesterPool,
                 new Observers<>(observerExecutor, pSource, pSource),
                 taskFactory);
     }
 
-    public LeasableResource<URL> newResource(final DisposeCallback pDisposeCallback, final DigesterPool pDigesterPool, final URL pSource) {
+    public Resource<URL> newResource(final DigesterPool pDigesterPool, final URL pSource) {
         return new StreamResource<>(
-                pDisposeCallback,
                 updateExecutor,
                 pDigesterPool,
                 new Observers<>(observerExecutor, pSource, new URLStreamSource(pSource)),

@@ -15,7 +15,6 @@ package ch.sourcepond.io.checksum.impl.store;
 
 import ch.sourcepond.io.checksum.api.Algorithm;
 import ch.sourcepond.io.checksum.api.Resource;
-import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -24,7 +23,7 @@ import java.util.Map;
  *
  */
 @SuppressWarnings("unchecked")
-public class ResourceStore implements DisposeCallback {
+public class ResourceStore {
     final Map<Algorithm, ResourceMap> resources = new EnumMap<>(Algorithm.class);
 
     public ResourceStore() {
@@ -33,23 +32,17 @@ public class ResourceStore implements DisposeCallback {
         }
     }
 
-    @Override
-    public void dispose(final Resource<?> pResource) {
-        // The returned map cannot be null
-        resources.get(pResource.getAlgorithm()).remove(pResource.getSource());
-    }
-
     public <T> Resource<T> get(final Algorithm pAlgorithm, T pSource, ResourceSupplier pSupplier) {
         final ResourceMap map = resources.get(pAlgorithm);
-        LeasableResource<?> rc = map.get(pSource);
+        Resource<?> rc = map.get(pSource);
         if (null == rc) {
             rc = pSupplier.supply(map.getPool());
-            LeasableResource<?> current = map.putIfAbsent(pSource, rc);
+            Resource<?> current = map.putIfAbsent(pSource, rc);
 
             if (null != current) {
                 rc = current;
             }
         }
-        return (Resource<T>) rc.lease();
+        return (Resource<T>) rc;
     }
 }

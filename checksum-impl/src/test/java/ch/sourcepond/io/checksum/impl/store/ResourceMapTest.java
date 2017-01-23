@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.store;
 
+import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("unchecked")
 public class ResourceMapTest {
     private final Path key = mock(Path.class);
-    private final LeasableResource<Path> value = mock(LeasableResource.class);
+    private final Resource<Path> value = mock(Resource.class);
     private final ResourceMap map = new ResourceMap(SHA256);
 
     @Test
@@ -42,7 +42,7 @@ public class ResourceMapTest {
     @Test
     public void checkPufIfAbsentGetAndRemove() {
         assertNull(map.putIfAbsent(key, value));
-        final LeasableResource<Path> secondValue = mock(LeasableResource.class);
+        final Resource<Path> secondValue = mock(Resource.class);
         assertSame(value, map.putIfAbsent(key, secondValue));
         assertSame(value, map.get(key));
         map.remove(key);

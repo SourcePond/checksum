@@ -17,7 +17,6 @@ import ch.sourcepond.commons.smartswitch.api.SmartSwitchFactory;
 import ch.sourcepond.commons.smartswitch.testing.SmartSwitchRule;
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.store.DisposeCallback;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +38,6 @@ import static org.mockito.Mockito.*;
 public class ResourceFactoryTest {
     private final Callable<Checksum> task = mock(Callable.class);
     private final TaskFactory taskFactory = mock(TaskFactory.class);
-    private final DisposeCallback disposeCallback = mock(DisposeCallback.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final ChannelSource channelSource = mock(ChannelSource.class);
     private final StreamSource streamSource = mock(StreamSource.class);
@@ -67,7 +65,7 @@ public class ResourceFactoryTest {
 
     @Test
     public void newChannelResource() {
-        final LeasableResource<ChannelSource> res = factory.newResource(disposeCallback, digesterPool, channelSource);
+        final Resource<ChannelSource> res = factory.newResource(digesterPool, channelSource);
         res.update();
         verify(updateExecutor).submit(task);
 
@@ -79,7 +77,7 @@ public class ResourceFactoryTest {
 
     @Test
     public void newStreamResource() {
-        final LeasableResource<StreamSource> res = factory.newResource(disposeCallback, digesterPool, streamSource);
+        final Resource<StreamSource> res = factory.newResource(digesterPool, streamSource);
         res.update();
         verify(updateExecutor).submit(task);
 
@@ -91,7 +89,7 @@ public class ResourceFactoryTest {
 
     @Test
     public void newPathResource() {
-        final LeasableResource<Path> res = factory.newResource(disposeCallback, digesterPool, path);
+        final Resource<Path> res = factory.newResource(digesterPool, path);
         res.update();
         verify(updateExecutor).submit(task);
 
@@ -103,7 +101,7 @@ public class ResourceFactoryTest {
 
     @Test
     public void newUrlResource() {
-        final LeasableResource<URL> res = factory.newResource(disposeCallback, digesterPool, url);
+        final Resource<URL> res = factory.newResource(digesterPool, url);
         res.update();
         verify(updateExecutor).submit(task);
 

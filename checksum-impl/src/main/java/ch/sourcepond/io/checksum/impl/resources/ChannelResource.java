@@ -15,7 +15,6 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.impl.store.DisposeCallback;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
@@ -28,12 +27,11 @@ import java.util.concurrent.TimeUnit;
  */
 class ChannelResource<S> extends BaseResource<S, ChannelSource> {
 
-    ChannelResource(final DisposeCallback pDisposeCallback,
-                    final ExecutorService pUpdateExecutor,
+    ChannelResource(final ExecutorService pUpdateExecutor,
                     final DigesterPool pDigesterPool,
                     final Observers<S, ChannelSource> pObservers,
                     final TaskFactory pTaskFactory) {
-        super(pDisposeCallback, pUpdateExecutor, pDigesterPool, pObservers, pTaskFactory);
+        super(pUpdateExecutor, pDigesterPool, pObservers, pTaskFactory);
     }
 
     @Override

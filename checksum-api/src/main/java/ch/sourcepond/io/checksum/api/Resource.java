@@ -34,19 +34,10 @@ import java.util.concurrent.TimeUnit;
  * resource exists in the {@link ResourcesRegistry}.
  * </p>
  *
- * <p>When a resource is not needed anymore by the client, it should should release the resource
- * through its {@link #release()} method.</p>
- *
  * @param <S> Type of the source object, i.e. type of the object being observed through this resource
  *            (check the second argument of the {@code get} methods on {@link ResourcesRegistry}).
  */
 public interface Resource<S> {
-
-    /**
-     * Releases this resource. If this object is not referenced by any client anymore,
-     * the {@link ResourcesRegistry} will dispose it freeing all held system resources like buffers etc..
-     */
-    void release();
 
     /**
      * Returns the source object where the data to be digested is read from.

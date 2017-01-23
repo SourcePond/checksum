@@ -15,55 +15,36 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.store.DisposeCallback;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * Abstract base implementation of the {@link LeasableResource} interface.
+ * Abstract base implementation of the {@link Resource} interface.
  *
  * @param <S> Type of the source which is associated with this resource.
  * @param <A> Type of the accessor necessary to read from the source. This can either be
  *            {@link ChannelSource} or {@link StreamSource}.
  */
-abstract class BaseResource<S, A> implements LeasableResource<S> {
-    private final AtomicInteger usages = new AtomicInteger();
-    private final DisposeCallback disposeCallback;
+abstract class BaseResource<S, A> implements Resource<S> {
     private final ExecutorService updateExecutor;
     final DigesterPool digesterPool;
     final Observers<S, A> observers;
     final TaskFactory taskFactory;
 
-    BaseResource(final DisposeCallback pDisposeCallback,
-                 final ExecutorService pUpdateExecutor,
-                 final DigesterPool pDigesterPool,
-                 final Observers<S, A> pObservers,
-                 final TaskFactory pTaskFactory) {
-        disposeCallback = pDisposeCallback;
+    BaseResource(final ExecutorService pUpdateExecutor,
+            final DigesterPool pDigesterPool,
+            final Observers<S, A> pObservers,
+            final TaskFactory pTaskFactory) {
         updateExecutor = pUpdateExecutor;
         digesterPool = pDigesterPool;
         observers = pObservers;
         taskFactory = pTaskFactory;
-    }
-
-    @SuppressWarnings("unchecked")
-    public final Resource<S> lease() {
-        usages.incrementAndGet();
-        return this;
-    }
-
-    @Override
-    public final void release() {
-        if (usages.decrementAndGet() == 0) {
-            disposeCallback.dispose(this);
-        }
     }
 
     @Override

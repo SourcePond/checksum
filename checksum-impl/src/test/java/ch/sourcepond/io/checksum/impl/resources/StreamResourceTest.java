@@ -31,7 +31,7 @@ public class StreamResourceTest extends BaseResourceTest<StreamSource, StreamSou
     @Before
     @Override
     public void setup() {
-        resource = new StreamResource<>(disposeCallback, updateExecutor, digesterPool, observers, taskFactory);
+        resource = new StreamResource<>(updateExecutor, digesterPool, observers, taskFactory);
         source = mock(StreamSource.class);
         super.setup();
     }

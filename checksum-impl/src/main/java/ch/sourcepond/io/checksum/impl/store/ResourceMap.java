@@ -14,17 +14,17 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.store;
 
 import ch.sourcepond.io.checksum.api.Algorithm;
+import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Thread-safe store for {@link LeasableResource} instances.
+ * Thread-safe store for {@link ch.sourcepond.io.checksum.api.Resource} instances.
  */
 final class ResourceMap {
-    private final ConcurrentMap<Object, LeasableResource<?>> map = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Object, Resource<?>> map = new ConcurrentHashMap<>();
     private final DigesterPool pool;
 
     ResourceMap(final Algorithm pAlgorithm) {
@@ -40,12 +40,12 @@ final class ResourceMap {
     }
 
     @SuppressWarnings("unchecked")
-    <T> LeasableResource<T> get(final T pSource) {
-        return (LeasableResource<T>)map.get(pSource);
+    <T> Resource<T> get(final T pSource) {
+        return (Resource<T>)map.get(pSource);
     }
 
     @SuppressWarnings("unchecked")
-    <T> LeasableResource<T> putIfAbsent(final T pSource, final LeasableResource<?> pValue) {
-        return (LeasableResource<T>)map.putIfAbsent(pSource, pValue);
+    <T> Resource<T> putIfAbsent(final T pSource, final Resource<?> pValue) {
+        return (Resource<T>)map.putIfAbsent(pSource, pValue);
     }
 }

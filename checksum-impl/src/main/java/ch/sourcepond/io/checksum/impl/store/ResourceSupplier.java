@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.store;
 
+import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 
 /**
  *
@@ -22,5 +22,5 @@ import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 @FunctionalInterface
 public interface ResourceSupplier<T> {
 
-    LeasableResource<T> supply(DigesterPool pPool);
+    Resource<T> supply(DigesterPool pPool);
 }

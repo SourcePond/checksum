@@ -16,7 +16,6 @@ package ch.sourcepond.io.checksum.impl.store;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.LeasableResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class ResourceStoreTest {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
     private final StreamSource source = mock(StreamSource.class);
     private final ResourceSupplier<StreamSource> supplier = mock(ResourceSupplier.class);
-    private final LeasableResource<StreamSource> resource = mock(LeasableResource.class);
+    private final Resource<StreamSource> resource = mock(Resource.class);
     private ResourceStore store;
     private DigesterPool pool;
 
@@ -47,7 +46,6 @@ public class ResourceStoreTest {
         store = new ResourceStore();
         pool = store.resources.get(SHA256).getPool();
         when(supplier.supply(pool)).thenReturn(resource);
-        when(resource.lease()).thenReturn((Resource) resource);
     }
 
     @After
@@ -59,34 +57,16 @@ public class ResourceStoreTest {
     public void verifySameInstance() {
         final Resource<StreamSource> res1 = store.get(SHA256, source, supplier);
         assertNotNull(res1);
-        verify(resource).lease();
         reset(resource);
-        when(resource.lease()).thenReturn((Resource) resource);
         final Resource<StreamSource> res2 = store.get(SHA256, source, supplier);
         assertNotNull(res2);
         assertSame(res1, res2);
-        verify(resource).lease();
     }
 
-    @Test
-    public void dispose() {
-        final LeasableResource<StreamSource> res1 = mock(LeasableResource.class);
-        final LeasableResource<StreamSource> res2 = mock(LeasableResource.class);
-        when(res1.getAlgorithm()).thenReturn(SHA256);
-        when(res2.getAlgorithm()).thenReturn(SHA256);
-        when(res1.getSource()).thenReturn(source);
-        when(res2.getSource()).thenReturn(source);
-        when(res1.lease()).thenReturn((Resource) res1);
-        when(res2.lease()).thenReturn((Resource) res2);
-        when(supplier.supply(pool)).thenReturn(res1).thenReturn(res2);
-        assertSame(res1, store.get(SHA256, source, supplier));
-        store.dispose(res1);
-        assertSame(res2, store.get(SHA256, source, supplier));
-    }
 
     @Test
     public void ignoreNewResourceIfAnotherIsAlreadyRegistered() throws Exception {
-        final LeasableResource<StreamSource> toBeIgnored = mock(LeasableResource.class);
+        final Resource<StreamSource> toBeIgnored = mock(Resource.class);
         final CountDownLatch latch = new CountDownLatch(2);
         executor.submit(() -> {
                     store.get(SHA256, source, pool -> {

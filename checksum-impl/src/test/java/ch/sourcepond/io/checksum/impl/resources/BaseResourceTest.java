@@ -13,12 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
-import ch.sourcepond.io.checksum.api.CancelObserver;
-import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.FailureObserver;
-import ch.sourcepond.io.checksum.api.SuccessObserver;
+import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.store.DisposeCallback;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +34,6 @@ import static org.mockito.Mockito.*;
 public abstract class BaseResourceTest<S, A> {
     final Future<Checksum> checksumFuture = mock(Future.class);
     final Callable<Checksum> updateTask = mock(Callable.class);
-    final DisposeCallback disposeCallback = mock(DisposeCallback.class);
     final ExecutorService updateExecutor = mock(ExecutorService.class);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     final Observers<S, A> observers = mock(Observers.class);
@@ -47,7 +42,7 @@ public abstract class BaseResourceTest<S, A> {
     private final FailureObserver<S> failureObserver = mock(FailureObserver.class);
     private final SuccessObserver<S> successObserver = mock(SuccessObserver.class);
     S source;
-    LeasableResource<S> resource;
+    Resource<S> resource;
 
     @Before
     public void setup() {
@@ -64,22 +59,6 @@ public abstract class BaseResourceTest<S, A> {
     @Test
     public void getAlgorithm() {
         assertSame(SHA256, resource.getAlgorithm());
-    }
-
-    @Test
-    public void verifyLeaseAndRelease() {
-        resource.lease(); // + 1
-        verify(disposeCallback, never()).dispose(resource);
-        resource.lease(); // + 2
-        verify(disposeCallback, never()).dispose(resource);
-        resource.lease(); // + 3
-        verify(disposeCallback, never()).dispose(resource);
-        resource.release(); // + 2
-        verify(disposeCallback, never()).dispose(resource);
-        resource.release(); // + 1
-        verify(disposeCallback, never()).dispose(resource);
-        resource.release(); // 0
-        verify(disposeCallback).dispose(resource);
     }
 
     @Test

@@ -31,7 +31,7 @@ public class ChannelResourceTest extends BaseResourceTest<ChannelSource, Channel
     @Before
     @Override
     public void setup() {
-        resource = new ChannelResource<>(disposeCallback, updateExecutor, digesterPool, observers, taskFactory);
+        resource = new ChannelResource<>(updateExecutor, digesterPool, observers, taskFactory);
         source = mock(ChannelSource.class);
         super.setup();
     }
