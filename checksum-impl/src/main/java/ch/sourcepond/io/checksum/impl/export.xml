@@ -2,6 +2,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
     <!-- Export services -->
-    <service ref="resourcesRegistry" interface="ch.sourcepond.io.checksum.api.ResourcesRegistry" />
+    <service ref="resourcesFactory" interface="ch.sourcepond.io.checksum.api.ResourcesFactory" />
 
 </blueprint>

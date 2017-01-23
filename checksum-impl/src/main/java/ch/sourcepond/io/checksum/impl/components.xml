@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <bean id="resourcesRegistry" class="ch.sourcepond.io.checksum.impl.ResourcesRegistryImpl">
-        <argument ref="resources.resourceFactory" />
-        <argument ref="store.resourceStore" />
+    <bean id="resourcesFactory" class="ch.sourcepond.io.checksum.impl.ResourcesFactoryImpl">
+        <argument ref="resources.internalResourceFactory" />
+        <argument ref="pool.digesterPoolRegistry" />
     </bean>
 </blueprint>

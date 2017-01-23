@@ -11,16 +11,25 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package ch.sourcepond.io.checksum.impl.store;
+package ch.sourcepond.io.checksum.impl.pools;
 
-import ch.sourcepond.io.checksum.api.Resource;
-import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.api.Algorithm;
+
+import java.util.EnumMap;
 
 /**
  *
  */
-@FunctionalInterface
-public interface ResourceSupplier<T> {
+public class DigesterPoolRegistry {
+    private final EnumMap<Algorithm, DigesterPool> digesterPools = new EnumMap<>(Algorithm.class);
 
-    Resource<T> supply(DigesterPool pPool);
+    public DigesterPoolRegistry() {
+        for (final Algorithm algorithm : Algorithm.values()) {
+            digesterPools.put(algorithm, new DigesterPool(algorithm));
+        }
+    }
+
+    public DigesterPool get(final Algorithm pAlgorithm) {
+        return digesterPools.get(pAlgorithm);
+    }
 }

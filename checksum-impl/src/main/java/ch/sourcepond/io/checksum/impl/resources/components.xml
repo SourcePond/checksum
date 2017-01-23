@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-    <bean id="resources.resourceFactory" class="ch.sourcepond.io.checksum.impl.resources.ResourceFactory">
+    <bean id="resources.internalResourceFactory" class="ch.sourcepond.io.checksum.impl.resources.InternalResourcesFactory">
         <argument ref="OSGi_service.smartSwitch" />
         <argument ref="tasks.taskFactory" />
     </bean>

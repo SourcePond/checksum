@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
  *
  */
 @SuppressWarnings({"unchecked", "FieldCanBeLocal"})
-public class ResourceFactoryTest {
+public class InternalResourcesFactoryTest {
     private final Callable<Checksum> task = mock(Callable.class);
     private final TaskFactory taskFactory = mock(TaskFactory.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
@@ -48,7 +48,7 @@ public class ResourceFactoryTest {
     private ExecutorService observerExecutor;
     private Path path;
     private URL url;
-    private ResourceFactory factory;
+    private InternalResourcesFactory factory;
 
     @Before
     public void setup() throws Exception {
@@ -60,7 +60,7 @@ public class ResourceFactoryTest {
         updateExecutor = rule.useOsgiService(ExecutorService.class, "(sourcepond.io.checksum.updateexecutor=*)");
         observerExecutor = rule.useOsgiService(ExecutorService.class, "(sourcepond.io.checksum.observerexecutor=*)");
 
-        factory = new ResourceFactory(smartSwitchFactory, taskFactory);
+        factory = new InternalResourcesFactory(smartSwitchFactory, taskFactory);
     }
 
     @Test

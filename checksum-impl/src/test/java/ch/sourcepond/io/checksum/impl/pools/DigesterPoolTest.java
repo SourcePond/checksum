@@ -30,10 +30,11 @@ public class DigesterPoolTest extends BasePoolTest<MessageDigest> {
             39, -82, 65, -28, 100, -101, -109, 76,
             -92, -107, -103, 27, 120, 82, -72, 85
     };
+    private final DigesterPoolRegistry registry = new DigesterPoolRegistry();
 
     @Override
     protected DigesterPool newTestPool() {
-        return new DigesterPool(SHA256);
+        return registry.get(SHA256);
     }
 
     @Test

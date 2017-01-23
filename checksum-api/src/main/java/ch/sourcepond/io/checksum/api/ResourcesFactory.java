@@ -17,17 +17,16 @@ import java.net.URL;
 import java.nio.file.Path;
 
 /**
- * Registry from where to retrieve existing or new {@link Resource} instances. This interface is the
+ * Factory to create new {@link Resource} instances. This interface is the
  * entry-point to use the checksum API.
  *
  */
 @SuppressWarnings("ALL")
-public interface ResourcesRegistry {
+public interface ResourcesFactory {
 
 	/**
 	 * <p>
-	 * Returns the registered {@link Resource} for the algorithm and source specified. If no resource is
-     * registered yet, a new instance will be created and stored for subsequent access.
+	 * Returns a new {@link Resource} instance for the algorithm and source specified.
 	 * </p>
 	 *
 	 * <p>
@@ -44,12 +43,11 @@ public interface ResourcesRegistry {
 	 * @return Resource instance, never {@code null}
 	 * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
 	 */
-	Resource<ChannelSource> get(Algorithm pAlgorithm, ChannelSource pSource);
+	Resource<ChannelSource> create(Algorithm pAlgorithm, ChannelSource pSource);
 
     /**
      * <p>
-     * Returns the registered {@link Resource} for the algorithm and source specified. If no resource is
-     * registered yet, a new instance will be created and stored for subsequent access.
+	 * Returns a new {@link Resource} instance for the algorithm and source specified.
      * </p>
      *
      * <p>
@@ -66,12 +64,11 @@ public interface ResourcesRegistry {
      * @return Resource instance, never {@code null}
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
-	Resource<StreamSource> get(Algorithm pAlgorithm, StreamSource pSource);
+	Resource<StreamSource> create(Algorithm pAlgorithm, StreamSource pSource);
 
     /**
      * <p>
-     * Returns the registered {@link Resource} for the algorithm and source specified. If no resource is
-     * registered yet, a new instance will be created and stored for subsequent access.
+	 * Returns a new {@link Resource} instance for the algorithm and source specified.
      * </p>
      *
      * <p>
@@ -88,12 +85,11 @@ public interface ResourcesRegistry {
      * @return Resource instance, never {@code null}
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
-	Resource<Path> get(Algorithm pAlgorithm, Path pSource);
+	Resource<Path> create(Algorithm pAlgorithm, Path pSource);
 
     /**
      * <p>
-     * Returns the registered {@link Resource} for the algorithm and source specified. If no resource is
-     * registered yet, a new instance will be created and stored for subsequent access.
+	 * Returns a new {@link Resource} instance for the algorithm and source specified.
      * </p>
      *
      * <p>
@@ -110,5 +106,5 @@ public interface ResourcesRegistry {
      * @return Resource instance, never {@code null}
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
-	Resource<URL> get(Algorithm pAlgorithm, URL pSource);
+	Resource<URL> create(Algorithm pAlgorithm, URL pSource);
 }

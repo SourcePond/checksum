@@ -29,12 +29,12 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 /**
  * Factory to create {@link Resource} instances for different sources.
  */
-public class ResourceFactory {
+public class InternalResourcesFactory {
     private final ExecutorService updateExecutor;
     private final ExecutorService observerExecutor;
     private final TaskFactory taskFactory;
 
-    public ResourceFactory(final SmartSwitchFactory pSmartSwitch, final TaskFactory pTaskFactory) {
+    public InternalResourcesFactory(final SmartSwitchFactory pSmartSwitch, final TaskFactory pTaskFactory) {
         updateExecutor = pSmartSwitch.whenService(ExecutorService.class).
                 withFilter("(sourcepond.io.checksum.updateexecutor=*)").
                 isUnavailableThenUse(() -> newFixedThreadPool(3)).

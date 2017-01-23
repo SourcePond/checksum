@@ -28,14 +28,8 @@ import java.util.concurrent.TimeUnit;
  * cases (see {@link CancelObserver} and {@link FailureObserver}).
  * </p>
  *
- * <p>
- * The used algorithm {@link #getAlgorithm()} and the source {@link #getSource()} uniquely identify
- * a resource. This means that for a particular combination of those attributes exactly one
- * resource exists in the {@link ResourcesRegistry}.
- * </p>
- *
  * @param <S> Type of the source object, i.e. type of the object being observed through this resource
- *            (check the second argument of the {@code get} methods on {@link ResourcesRegistry}).
+ *            (check the second argument of the {@code get} methods on {@link ResourcesFactory}).
  */
 public interface Resource<S> {
 

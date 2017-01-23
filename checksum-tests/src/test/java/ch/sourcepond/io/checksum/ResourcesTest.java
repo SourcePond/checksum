@@ -2,7 +2,7 @@ package ch.sourcepond.io.checksum;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
-import ch.sourcepond.io.checksum.api.ResourcesRegistry;
+import ch.sourcepond.io.checksum.api.ResourcesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class ResourcesTest {
 
     @SuppressWarnings("CanBeFinal")
     @Inject
-    private ResourcesRegistry registry;
+    private ResourcesFactory registry;
 
     @Configuration
     public Option[] configure() {
@@ -79,7 +79,7 @@ public class ResourcesTest {
     public void verifyPathResource() throws Exception {
         final CountDownLatch latch = new CountDownLatch(2);
         final List<Checksum> observerChecksums = new CopyOnWriteArrayList<>();
-        final Resource<Path> resource = registry.get(SHA256, testfile.toPath());
+        final Resource<Path> resource = registry.create(SHA256, testfile.toPath());
         resource.addSuccessObserver((pSource, pPrevious, pCurrent) -> {
                 observerChecksums.add(pPrevious);
                 observerChecksums.add(pCurrent);
