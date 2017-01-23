@@ -14,8 +14,9 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.Observable;
+import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -26,13 +27,15 @@ import static java.time.Instant.now;
 /**
  * Base task for updating a {@link MessageDigest}.
  */
-public abstract class UpdateTask<S, A> implements Callable<Checksum> {
+public abstract class UpdateTask<A> implements Callable<Checksum> {
     private final DigesterPool digesterPool;
-    final Observable<S, A> resource;
+    private final CalculationObserver observer;
+    final BaseResource<A> resource;
     final DataReader reader;
 
-    UpdateTask(final DigesterPool pDigesterPool, final Observable<S, A> pResource, final DataReader pReader) {
+    UpdateTask(final DigesterPool pDigesterPool, final CalculationObserver pObserver, final BaseResource<A> pResource, final DataReader pReader) {
         digesterPool = pDigesterPool;
+        observer = pObserver;
         resource = pResource;
         reader = pReader;
     }
@@ -44,15 +47,10 @@ public abstract class UpdateTask<S, A> implements Callable<Checksum> {
         final MessageDigest digest = digesterPool.get();
         try {
             updateDigest(digest);
-            final Checksum checksum = new ChecksumImpl(now(), digest.digest());
-            resource.informSuccessObservers(checksum);
-            return checksum;
-        } catch (final InterruptedException e) {
-            resource.informCancelObservers();
-            throw e;
-        } catch (final IOException e) {
-            resource.informFailureObservers(e);
-            throw e;
+            final Checksum current = new ChecksumImpl(now(), digest.digest());
+            final Checksum previous = resource.updateChecksum(current);
+            observer.done(previous, current);
+            return current;
         } finally {
             digesterPool.release(digest);
         }

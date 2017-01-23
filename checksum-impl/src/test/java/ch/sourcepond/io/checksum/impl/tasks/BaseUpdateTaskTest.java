@@ -1,9 +1,10 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.Observable;
+import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -20,12 +21,12 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class BaseUpdateTaskTest {
 
-    private static class TestUpdateTask extends UpdateTask<StreamSource, StreamSource> {
+    private static class TestUpdateTask extends UpdateTask<StreamSource> {
         InterruptedException interruptedException;
         IOException ioException;
 
-        public TestUpdateTask(final DigesterPool pDigesterPool, final Observable<StreamSource, StreamSource> pResource, final DataReader pReader) {
-            super(pDigesterPool, pResource, pReader);
+        public TestUpdateTask(final DigesterPool pDigesterPool, final CalculationObserver pObserver, final BaseResource<StreamSource> pResource, final DataReader pReader) {
+            super(pDigesterPool, pObserver, pResource, pReader);
         }
 
         @Override
@@ -44,24 +45,26 @@ public class BaseUpdateTaskTest {
     private final DataReader reader = mock(DataReader.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final MessageDigest digest = mock(MessageDigest.class);
-    private final Observable<StreamSource, StreamSource> resource = mock(Observable.class);
+    private final CalculationObserver observer = mock(CalculationObserver.class);
+    private final BaseResource<StreamSource> resource = mock(BaseResource.class);
     private final Checksum checksum = mock(Checksum.class);
-    private final TestUpdateTask task = new TestUpdateTask(digesterPool, resource, reader);
+    private final TestUpdateTask task = new TestUpdateTask(digesterPool, observer, resource, reader);
 
     @Before
     public void setup() {
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
+        when(resource.updateChecksum(notNull())).thenReturn(checksum);
     }
 
     @Test
     public void verifySuccess() throws Exception {
         task.call();
-        final InOrder order = inOrder(digesterPool, digest, resource);
+        final InOrder order = inOrder(digesterPool, digest, observer);
         order.verify(digesterPool).get();
         order.verify(digest).update(ANY_DATA);
         order.verify(digest).digest();
-        order.verify(resource).informSuccessObservers(notNull());
+        order.verify(observer).done(same(checksum), notNull());
         order.verify(digesterPool).release(digest);
     }
 
@@ -76,7 +79,6 @@ public class BaseUpdateTaskTest {
         }
         final InOrder order = inOrder(digest, resource, digesterPool);
         order.verify(digesterPool).get();
-        order.verify(resource).informCancelObservers();
         order.verify(digesterPool).release(digest);
     }
 
@@ -91,7 +93,6 @@ public class BaseUpdateTaskTest {
         }
         final InOrder order = inOrder(digest, resource, digesterPool);
         order.verify(digesterPool).get();
-        order.verify(resource).informFailureObservers(task.ioException);
         order.verify(digesterPool).release(digest);
     }
 }

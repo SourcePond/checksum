@@ -27,24 +27,28 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Abstract base implementation of the {@link Resource} interface.
  *
- * @param <S> Type of the source which is associated with this resource.
  * @param <A> Type of the accessor necessary to read from the source. This can either be
  *            {@link ChannelSource} or {@link StreamSource}.
  */
-abstract class BaseResource<S, A> implements Resource<S> {
+public abstract class BaseResource<A> implements Resource {
     private final ExecutorService updateExecutor;
+    private final A source;
     final DigesterPool digesterPool;
-    final Observers<S, A> observers;
     final TaskFactory taskFactory;
+    private Checksum current;
 
     BaseResource(final ExecutorService pUpdateExecutor,
-            final DigesterPool pDigesterPool,
-            final Observers<S, A> pObservers,
-            final TaskFactory pTaskFactory) {
+                 final A pSource,
+                 final DigesterPool pDigesterPool,
+                 final TaskFactory pTaskFactory) {
         updateExecutor = pUpdateExecutor;
+        source = pSource;
         digesterPool = pDigesterPool;
-        observers = pObservers;
         taskFactory = pTaskFactory;
+    }
+
+    public A getSource() {
+        return source;
     }
 
     @Override
@@ -53,60 +57,25 @@ abstract class BaseResource<S, A> implements Resource<S> {
     }
 
     @Override
-    public final S getSource() {
-        return observers.getSource();
+    public final Future<Checksum> update(final CalculationObserver pObserver) {
+        return update(0L, pObserver);
     }
 
     @Override
-    public final Resource<S> addCancelObserver(final CancelObserver<S> pObserver) {
-        observers.addCancelObserver(pObserver);
-        return this;
+    public final Future<Checksum> update(final long pIntervalInMilliseconds, final CalculationObserver pObserver) {
+        return update(MILLISECONDS, pIntervalInMilliseconds, pObserver);
     }
 
     @Override
-    public final Resource<S> addFailureObserver(final FailureObserver<S> pObserver) {
-        observers.addFailureObserver(pObserver);
-        return this;
+    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final CalculationObserver pObserver) {
+        return updateExecutor.submit(newUpdateTask(pUnit, pInterval, pObserver));
     }
 
-    @Override
-    public final Resource<S> addSuccessObserver(final SuccessObserver<S> pObserver) {
-        observers.addSuccessObserver(pObserver);
-        return this;
-    }
+    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final CalculationObserver pObserver);
 
-    @Override
-    public final Resource<S> removeCancelObserver(final CancelObserver<S> pObserverOrNull) {
-        observers.removeCancelObserver(pObserverOrNull);
-        return this;
+    public synchronized Checksum updateChecksum(final Checksum pCurrent) {
+        final Checksum previous = current;
+        current = pCurrent;
+        return previous;
     }
-
-    @Override
-    public final Resource<S> removeFailureObserver(final FailureObserver<S> pObserverOrNull) {
-        observers.removeFailureObserver(pObserverOrNull);
-        return this;
-    }
-
-    @Override
-    public final Resource<S> removeSuccessObserver(final SuccessObserver<S> pObserverOrNull) {
-        observers.removeSuccessObserver(pObserverOrNull);
-        return this;
-    }
-
-    @Override
-    public final Future<Checksum> update() {
-        return update(0L);
-    }
-
-    @Override
-    public final Future<Checksum> update(final long pIntervalInMilliseconds) {
-        return update(MILLISECONDS, pIntervalInMilliseconds);
-    }
-
-    @Override
-    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval) {
-        return updateExecutor.submit(newUpdateTask(pUnit, pInterval));
-    }
-
-    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval);
 }

@@ -13,14 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
-import java.io.IOException;
-
 /**
- * Observer being triggered when a checksum calculation has been cancelled because
- * data read failed for some reason.
+ *
  */
-@SuppressWarnings("ALL")
-public interface FailureObserver<T> {
+@FunctionalInterface
+public interface CalculationObserver {
 
-    void updateFailed(T pSource, IOException pFailure);
+    void done(Checksum pPrevious, Checksum pCurrent);
 }

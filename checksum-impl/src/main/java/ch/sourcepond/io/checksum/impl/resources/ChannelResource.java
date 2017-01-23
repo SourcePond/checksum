@@ -15,6 +15,7 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
@@ -25,17 +26,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * Resource implementation which works with any kind of NIO {@link java.nio.channels.ReadableByteChannel}.
  */
-class ChannelResource<S> extends BaseResource<S, ChannelSource> {
+class ChannelResource extends BaseResource<ChannelSource> {
 
     ChannelResource(final ExecutorService pUpdateExecutor,
+                    final ChannelSource pAccessor,
                     final DigesterPool pDigesterPool,
-                    final Observers<S, ChannelSource> pObservers,
                     final TaskFactory pTaskFactory) {
-        super(pUpdateExecutor, pDigesterPool, pObservers, pTaskFactory);
+        super(pUpdateExecutor, pAccessor, pDigesterPool, pTaskFactory);
     }
 
     @Override
-    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval) {
-        return taskFactory.newChannelTask(digesterPool, observers, pUnit, pInterval);
+    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final CalculationObserver pObserver) {
+        return taskFactory.newChannelTask(digesterPool, pObserver, this, pUnit, pInterval);
     }
 }

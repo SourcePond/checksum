@@ -41,10 +41,7 @@ public class ResourcesFactoryImplTest {
     private final ChannelSource channelSource = mock(ChannelSource.class);
     private final Path path = mock(Path.class);
     private final StreamSource streamSource = mock(StreamSource.class);
-    private final Resource<ChannelSource> channelResource = mock(Resource.class);
-    private final Resource<Path> pathResource = mock(Resource.class);
-    private final Resource<StreamSource> streamResource = mock(Resource.class);
-    private final Resource<URL> urlResource = mock(Resource.class);
+    private final Resource resource = mock(Resource.class);
     private URL url;
     private ResourcesFactoryImpl factory;
 
@@ -57,25 +54,25 @@ public class ResourcesFactoryImplTest {
 
     @Test
     public void newChannelResource() {
-        when(internalResourcesFactory.newResource(digesterPool, channelSource)).thenReturn(channelResource);
-        assertSame(channelResource, factory.create(SHA256, channelSource));
+        when(internalResourcesFactory.newResource(digesterPool, channelSource)).thenReturn(resource);
+        assertSame(resource, factory.create(SHA256, channelSource));
     }
 
     @Test
     public void newPathResource() {
-        when(internalResourcesFactory.newResource(digesterPool, path)).thenReturn(pathResource);
-        assertSame(pathResource, factory.create(SHA256, path));
+        when(internalResourcesFactory.newResource(digesterPool, path)).thenReturn(resource);
+        assertSame(resource, factory.create(SHA256, path));
     }
 
     @Test
     public void newStreamResource() {
-        when(internalResourcesFactory.newResource(digesterPool, streamSource)).thenReturn(streamResource);
-        assertSame(streamResource, factory.create(SHA256, streamSource));
+        when(internalResourcesFactory.newResource(digesterPool, streamSource)).thenReturn(resource);
+        assertSame(resource, factory.create(SHA256, streamSource));
     }
 
     @Test
     public void newURLResource() {
-        when(internalResourcesFactory.newResource(digesterPool, url)).thenReturn(urlResource);
-        assertSame(urlResource, factory.create(SHA256, url));
+        when(internalResourcesFactory.newResource(digesterPool, url)).thenReturn(resource);
+        assertSame(resource, factory.create(SHA256, url));
     }
 }

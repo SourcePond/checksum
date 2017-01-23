@@ -20,40 +20,38 @@ import org.junit.Test;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  *
  */
-public class StreamResourceTest extends BaseResourceTest<StreamSource, StreamSource> {
+public class StreamResourceTest extends BaseResourceTest<StreamSource> {
 
     @Before
     @Override
     public void setup() {
-        resource = new StreamResource<>(updateExecutor, digesterPool, observers, taskFactory);
-        source = mock(StreamSource.class);
+        resource = new StreamResource(updateExecutor, source, digesterPool, taskFactory);
         super.setup();
     }
 
     @Test
     @Override
     public void update() {
-        when(taskFactory.newStreamTask(digesterPool, observers, MILLISECONDS, 0L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update());
+        when(taskFactory.newStreamTask(digesterPool, observer, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
+        assertSame(checksumFuture, resource.update(observer));
     }
 
     @Test
     @Override
     public void updateWithInterval() {
-        when(taskFactory.newStreamTask(digesterPool, observers, MILLISECONDS, 100L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(100L));
+        when(taskFactory.newStreamTask(digesterPool, observer, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
+        assertSame(checksumFuture, resource.update(100L, observer));
     }
 
     @Test
     @Override
     public void updateWithIntervalAndUnit() {
-        when(taskFactory.newStreamTask(digesterPool, observers, SECONDS, 200L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(SECONDS, 200L));
+        when(taskFactory.newStreamTask(digesterPool, observer, resource, SECONDS, 200L)).thenReturn(updateTask);
+        assertSame(checksumFuture, resource.update(SECONDS, 200L, observer));
     }
 }

@@ -21,24 +21,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * <p>
  * A resource represents an abstraction layer for checksum calculation on some content.
- * If a change on the content (the "source", see {@link #getSource()}) object is detected,
+ * If a change on the content object is detected,
  * the observing client should call one of the {@code update} method on this interface. This will
  * trigger a new {@link Checksum} being calculated which then can be accessed through {@link Future#get()} or
- * through an {@link SuccessObserver}. It's also possible to register observers for cancel and failure
- * cases (see {@link CancelObserver} and {@link FailureObserver}).
+ * through an {@link CalculationObserver}.
  * </p>
  *
- * @param <S> Type of the source object, i.e. type of the object being observed through this resource
- *            (check the second argument of the {@code get} methods on {@link ResourcesFactory}).
  */
-public interface Resource<S> {
-
-    /**
-     * Returns the source object where the data to be digested is read from.
-     *
-     * @return Source object, never {@code null}
-     */
-    S getSource();
+public interface Resource {
 
     /**
      * The algorithm being used for checksum calculation.
@@ -48,70 +38,13 @@ public interface Resource<S> {
     Algorithm getAlgorithm();
 
     /**
-     * Adds the observer specified to this checksum object. If the observer
-     * specified is already registered nothing happens.
-     *
-     * @param pObserver Observer to be added to this checksum, must not be {@code null}.
-     * @return Returns this checksum object, never {@code null}
-     * @throws NullPointerException Thrown, if the observer is {@code null}
-     */
-    Resource<S> addCancelObserver(CancelObserver<S> pObserver);
-
-    /**
-     * Adds the observer specified to this checksum object. If the observer
-     * specified is already registered nothing happens.
-     *
-     * @param pObserver Observer to be added to this checksum, must not be {@code null}.
-     * @return Returns this checksum object, never {@code null}
-     * @throws NullPointerException Thrown, if the observer is {@code null}
-     */
-    Resource<S> addFailureObserver(FailureObserver<S> pObserver);
-
-    /**
-     * Adds the observer specified to this checksum object. If the observer
-     * specified is already registered nothing happens.
-     *
-     * @param pObserver Observer to be added to this checksum, must not be {@code null}.
-     * @return Returns this checksum object, never {@code null}
-     * @throws NullPointerException Thrown, if the observer is {@code null}
-     */
-    Resource<S> addSuccessObserver(SuccessObserver<S> pObserver);
-
-    /**
-     * Removes the observer specified from this checksum object. If the observer
-     * is not registered or is {@code null} nothing happens.
-     *
-     * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
-     * @return Returns this checksum object, never {@code null}
-     */
-    Resource<S> removeCancelObserver(CancelObserver<S> pObserverOrNull);
-
-    /**
-     * Removes the observer specified from this checksum object. If the observer
-     * is not registered or is {@code null} nothing happens.
-     *
-     * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
-     * @return Returns this checksum object, never {@code null}
-     */
-    Resource<S> removeFailureObserver(FailureObserver<S> pObserverOrNull);
-
-    /**
-     * Removes the observer specified from this checksum object. If the observer
-     * is not registered or is {@code null} nothing happens.
-     *
-     * @param pObserverOrNull Observer to be removed from this checksum or {@code null}.
-     * @return Returns this checksum object, never {@code null}
-     */
-    Resource<S> removeSuccessObserver(SuccessObserver<S> pObserverOrNull);
-
-    /**
      * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
      *
      * @return Returns a future representing the newly calculated checksum object, never {@code null}
      * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
      *                                    submitted.
      */
-    Future<Checksum> update();
+    Future<Checksum> update(CalculationObserver pObserver);
 
     /**
      * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
@@ -122,16 +55,13 @@ public interface Resource<S> {
      *                                    submitted.
      * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
-    Future<Checksum> update(long pIntervalInMilliseconds);
+    Future<Checksum> update(long pIntervalInMilliseconds, CalculationObserver pObserver);
 
     /**
      * <p>
      * Updates this checksum in an asynchronous manner. After the new checksum
-     * has been calculated, the registered {@link SuccessObserver} will be
-     * informed. If the update has been cancelled through {@link Future#cancel(boolean)} with
-     * argument {@code true} then all registered {@link CancelObserver} will be informed. In case of
-     * a failure because the data necessary could not be read from the source, the causing
-     * {@link java.io.IOException} will be passed to all registered {@link FailureObserver} instances.
+     * has been calculated, the registered {@link CalculationObserver} will be
+     * informed.
      * </p>
 
      * <p>
@@ -152,5 +82,5 @@ public interface Resource<S> {
      * @throws NullPointerException       Thrown, if the time-unit specified is {@code null}
      * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
-    Future<Checksum> update(TimeUnit pUnit, long pInterval);
+    Future<Checksum> update(TimeUnit pUnit, long pInterval, CalculationObserver pObserver);
 }

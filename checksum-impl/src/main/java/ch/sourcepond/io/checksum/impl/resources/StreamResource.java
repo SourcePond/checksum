@@ -15,6 +15,7 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
@@ -25,17 +26,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * Resource implementation which works with any kind of {@link java.io.InputStream}.
  */
-class StreamResource<S> extends BaseResource<S, StreamSource> {
+class StreamResource extends BaseResource<StreamSource> {
 
     public StreamResource(final ExecutorService pUpdateExecutor,
+                          final StreamSource pAccessor,
                           final DigesterPool pDigesterPool,
-                          final Observers<S, StreamSource> pObservers,
                           final TaskFactory pTaskFactory) {
-        super(pUpdateExecutor, pDigesterPool, pObservers, pTaskFactory);
+        super(pUpdateExecutor, pAccessor, pDigesterPool, pTaskFactory);
     }
 
     @Override
-    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval) {
-        return taskFactory.newStreamTask(digesterPool, observers, pUnit, pInterval);
+    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final CalculationObserver pObserver) {
+        return taskFactory.newStreamTask(digesterPool, pObserver, this, pUnit, pInterval);
     }
 }

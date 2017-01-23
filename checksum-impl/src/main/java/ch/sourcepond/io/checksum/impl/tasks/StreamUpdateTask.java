@@ -14,8 +14,9 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.Observable;
+import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,17 +25,18 @@ import java.security.MessageDigest;
 /**
  *
  */
-final class StreamUpdateTask<S> extends UpdateTask<S, StreamSource> {
+final class StreamUpdateTask extends UpdateTask<StreamSource> {
 
     StreamUpdateTask(final DigesterPool pDigesterPool,
-                     final Observable<S, StreamSource> pResource,
+                     final CalculationObserver pObserver,
+                     final BaseResource<StreamSource> pResource,
                      final DataReader pReader) {
-        super(pDigesterPool, pResource, pReader);
+        super(pDigesterPool, pObserver, pResource, pReader);
     }
 
     @Override
     void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
-        try (final InputStream in = resource.getAccessor().openStream()) {
+        try (final InputStream in = resource.getSource().openStream()) {
             final byte[] buffer = new byte[1024];
             reader.read(() -> in.read(buffer), readBytes -> pDigest.update(buffer, 0, readBytes));
         }

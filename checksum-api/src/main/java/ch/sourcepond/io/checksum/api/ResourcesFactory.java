@@ -43,7 +43,7 @@ public interface ResourcesFactory {
 	 * @return Resource instance, never {@code null}
 	 * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
 	 */
-	Resource<ChannelSource> create(Algorithm pAlgorithm, ChannelSource pSource);
+	Resource create(Algorithm pAlgorithm, ChannelSource pSource);
 
     /**
      * <p>
@@ -64,7 +64,7 @@ public interface ResourcesFactory {
      * @return Resource instance, never {@code null}
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
-	Resource<StreamSource> create(Algorithm pAlgorithm, StreamSource pSource);
+	Resource create(Algorithm pAlgorithm, StreamSource pSource);
 
     /**
      * <p>
@@ -85,7 +85,7 @@ public interface ResourcesFactory {
      * @return Resource instance, never {@code null}
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
-	Resource<Path> create(Algorithm pAlgorithm, Path pSource);
+	Resource create(Algorithm pAlgorithm, Path pSource);
 
     /**
      * <p>
@@ -106,5 +106,5 @@ public interface ResourcesFactory {
      * @return Resource instance, never {@code null}
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
-	Resource<URL> create(Algorithm pAlgorithm, URL pSource);
+	Resource create(Algorithm pAlgorithm, URL pSource);
 }

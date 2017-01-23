@@ -31,7 +31,6 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
  */
 public class InternalResourcesFactory {
     private final ExecutorService updateExecutor;
-    private final ExecutorService observerExecutor;
     private final TaskFactory taskFactory;
 
     public InternalResourcesFactory(final SmartSwitchFactory pSmartSwitch, final TaskFactory pTaskFactory) {
@@ -39,42 +38,38 @@ public class InternalResourcesFactory {
                 withFilter("(sourcepond.io.checksum.updateexecutor=*)").
                 isUnavailableThenUse(() -> newFixedThreadPool(3)).
                 insteadAndExecuteWhenAvailable(ExecutorService::shutdown);
-        observerExecutor = pSmartSwitch.whenService(ExecutorService.class).
-                withFilter("(sourcepond.io.checksum.observerexecutor=*)").
-                isUnavailableThenUse(() -> newFixedThreadPool(5)).
-                insteadAndExecuteWhenAvailable(ExecutorService::shutdown);
         taskFactory = pTaskFactory;
     }
 
-    public Resource<ChannelSource> newResource(final DigesterPool pDigesterPool, final ChannelSource pSource) {
-        return new ChannelResource<>(
+    public Resource newResource(final DigesterPool pDigesterPool, final ChannelSource pSource) {
+        return new ChannelResource(
                 updateExecutor,
+                pSource,
                 pDigesterPool,
-                new Observers<>(observerExecutor, pSource, pSource),
                 taskFactory);
     }
 
-    public Resource<Path> newResource(final DigesterPool pDigesterPool, final Path pSource) {
-        return new ChannelResource<>(
+    public Resource newResource(final DigesterPool pDigesterPool, final Path pSource) {
+        return new ChannelResource(
                 updateExecutor,
+                new FileChannelSource(pSource),
                 pDigesterPool,
-                new Observers<>(observerExecutor, pSource, new FileChannelSource(pSource)),
                 taskFactory);
     }
 
-    public Resource<StreamSource> newResource(final DigesterPool pDigesterPool, final StreamSource pSource) {
-        return new StreamResource<>(
+    public Resource newResource(final DigesterPool pDigesterPool, final StreamSource pSource) {
+        return new StreamResource(
                 updateExecutor,
+                pSource,
                 pDigesterPool,
-                new Observers<>(observerExecutor, pSource, pSource),
                 taskFactory);
     }
 
-    public Resource<URL> newResource(final DigesterPool pDigesterPool, final URL pSource) {
-        return new StreamResource<>(
+    public Resource newResource(final DigesterPool pDigesterPool, final URL pSource) {
+        return new StreamResource(
                 updateExecutor,
+                new URLStreamSource(pSource),
                 pDigesterPool,
-                new Observers<>(observerExecutor, pSource, new URLStreamSource(pSource)),
                 taskFactory);
     }
 }

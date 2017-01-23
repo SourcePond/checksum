@@ -14,9 +14,10 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.BufferPool;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.Observable;
+import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -26,21 +27,22 @@ import java.security.MessageDigest;
 /**
  * Updater-task which fetches its data from a {@link ReadableByteChannel} instance.
  */
-class ChannelUpdateTask<S> extends UpdateTask<S, ChannelSource> {
+class ChannelUpdateTask extends UpdateTask<ChannelSource> {
     private final BufferPool bufferPool;
 
     ChannelUpdateTask(final DigesterPool pDigesterPool,
-                      final Observable<S, ChannelSource> pResource,
+                      final CalculationObserver pObserver,
+                      final BaseResource<ChannelSource> pResource,
                       final DataReader pReader,
                       final BufferPool pBufferPool) {
-        super(pDigesterPool, pResource, pReader);
+        super(pDigesterPool, pObserver, pResource, pReader);
         bufferPool = pBufferPool;
     }
 
     @Override
     void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
         final ByteBuffer buffer = bufferPool.get();
-        try (final ReadableByteChannel ch = resource.getAccessor().openChannel()) {
+        try (final ReadableByteChannel ch = resource.getSource().openChannel()) {
             reader.read(() -> ch.read(buffer), readBytes -> {
                 buffer.flip();
                 pDigest.update(buffer);

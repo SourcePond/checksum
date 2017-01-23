@@ -3,6 +3,7 @@ package ch.sourcepond.io.checksum;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.ResourcesFactory;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 
 import javax.inject.Inject;
 import java.io.*;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.List;
@@ -79,16 +79,17 @@ public class ResourcesTest {
     public void verifyPathResource() throws Exception {
         final CountDownLatch latch = new CountDownLatch(2);
         final List<Checksum> observerChecksums = new CopyOnWriteArrayList<>();
-        final Resource<Path> resource = registry.create(SHA256, testfile.toPath());
-        resource.addSuccessObserver((pSource, pPrevious, pCurrent) -> {
-                observerChecksums.add(pPrevious);
-                observerChecksums.add(pCurrent);
-                latch.countDown();
-            }
-        );
-        final Checksum firstChecksum = resource.update().get();
+        final Resource resource = registry.create(SHA256, testfile.toPath());
+
+        CalculationObserver observer = (pPrevious, pCurrent) -> {
+            observerChecksums.add(pPrevious);
+            observerChecksums.add(pCurrent);
+            latch.countDown();
+        };
+
+        final Checksum firstChecksum = resource.update(observer).get();
         appendToTestFile();
-        final Checksum secondChecksum = resource.update().get();
+        final Checksum secondChecksum = resource.update(observer).get();
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, firstChecksum.getHexValue());
         assertEquals(SECOND_EXPECTED_SHA_256_HASH, secondChecksum.getHexValue());
 

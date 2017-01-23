@@ -45,7 +45,7 @@ public class InternalResourcesFactoryTest {
     public final SmartSwitchRule rule = new SmartSwitchRule();
     private final SmartSwitchFactory smartSwitchFactory = rule.getTestFactory();
     private ExecutorService updateExecutor;
-    private ExecutorService observerExecutor;
+    private final CalculationObserver observer = mock(CalculationObserver.class);
     private Path path;
     private URL url;
     private InternalResourcesFactory factory;
@@ -54,61 +54,40 @@ public class InternalResourcesFactoryTest {
     public void setup() throws Exception {
         path = FileSystems.getDefault().getPath("src", "test", "resources", "testfile_01.txt");
         url = getClass().getResource("/testfile_01.txt");
-        when(taskFactory.newChannelTask(same(digesterPool), notNull(), same(MILLISECONDS), eq(0L))).thenReturn(task);
-        when(taskFactory.newStreamTask(same(digesterPool), notNull(), same(MILLISECONDS), eq(0L))).thenReturn(task);
+        when(taskFactory.newChannelTask(same(digesterPool), same(observer), notNull(), same(MILLISECONDS),same(0L))).thenReturn(task);
+        when(taskFactory.newStreamTask(same(digesterPool), same(observer), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
 
         updateExecutor = rule.useOsgiService(ExecutorService.class, "(sourcepond.io.checksum.updateexecutor=*)");
-        observerExecutor = rule.useOsgiService(ExecutorService.class, "(sourcepond.io.checksum.observerexecutor=*)");
 
         factory = new InternalResourcesFactory(smartSwitchFactory, taskFactory);
     }
 
     @Test
     public void newChannelResource() {
-        final Resource<ChannelSource> res = factory.newResource(digesterPool, channelSource);
-        res.update();
+        final Resource res = factory.newResource(digesterPool, channelSource);
+        res.update(observer);
         verify(updateExecutor).submit(task);
-
-        // Should not cause a NullPointerException
-        res.addCancelObserver(mock(CancelObserver.class));
-        res.addSuccessObserver(mock(SuccessObserver.class));
-        res.addFailureObserver(mock(FailureObserver.class));
     }
 
     @Test
     public void newStreamResource() {
-        final Resource<StreamSource> res = factory.newResource(digesterPool, streamSource);
-        res.update();
+        final Resource res = factory.newResource(digesterPool, streamSource);
+        res.update(observer);
         verify(updateExecutor).submit(task);
-
-        // Should not cause a NullPointerException
-        res.addCancelObserver(mock(CancelObserver.class));
-        res.addSuccessObserver(mock(SuccessObserver.class));
-        res.addFailureObserver(mock(FailureObserver.class));
     }
 
     @Test
     public void newPathResource() {
-        final Resource<Path> res = factory.newResource(digesterPool, path);
-        res.update();
+        final Resource res = factory.newResource(digesterPool, path);
+        res.update(observer);
         verify(updateExecutor).submit(task);
-
-        // Should not cause a NullPointerException
-        res.addCancelObserver(mock(CancelObserver.class));
-        res.addSuccessObserver(mock(SuccessObserver.class));
-        res.addFailureObserver(mock(FailureObserver.class));
     }
 
     @Test
     public void newUrlResource() {
-        final Resource<URL> res = factory.newResource(digesterPool, url);
-        res.update();
+        final Resource res = factory.newResource(digesterPool, url);
+        res.update(observer);
         verify(updateExecutor).submit(task);
-
-        // Should not cause a NullPointerException
-        res.addCancelObserver(mock(CancelObserver.class));
-        res.addSuccessObserver(mock(SuccessObserver.class));
-        res.addFailureObserver(mock(FailureObserver.class));
     }
 
 }

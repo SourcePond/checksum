@@ -26,34 +26,34 @@ import static org.mockito.Mockito.when;
 /**
  *
  */
-public class ChannelResourceTest extends BaseResourceTest<ChannelSource, ChannelSource> {
+public class ChannelResourceTest extends BaseResourceTest<ChannelSource> {
 
     @Before
     @Override
     public void setup() {
-        resource = new ChannelResource<>(updateExecutor, digesterPool, observers, taskFactory);
         source = mock(ChannelSource.class);
+        resource = new ChannelResource(updateExecutor, source, digesterPool, taskFactory);
         super.setup();
     }
 
     @Test
     @Override
     public void update() {
-        when(taskFactory.newChannelTask(digesterPool, observers, MILLISECONDS, 0L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update());
+        when(taskFactory.newChannelTask(digesterPool, observer, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
+        assertSame(checksumFuture, resource.update(observer));
     }
 
     @Test
     @Override
     public void updateWithInterval() {
-        when(taskFactory.newChannelTask(digesterPool, observers, MILLISECONDS, 100L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(100L));
+        when(taskFactory.newChannelTask(digesterPool, observer, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
+        assertSame(checksumFuture, resource.update(100L, observer));
     }
 
     @Test
     @Override
     public void updateWithIntervalAndUnit() {
-        when(taskFactory.newChannelTask(digesterPool, observers, SECONDS, 200L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(SECONDS, 200L));
+        when(taskFactory.newChannelTask(digesterPool, observer, resource, SECONDS, 200L)).thenReturn(updateTask);
+        assertSame(checksumFuture, resource.update(SECONDS, 200L, observer));
     }
 }

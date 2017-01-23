@@ -33,22 +33,22 @@ public final class ResourcesFactoryImpl implements ResourcesFactory {
     }
 
     @Override
-    public Resource<ChannelSource> create(final Algorithm pAlgorithm, final ChannelSource pSource) {
+    public Resource create(final Algorithm pAlgorithm, final ChannelSource pSource) {
         return internalResourcesFactory.newResource(digesterPoolRegistry.get(pAlgorithm), pSource);
     }
 
     @Override
-    public Resource<StreamSource> create(final Algorithm pAlgorithm, final StreamSource pSource) {
+    public Resource create(final Algorithm pAlgorithm, final StreamSource pSource) {
         return internalResourcesFactory.newResource(digesterPoolRegistry.get(pAlgorithm), pSource);
     }
 
     @Override
-    public Resource<Path> create(final Algorithm pAlgorithm, final Path pPath) {
+    public Resource create(final Algorithm pAlgorithm, final Path pPath) {
         return internalResourcesFactory.newResource(digesterPoolRegistry.get(pAlgorithm), pPath);
     }
 
     @Override
-    public Resource<URL> create(final Algorithm pAlgorithm, final URL pUrl) {
+    public Resource create(final Algorithm pAlgorithm, final URL pUrl) {
         return internalResourcesFactory.newResource(digesterPoolRegistry.get(pAlgorithm), pUrl);
     }
 }

@@ -1,9 +1,10 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.BufferPool;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.resources.Observable;
+import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,8 @@ public class TaskFactoryTest {
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final BufferPool bufferPool = mock(BufferPool.class);
     private final TaskFactory factory = new TaskFactory(bufferPool);
-    private final Observable resource = mock(Observable.class);
+    private final BaseResource resource = mock(BaseResource.class);
+    private final CalculationObserver observer = mock(CalculationObserver.class);
     private URL anyUrl;
 
     @Before
@@ -39,9 +41,9 @@ public class TaskFactoryTest {
 
     @Test
     public void verifyFactoryMethods() {
-        assertNotSame(factory.newChannelTask(digesterPool, resource, TimeUnit.SECONDS, 1L),
-                factory.newChannelTask(digesterPool, resource, TimeUnit.SECONDS, 1L));
-        assertNotSame(factory.newStreamTask(digesterPool, resource, TimeUnit.SECONDS, 1L),
-                factory.newStreamTask(digesterPool, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newChannelTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L),
+                factory.newChannelTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newStreamTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L),
+                factory.newStreamTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L));
     }
 }
