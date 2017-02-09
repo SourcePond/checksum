@@ -18,7 +18,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>checksum-api</artifactId>
-    <inceptionYear>2015</inceptionYear>
     <packaging>bundle</packaging>
     <description>
         Provides a simple API to calculate checksums for the content of any input-stream, file or directory.

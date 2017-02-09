@@ -7,7 +7,6 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>checksum-impl</artifactId>
-	<inceptionYear>2015</inceptionYear>
 	<packaging>bundle</packaging>
 	<description>Provides an implementation for the checksum-api bundle.</description>
 
