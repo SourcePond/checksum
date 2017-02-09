@@ -27,6 +27,7 @@ final class ChecksumImpl implements Checksum {
 
     @SuppressWarnings("ForLoopReplaceableByForEach")
     public ChecksumImpl(final Instant pTimestamp, final byte[] pValue) {
+        assert pTimestamp != null : "pTimestamp is null";
         timestamp = pTimestamp;
         value = pValue;
         final StringBuilder b = new StringBuilder();
@@ -64,11 +65,18 @@ final class ChecksumImpl implements Checksum {
 
     @Override
     public byte[] toByteArray() {
+        final byte[] copy = new byte[value.length];
+        System.arraycopy(value, 0, copy, 0, copy.length);
         return value;
     }
 
     @Override
     public String getHexValue() {
         return hexValue;
+    }
+
+    @Override
+    public String toString() {
+        return getHexValue();
     }
 }

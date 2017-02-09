@@ -17,6 +17,7 @@ import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
+import java.time.Instant;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -31,11 +32,31 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  *            {@link ChannelSource} or {@link StreamSource}.
  */
 public abstract class BaseResource<A> implements Resource {
+
+    private static class DefaultChecksum implements Checksum {
+        private static final byte[] ARR = new byte[0];
+
+        @Override
+        public Instant getTimestamp() {
+            return Instant.MIN;
+        }
+
+        @Override
+        public byte[] toByteArray() {
+            return ARR;
+        }
+
+        @Override
+        public String getHexValue() {
+            return "";
+        }
+    }
+
     private final ExecutorService updateExecutor;
     private final A source;
     final DigesterPool digesterPool;
     final TaskFactory taskFactory;
-    private Checksum current;
+    private volatile Checksum current = new DefaultChecksum();
 
     BaseResource(final ExecutorService pUpdateExecutor,
                  final A pSource,
@@ -73,7 +94,7 @@ public abstract class BaseResource<A> implements Resource {
 
     abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final CalculationObserver pObserver);
 
-    public synchronized Checksum updateChecksum(final Checksum pCurrent) {
+    public Checksum updateChecksum(final Checksum pCurrent) {
         final Checksum previous = current;
         current = pCurrent;
         return previous;

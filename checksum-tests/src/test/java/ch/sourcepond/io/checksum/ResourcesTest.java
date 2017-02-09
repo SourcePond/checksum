@@ -1,9 +1,9 @@
 package ch.sourcepond.io.checksum;
 
+import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.ResourcesFactory;
-import ch.sourcepond.io.checksum.api.CalculationObserver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +15,7 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import javax.inject.Inject;
 import java.io.*;
 import java.nio.file.StandardOpenOption;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
@@ -78,7 +76,7 @@ public class ResourcesTest {
     @Test
     public void verifyPathResource() throws Exception {
         final CountDownLatch latch = new CountDownLatch(2);
-        final List<Checksum> observerChecksums = new CopyOnWriteArrayList<>();
+        final List<Checksum> observerChecksums = Collections.synchronizedList(new ArrayList<>());
         final Resource resource = registry.create(SHA256, testfile.toPath());
 
         CalculationObserver observer = (pPrevious, pCurrent) -> {
