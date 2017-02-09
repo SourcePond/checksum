@@ -53,10 +53,10 @@ public interface Checksum {
      *
      * @return The calculated checksum as byte array, never {@code null}
      */
-    byte[] getValue();
+    byte[] toByteArray();
 
     /**
-     * Returns the checksum as hex-string. See {@link #getValue()} for further
+     * Returns the checksum as hex-string. See {@link #toByteArray()} for further
      * information.
      *
      * @return The calculated checksum as string, never {@code null}

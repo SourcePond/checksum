@@ -63,7 +63,7 @@ final class ChecksumImpl implements Checksum {
     }
 
     @Override
-    public byte[] getValue() {
+    public byte[] toByteArray() {
         return value;
     }
 

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * If a change on the content object is detected,
  * the observing client should call one of the {@code update} method on this interface. This will
  * trigger a new {@link Checksum} being calculated which then can be accessed through {@link Future#get()} or
- * through an {@link CalculationObserver}.
+ * through a {@link CalculationObserver}.
  * </p>
  *
  */
@@ -60,7 +60,7 @@ public interface Resource {
     /**
      * <p>
      * Updates this checksum in an asynchronous manner. After the new checksum
-     * has been calculated, the registered {@link CalculationObserver} will be
+     * has been calculated, the {@link CalculationObserver} specified will be
      * informed.
      * </p>
 

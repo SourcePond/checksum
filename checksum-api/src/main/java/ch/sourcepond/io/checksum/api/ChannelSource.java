@@ -20,7 +20,7 @@ import java.nio.channels.ReadableByteChannel;
  * Implementations of this interface allow to open an {@link ReadableByteChannel} from a
  * specific source. Use implementations of this interface in conjunction with
  * {@link ResourcesFactory#create(Algorithm, ChannelSource)} to create
- * {@link Checksum} instances which fetch their data from a custom source.
+ * {@link Resource} instances which fetch their data from a custom source.
  */
 public interface ChannelSource {
 

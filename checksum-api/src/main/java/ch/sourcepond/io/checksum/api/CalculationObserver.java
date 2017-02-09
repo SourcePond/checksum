@@ -13,11 +13,23 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
+import java.util.concurrent.TimeUnit;
+
 /**
- *
+ * A calculation observer will be informed when the calculation of checksum
+ * has been finished successfully. See {@link Resource#update(TimeUnit, long, CalculationObserver)}
+ * for further information.
  */
 @FunctionalInterface
 public interface CalculationObserver {
 
+    /**
+     * Triggered when the checksum calculation of a resource has been
+     * finished.
+     *
+     * @param pPrevious Previous checksum i.e. checksum which was valid before
+     *                  the update was triggered, never {@code null}
+     * @param pCurrent Current checksum i.e. the checksum which is valid now, never {@code null}
+     */
     void done(Checksum pPrevious, Checksum pCurrent);
 }

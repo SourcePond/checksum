@@ -1,0 +1,49 @@
+#set($h1 = '#')
+#set($h2 = '##')
+#set($h3 = '###')
+#set($h4 = '####')
+
+$h1 Quick Overview
+Checksum is a small OSGi component which aims to calculate checksums from different sources with any hashing algorithm supported. It supports asynchronous triggering of observers after a checksum has been calculated.
+
+$h2 Requirements
+Your OSGi environment must provide a [Blueprint Extender](https://www.ibm.com/developerworks/library/os-osgiblueprint/) otherwise
+checksum-impl will not work as expected. A good one is [Apache Aries](http://aries.apache.org/modules/blueprint.html).
+
+$h2 Dependencies
+Checksum bundles are available from Maven Central. If you want to use Checksum in your own project, you need to add following dependency to the POM:
+
+```
+<dependency>
+    <groupId>ch.sourcepond.io</groupId>
+    <artifactId>checksum-api</artifactId>
+    <version>${project.version}</version>
+</dependency>
+```
+
+To work with Checksum, it's necessary that following bundle is installed in your OSGi environment.
+
+```
+<dependency>
+	<!-- Only needed on runtime <scope>runtime</scope> -->
+    <groupId>ch.sourcepond.io</groupId>
+    <artifactId>checksum-impl</artifactId>
+    <version>${project.version}</version>
+</dependency>
+```
+Note: You need to install additional bundles which provide the services required by checksum-impl.
+
+Alternatively, there is also a [Karaf](http://karaf.apache.org/) feature available.
+
+```
+<dependency>
+    <groupId>ch.sourcepond.io</groupId>
+    <artifactId>checksum-feature</artifactId>
+    <version>${project.version}</version>
+</dependency>
+```
+The feature references all necessary dependencies, so after installing the "checksum-feature", the checksum service will work out-of-the-box.
+
+$h2 Usage
+The entry point to checksum is the ```ch.sourcepond.io.checksum.api.ResourcesFactory``` service from the checksum-api bundle. See
+the JavaDocs for further information.

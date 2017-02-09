@@ -35,7 +35,7 @@ public class ChecksumImplTest {
 
     @Test
     public void verifyChecksum() throws Exception {
-        assertSame(expectedBytes, checksum.getValue());
+        assertSame(expectedBytes, checksum.toByteArray());
         assertEquals(EXPECTED_SHA_256_HASH, checksum.getHexValue());
         assertSame(timestamp, checksum.getTimestamp());
     }
@@ -47,7 +47,7 @@ public class ChecksumImplTest {
         assertFalse(checksum.equals(null));
         assertFalse(checksum.equals(new Object()));
 
-        final ChecksumImpl second = new ChecksumImpl(now(), checksum.getValue());
+        final ChecksumImpl second = new ChecksumImpl(now(), checksum.toByteArray());
         assertTrue(checksum.equals(second));
         assertEquals(checksum.hashCode(), second.hashCode());
     }
