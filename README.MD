@@ -1,0 +1,1 @@
+See https://sourcepond.ch/ch.sourcepond.io/checksum/1.0-SNAPSHOT for further information.
