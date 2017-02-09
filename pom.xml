@@ -29,6 +29,7 @@
     </description>
 
     <properties>
+        <repo.project>${project.artifactId}</repo.project>
         <smartswitch.version>[1.0.0,2.0.0)</smartswitch.version>
     </properties>
 
