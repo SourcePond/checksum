@@ -15,14 +15,18 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import javax.inject.Inject;
 import java.io.*;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
-import static ch.sourcepond.testing.OptionsHelper.blueprintBundles;
+import static ch.sourcepond.testing.OptionsHelper.karafContainer;
 import static java.nio.file.Files.newBufferedWriter;
 import static org.junit.Assert.*;
-import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
 /**
  *
@@ -38,14 +42,15 @@ public class ResourcesTest {
     private ResourcesFactory registry;
 
     @Configuration
-    public Option[] configure() {
-        return options(
-                blueprintBundles(),
-                mavenBundle("ch.sourcepond.commons", "smartswitch-api").versionAsInProject(),
-                mavenBundle("ch.sourcepond.commons", "smartswitch-impl").versionAsInProject(),
-                mavenBundle("ch.sourcepond.io", "checksum-api").versionAsInProject(),
-                mavenBundle("ch.sourcepond.io", "checksum-impl").versionAsInProject(),
-                junitBundles());
+    public Option[] config() {
+        return new Option[]{
+                karafContainer(features(maven()
+                        .groupId("ch.sourcepond.io")
+                        .artifactId("checksum-feature")
+                        .classifier("features")
+                        .type("xml")
+                        .versionAsInProject(), "checksum-feature"))
+        };
     }
 
     @Before

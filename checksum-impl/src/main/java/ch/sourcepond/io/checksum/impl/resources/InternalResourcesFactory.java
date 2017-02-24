@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
-import ch.sourcepond.commons.smartswitch.api.SmartSwitchFactory;
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.StreamSource;
@@ -24,20 +23,22 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 
-import static java.util.concurrent.Executors.newFixedThreadPool;
-
 /**
  * Factory to create {@link Resource} instances for different sources.
  */
 public class InternalResourcesFactory {
-    private final ExecutorService updateExecutor;
     private final TaskFactory taskFactory;
 
-    public InternalResourcesFactory(final SmartSwitchFactory pSmartSwitch, final TaskFactory pTaskFactory) {
-        updateExecutor = pSmartSwitch.whenService(ExecutorService.class).
-                withFilter("(sourcepond.io.checksum.updateexecutor=*)").
-                isUnavailableThenUse(() -> newFixedThreadPool(3)).
-                insteadAndExecuteWhenAvailable(ExecutorService::shutdown);
+    // Service dependency injected by Felix DM
+    volatile ExecutorService updateExecutor;
+
+    // Constructor used by BundleActivator
+    public InternalResourcesFactory() {
+        this(new TaskFactory());
+    }
+
+    // Constructor used for testing
+    public InternalResourcesFactory(final TaskFactory pTaskFactory) {
         taskFactory = pTaskFactory;
     }
 

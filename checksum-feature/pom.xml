@@ -15,7 +15,7 @@
         <dependency>
             <scope>provided</scope>
             <groupId>ch.sourcepond.commons</groupId>
-            <artifactId>smartswitch-api</artifactId>
+            <artifactId>smartswitch-lib</artifactId>
             <version>${smartswitch.version}</version>
         </dependency>
         <dependency>

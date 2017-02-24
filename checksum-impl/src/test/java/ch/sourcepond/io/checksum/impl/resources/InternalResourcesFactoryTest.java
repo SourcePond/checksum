@@ -13,13 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
-import ch.sourcepond.commons.smartswitch.api.SmartSwitchFactory;
-import ch.sourcepond.commons.smartswitch.testing.SmartSwitchRule;
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.net.URL;
@@ -41,10 +38,6 @@ public class InternalResourcesFactoryTest {
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final ChannelSource channelSource = mock(ChannelSource.class);
     private final StreamSource streamSource = mock(StreamSource.class);
-    @Rule
-    public final SmartSwitchRule rule = new SmartSwitchRule();
-    private final SmartSwitchFactory smartSwitchFactory = rule.getTestFactory();
-    private ExecutorService updateExecutor;
     private final CalculationObserver observer = mock(CalculationObserver.class);
     private Path path;
     private URL url;
@@ -56,38 +49,36 @@ public class InternalResourcesFactoryTest {
         url = getClass().getResource("/testfile_01.txt");
         when(taskFactory.newChannelTask(same(digesterPool), same(observer), notNull(), same(MILLISECONDS),same(0L))).thenReturn(task);
         when(taskFactory.newStreamTask(same(digesterPool), same(observer), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
-
-        updateExecutor = rule.useOsgiService(ExecutorService.class, "(sourcepond.io.checksum.updateexecutor=*)");
-
-        factory = new InternalResourcesFactory(smartSwitchFactory, taskFactory);
+        factory = new InternalResourcesFactory(taskFactory);
+        factory.updateExecutor = mock(ExecutorService.class);
     }
 
     @Test
     public void newChannelResource() {
         final Resource res = factory.newResource(digesterPool, channelSource);
         res.update(observer);
-        verify(updateExecutor).submit(task);
+        verify(factory.updateExecutor).submit(task);
     }
 
     @Test
     public void newStreamResource() {
         final Resource res = factory.newResource(digesterPool, streamSource);
         res.update(observer);
-        verify(updateExecutor).submit(task);
+        verify(factory.updateExecutor).submit(task);
     }
 
     @Test
     public void newPathResource() {
         final Resource res = factory.newResource(digesterPool, path);
         res.update(observer);
-        verify(updateExecutor).submit(task);
+        verify(factory.updateExecutor).submit(task);
     }
 
     @Test
     public void newUrlResource() {
         final Resource res = factory.newResource(digesterPool, url);
         res.update(observer);
-        verify(updateExecutor).submit(task);
+        verify(factory.updateExecutor).submit(task);
     }
 
 }

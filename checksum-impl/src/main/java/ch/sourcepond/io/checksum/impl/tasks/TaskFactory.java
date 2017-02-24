@@ -30,6 +30,12 @@ import java.util.concurrent.TimeUnit;
 public class TaskFactory {
     private final BufferPool bufferPool;
 
+    // Constructor used by BundleActivator
+    public TaskFactory() {
+        this(new BufferPool());
+    }
+
+    // Constructor used for testing
     public TaskFactory(final BufferPool pBufferPool) {
         bufferPool = pBufferPool;
     }

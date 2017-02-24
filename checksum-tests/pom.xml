@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ch.sourcepond</groupId>
 		<artifactId>bundle-test</artifactId>
-		<version>0.6.12</version>
+		<version>0.7.5</version>
 		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -19,21 +19,49 @@
 
 	<properties>
 		<repo.project>checksum</repo.project>
-		<smartswitch.version>1.0.2</smartswitch.version>
+		<smartswitch.version>3.0.0</smartswitch.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<scope>test</scope>
 			<groupId>ch.sourcepond.commons</groupId>
-			<artifactId>smartswitch-api</artifactId>
+			<artifactId>smartswitch-lib</artifactId>
 			<version>${smartswitch.version}</version>
 		</dependency>
 		<dependency>
+			<scope>runtime</scope>
+			<type>xml</type>
+			<classifier>features</classifier>
+			<groupId>ch.sourcepond.io</groupId>
+			<artifactId>checksum-feature</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<scope>runtime</scope>
+			<groupId>org.apache.karaf</groupId>
+			<artifactId>apache-karaf</artifactId>
+			<type>tar.gz</type>
+			<version>${karaf.version}</version>
+		</dependency>
+		<dependency>
+			<scope>runtime</scope>
+			<groupId>org.apache.karaf</groupId>
+			<artifactId>org.apache.karaf.exception</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.sourcepond.testing</groupId>
+			<artifactId>bundle-test-support</artifactId>
+		</dependency>
+		<dependency>
 			<scope>test</scope>
-			<groupId>ch.sourcepond.commons</groupId>
-			<artifactId>smartswitch-impl</artifactId>
-			<version>${smartswitch.version}</version>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.javax-inject</artifactId>
+		</dependency>
+		<dependency>
+			<scope>test</scope>
+			<groupId>org.ops4j.pax.exam</groupId>
+			<artifactId>pax-exam-container-karaf</artifactId>
 		</dependency>
 		<dependency>
 			<scope>test</scope>

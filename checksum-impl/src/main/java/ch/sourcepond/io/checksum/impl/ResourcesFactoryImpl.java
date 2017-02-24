@@ -27,9 +27,21 @@ public final class ResourcesFactoryImpl implements ResourcesFactory {
     private final InternalResourcesFactory internalResourcesFactory;
     private final DigesterPoolRegistry digesterPoolRegistry;
 
+    // Constructor used by BundleActivator
+    public ResourcesFactoryImpl() {
+        this(new InternalResourcesFactory(), new DigesterPoolRegistry());
+    }
+
+    // Constructor used for testing
     public ResourcesFactoryImpl(final InternalResourcesFactory pInternalResourcesFactory, final DigesterPoolRegistry pDigesterPoolRegistry) {
         internalResourcesFactory = pInternalResourcesFactory;
         digesterPoolRegistry = pDigesterPoolRegistry;
+    }
+
+    // Used by Felix DM to determine where to inject
+    // service references
+    public Object[] getComposition() {
+        return new Object[] { internalResourcesFactory };
     }
 
     @Override
