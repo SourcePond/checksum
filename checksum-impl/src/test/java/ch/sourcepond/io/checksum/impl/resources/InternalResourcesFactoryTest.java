@@ -38,7 +38,7 @@ public class InternalResourcesFactoryTest {
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final ChannelSource channelSource = mock(ChannelSource.class);
     private final StreamSource streamSource = mock(StreamSource.class);
-    private final CalculationObserver observer = mock(CalculationObserver.class);
+    private final UpdateObserver observer = mock(UpdateObserver.class);
     private Path path;
     private URL url;
     private InternalResourcesFactory factory;

@@ -15,7 +15,7 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.CalculationObserver;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
@@ -36,7 +36,7 @@ class ChannelResource extends BaseResource<ChannelSource> {
     }
 
     @Override
-    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final CalculationObserver pObserver) {
+    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
         return taskFactory.newChannelTask(digesterPool, pObserver, this, pUnit, pInterval);
     }
 }

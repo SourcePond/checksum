@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.CalculationObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
@@ -29,11 +29,11 @@ import static java.time.Instant.now;
  */
 public abstract class UpdateTask<A> implements Callable<Checksum> {
     private final DigesterPool digesterPool;
-    private final CalculationObserver observer;
+    private final UpdateObserver observer;
     final BaseResource<A> resource;
     final DataReader reader;
 
-    UpdateTask(final DigesterPool pDigesterPool, final CalculationObserver pObserver, final BaseResource<A> pResource, final DataReader pReader) {
+    UpdateTask(final DigesterPool pDigesterPool, final UpdateObserver pObserver, final BaseResource<A> pResource, final DataReader pReader) {
         digesterPool = pDigesterPool;
         observer = pObserver;
         resource = pResource;
@@ -43,14 +43,24 @@ public abstract class UpdateTask<A> implements Callable<Checksum> {
     abstract void updateDigest(MessageDigest pDigest) throws InterruptedException, IOException;
 
     @Override
-    public final Checksum call() throws Exception {
+    public final Checksum call() {
         final MessageDigest digest = digesterPool.get();
         try {
-            updateDigest(digest);
-            final Checksum current = new ChecksumImpl(now(), digest.digest());
-            final Checksum previous = resource.updateChecksum(current);
-            observer.done(previous, current);
-            return current;
+            // Mutex on resource, getCurrent and setCurrent
+            // must be synchronized externally.
+            synchronized (resource) {
+                final Checksum previous = resource.getCurrent();
+                try {
+                    updateDigest(digest);
+                    final Checksum current = new ChecksumImpl(now(), digest.digest());
+                    resource.setCurrent(current);
+                    observer.done(new UpdateImpl(previous, current, null));
+                    return current;
+                } catch (final Throwable e) {
+                    observer.done(new UpdateImpl(previous, previous, e));
+                    return previous;
+                }
+            }
         } finally {
             digesterPool.release(digest);
         }

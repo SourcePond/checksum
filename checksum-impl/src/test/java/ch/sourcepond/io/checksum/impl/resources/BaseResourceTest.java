@@ -37,7 +37,7 @@ public abstract class BaseResourceTest<A> {
     final ExecutorService updateExecutor = mock(ExecutorService.class);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     final TaskFactory taskFactory = mock(TaskFactory.class);
-    final CalculationObserver observer = mock(CalculationObserver.class);
+    final UpdateObserver observer = mock(UpdateObserver.class);
     A source;
     BaseResource<A> resource;
 

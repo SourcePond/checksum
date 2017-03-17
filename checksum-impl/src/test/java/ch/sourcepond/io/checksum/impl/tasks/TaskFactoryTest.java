@@ -1,7 +1,7 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.CalculationObserver;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.BufferPool;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
@@ -25,7 +25,7 @@ public class TaskFactoryTest {
     private final BufferPool bufferPool = mock(BufferPool.class);
     private final TaskFactory factory = new TaskFactory(bufferPool);
     private final BaseResource resource = mock(BaseResource.class);
-    private final CalculationObserver observer = mock(CalculationObserver.class);
+    private final UpdateObserver observer = mock(UpdateObserver.class);
     private URL anyUrl;
 
     @Before

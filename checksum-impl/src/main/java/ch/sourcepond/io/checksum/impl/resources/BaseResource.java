@@ -56,7 +56,7 @@ public abstract class BaseResource<A> implements Resource {
     private final A source;
     final DigesterPool digesterPool;
     final TaskFactory taskFactory;
-    private volatile Checksum current = new DefaultChecksum();
+    private Checksum current = new DefaultChecksum();
 
     BaseResource(final ExecutorService pUpdateExecutor,
                  final A pSource,
@@ -78,25 +78,29 @@ public abstract class BaseResource<A> implements Resource {
     }
 
     @Override
-    public final Future<Checksum> update(final CalculationObserver pObserver) {
+    public final Future<Checksum> update(final UpdateObserver pObserver) {
         return update(0L, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final long pIntervalInMilliseconds, final CalculationObserver pObserver) {
+    public final Future<Checksum> update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) {
         return update(MILLISECONDS, pIntervalInMilliseconds, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final CalculationObserver pObserver) {
+    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
         return updateExecutor.submit(newUpdateTask(pUnit, pInterval, pObserver));
     }
 
-    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final CalculationObserver pObserver);
+    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final UpdateObserver pObserver);
 
-    public Checksum updateChecksum(final Checksum pCurrent) {
-        final Checksum previous = current;
+    // Not thread-safe; must be synchronized externally
+    public Checksum getCurrent() {
+        return current;
+    }
+
+    // Not thread-safe, must be synchronized externally
+    public void setCurrent(final Checksum pCurrent) {
         current = pCurrent;
-        return previous;
     }
 }

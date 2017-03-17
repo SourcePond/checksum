@@ -17,19 +17,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A calculation observer will be informed when the calculation of checksum
- * has been finished successfully. See {@link Resource#update(TimeUnit, long, CalculationObserver)}
+ * has been finished successfully. See {@link Resource#update(TimeUnit, long, UpdateObserver)}
  * for further information.
  */
 @FunctionalInterface
-public interface CalculationObserver {
+public interface UpdateObserver {
 
     /**
-     * Triggered when the checksum calculation of a resource has been
-     * finished.
+     * Triggered when the checksum calculation of a resource has been done. This will always be the case no
+     * matter if the update was successful or not.
      *
-     * @param pPrevious Previous checksum i.e. checksum which was valid before
-     *                  the update was triggered, never {@code null}
-     * @param pCurrent Current checksum i.e. the checksum which is valid now, never {@code null}
+     * @param pUpdate Object which holds the result of a checksum update, never {@code null}
      */
-    void done(Checksum pPrevious, Checksum pCurrent);
+    void done(Update pUpdate);
 }

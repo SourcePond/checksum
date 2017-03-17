@@ -14,7 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.api.CalculationObserver;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
@@ -28,7 +28,7 @@ import java.security.MessageDigest;
 final class StreamUpdateTask extends UpdateTask<StreamSource> {
 
     StreamUpdateTask(final DigesterPool pDigesterPool,
-                     final CalculationObserver pObserver,
+                     final UpdateObserver pObserver,
                      final BaseResource<StreamSource> pResource,
                      final DataReader pReader) {
         super(pDigesterPool, pObserver, pResource, pReader);

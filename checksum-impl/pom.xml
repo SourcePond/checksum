@@ -3,7 +3,7 @@
     <parent>
         <groupId>ch.sourcepond.io</groupId>
         <artifactId>checksum</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>checksum-impl</artifactId>
@@ -15,6 +15,11 @@
             <groupId>ch.sourcepond.io</groupId>
             <artifactId>checksum-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
+            <version>${threeten-extra.version}</version>
         </dependency>
         <dependency>
             <scope>provided</scope>

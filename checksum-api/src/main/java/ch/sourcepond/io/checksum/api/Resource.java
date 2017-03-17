@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * If a change on the content object is detected,
  * the observing client should call one of the {@code update} method on this interface. This will
  * trigger a new {@link Checksum} being calculated which then can be accessed through {@link Future#get()} or
- * through a {@link CalculationObserver}.
+ * through a {@link UpdateObserver}.
  * </p>
  *
  */
@@ -44,7 +44,7 @@ public interface Resource {
      * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
      *                                    submitted.
      */
-    Future<Checksum> update(CalculationObserver pObserver);
+    Future<Checksum> update(UpdateObserver pObserver);
 
     /**
      * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
@@ -55,12 +55,12 @@ public interface Resource {
      *                                    submitted.
      * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
-    Future<Checksum> update(long pIntervalInMilliseconds, CalculationObserver pObserver);
+    Future<Checksum> update(long pIntervalInMilliseconds, UpdateObserver pObserver);
 
     /**
      * <p>
      * Updates this checksum in an asynchronous manner. After the new checksum
-     * has been calculated, the {@link CalculationObserver} specified will be
+     * has been calculated, the {@link UpdateObserver} specified will be
      * informed.
      * </p>
 
@@ -72,6 +72,9 @@ public interface Resource {
      * elapses and no more data is available.
      * </p>
      *
+     * <p>If the update fails for some reason, the current checksum will be remain
+     * untouched, see {@link Update#hasChanged()}.</p>
+     *
      * @param pUnit     Time-unit of the interval specified.
      * @param pInterval Time to wait until the data-source should be closed when
      *                  currently no more data is available. Must not be negative, 0
@@ -82,5 +85,5 @@ public interface Resource {
      * @throws NullPointerException       Thrown, if the time-unit specified is {@code null}
      * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
-    Future<Checksum> update(TimeUnit pUnit, long pInterval, CalculationObserver pObserver);
+    Future<Checksum> update(TimeUnit pUnit, long pInterval, UpdateObserver pObserver);
 }

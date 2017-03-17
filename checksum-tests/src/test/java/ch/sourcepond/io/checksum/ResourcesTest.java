@@ -1,6 +1,6 @@
 package ch.sourcepond.io.checksum;
 
-import ch.sourcepond.io.checksum.api.CalculationObserver;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.ResourcesFactory;
@@ -84,9 +84,9 @@ public class ResourcesTest {
         final List<Checksum> observerChecksums = Collections.synchronizedList(new ArrayList<>());
         final Resource resource = registry.create(SHA256, testfile.toPath());
 
-        CalculationObserver observer = (pPrevious, pCurrent) -> {
-            observerChecksums.add(pPrevious);
-            observerChecksums.add(pCurrent);
+        UpdateObserver observer = (pUpdate) -> {
+            observerChecksums.add(pUpdate.getPrevious());
+            observerChecksums.add(pUpdate.getCurrent());
             latch.countDown();
         };
 
