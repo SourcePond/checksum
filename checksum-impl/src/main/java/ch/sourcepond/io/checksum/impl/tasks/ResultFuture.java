@@ -40,11 +40,12 @@ class ResultFuture implements UpdateObserver, Future<Checksum> {
     private final Condition resultAvailable = lock.newCondition();
     private final UpdateObserver delegate;
     private volatile Checksum result;
+    private volatile ExecutionException exception;
+    private volatile Thread executingThread;
     private boolean cancelled;
-    private ExecutionException exception;
-    private Thread executingThread;
 
-    ResultFuture(final UpdateObserver pDelegate) {
+    ResultFuture(final Thread pInitiallyExecutingThread, final UpdateObserver pDelegate) {
+        executingThread = pInitiallyExecutingThread;
         delegate = pDelegate;
     }
 
@@ -156,11 +157,6 @@ class ResultFuture implements UpdateObserver, Future<Checksum> {
     }
 
     void setExecutingThread(final Thread pExecutingThread) {
-        lock.lock();
-        try {
-            executingThread = pExecutingThread;
-        } finally {
-            lock.unlock();
-        }
+        executingThread = pExecutingThread;
     }
 }
