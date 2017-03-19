@@ -46,21 +46,31 @@ public abstract class UpdateTask<A> implements Callable<Checksum> {
     public final Checksum call() {
         final MessageDigest digest = digesterPool.get();
         try {
+            Throwable failureOrNull = null;
+            try {
+                updateDigest(digest);
+            } catch (final Throwable e) {
+                failureOrNull = e;
+            }
+
+            final byte[] checksum = digest.digest();
+            final Checksum current;
+            final Checksum previous;
+
             // Mutex on resource, getCurrent and setCurrent
             // must be synchronized externally.
             synchronized (resource) {
-                final Checksum previous = resource.getCurrent();
-                try {
-                    updateDigest(digest);
-                    final Checksum current = new ChecksumImpl(now(), digest.digest());
+                previous = resource.getCurrent();
+                if (failureOrNull == null) {
+                    current = new ChecksumImpl(now(), checksum);
                     resource.setCurrent(current);
-                    observer.done(new UpdateImpl(previous, current, null));
-                    return current;
-                } catch (final Throwable e) {
-                    observer.done(new UpdateImpl(previous, previous, e));
-                    return previous;
+                } else {
+                    current = previous;
                 }
             }
+
+            observer.done(new UpdateImpl(previous, current, failureOrNull));
+            return current;
         } finally {
             digesterPool.release(digest);
         }
