@@ -90,7 +90,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
                 pUpdater.update(readBytes);
             }
 
-            return 1 >= rc;
+            return 1 >= rc && delay > 0;
         }
         return false;
     }
@@ -110,6 +110,10 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
             failureOrNull = e;
         }
 
+        finalizeResult(failureOrNull);
+    }
+
+    private void finalizeResult(final Throwable pFailureOrNull) {
         final byte[] checksum = digest.digest();
         final Checksum current;
         final Checksum previous;
@@ -118,7 +122,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
         // must be synchronized externally.
         synchronized (resource) {
             previous = resource.getCurrent();
-            if (failureOrNull == null) {
+            if (pFailureOrNull == null) {
                 current = new ChecksumImpl(now(), checksum);
                 resource.setCurrent(current);
             } else {
@@ -127,7 +131,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
         }
 
         try {
-            future.done(new UpdateImpl(previous, current, failureOrNull));
+            future.done(new UpdateImpl(previous, current, pFailureOrNull));
         } finally {
             try {
                 close();
