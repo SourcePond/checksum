@@ -49,6 +49,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     private final DigesterPool digesterPool;
     private final ResultFuture future;
     private volatile byte numOfReSchedules;
+    private final MessageDigest digest;
     final BaseResource<A> resource;
     final DataReader reader;
 
@@ -60,6 +61,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
         future = pFuture;
         resource = pResource;
         reader = pReader;
+        digest = pDigesterPool.get();
     }
 
     abstract void updateDigest(MessageDigest pDigest) throws InterruptedException, IOException;
@@ -88,43 +90,40 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
 
     @Override
     public final Checksum call() {
-        final MessageDigest digest = digesterPool.get();
+        Throwable failureOrNull = null;
         try {
-            Throwable failureOrNull = null;
-            try {
-                updateDigest(digest);
-            } catch (final Throwable e) {
-                failureOrNull = e;
-            }
-
-            final byte[] checksum = digest.digest();
-            final Checksum current;
-            final Checksum previous;
-
-            // Mutex on resource, getCurrent and setCurrent
-            // must be synchronized externally.
-            synchronized (resource) {
-                previous = resource.getCurrent();
-                if (failureOrNull == null) {
-                    current = new ChecksumImpl(now(), checksum);
-                    resource.setCurrent(current);
-                } else {
-                    current = previous;
-                }
-            }
-
-            try {
-                future.done(new UpdateImpl(previous, current, failureOrNull));
-            } finally {
-                try {
-                    close();
-                } catch (final IOException e) {
-                    LOG.error(e.getMessage(), e);
-                }
-            }
-            return current;
-        } finally {
-            digesterPool.release(digest);
+            updateDigest(digest);
+        } catch (final Throwable e) {
+            failureOrNull = e;
         }
+
+        final byte[] checksum = digest.digest();
+        final Checksum current;
+        final Checksum previous;
+
+        // Mutex on resource, getCurrent and setCurrent
+        // must be synchronized externally.
+        synchronized (resource) {
+            previous = resource.getCurrent();
+            if (failureOrNull == null) {
+                current = new ChecksumImpl(now(), checksum);
+                resource.setCurrent(current);
+            } else {
+                current = previous;
+            }
+        }
+
+        try {
+            future.done(new UpdateImpl(previous, current, failureOrNull));
+        } finally {
+            try {
+                close();
+            } catch (final IOException e) {
+                LOG.error(e.getMessage(), e);
+            } finally {
+                digesterPool.release(digest);
+            }
+        }
+        return current;
     }
 }

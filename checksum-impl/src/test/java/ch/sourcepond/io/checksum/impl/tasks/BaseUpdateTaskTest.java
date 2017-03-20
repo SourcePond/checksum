@@ -55,7 +55,7 @@ public class BaseUpdateTaskTest {
     private final BaseResource<StreamSource> resource = mock(BaseResource.class);
     private final Checksum checksum = mock(Checksum.class);
     private final ResultFuture future = mock(ResultFuture.class);
-    private final TestUpdateTask task = new TestUpdateTask(digesterPool, future, resource, reader);
+    private TestUpdateTask task;
 
     private static Checksum matchCurrent() {
         return argThat(new ArgumentMatcher<Checksum>() {
@@ -70,6 +70,7 @@ public class BaseUpdateTaskTest {
     public void setup() {
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
+        task = new TestUpdateTask(digesterPool, future, resource, reader);
     }
 
     @Test
