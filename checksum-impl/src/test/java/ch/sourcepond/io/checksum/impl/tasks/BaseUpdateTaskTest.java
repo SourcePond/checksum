@@ -29,6 +29,7 @@ public class BaseUpdateTaskTest {
         InterruptedException interruptedException;
         IOException ioException;
         boolean closed;
+        boolean delay;
 
         public TestUpdateTask(final ScheduledExecutorService pExecutor,
                               final DigesterPool pDigesterPool,
@@ -48,7 +49,7 @@ public class BaseUpdateTaskTest {
                 throw ioException;
             }
             digest.update(ANY_DATA);
-            return false;
+            return delay;
         }
 
         @Override
@@ -83,6 +84,18 @@ public class BaseUpdateTaskTest {
     }
 
     @Test
+    public void verifyDelayExecution() throws Exception {
+        when(resource.getCurrent()).thenReturn(checksum);
+        task.delay = true;
+        task.run();
+        final InOrder order = inOrder(digesterPool, digest, executor, resource, future);
+        order.verify(digesterPool).get();
+        order.verify(digest).update(ANY_DATA);
+        order.verify(executor).schedule(task, 1, SECONDS);
+        order.verifyNoMoreInteractions();
+    }
+
+    @Test
     public void verifySuccess() throws Exception {
         when(resource.getCurrent()).thenReturn(checksum);
         task.run();
@@ -93,6 +106,7 @@ public class BaseUpdateTaskTest {
         order.verify(resource).setCurrent(matchCurrent());
         order.verify(future).done(argThat(u -> checksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
         order.verify(digesterPool).release(digest);
+        verifyZeroInteractions(executor);
         assertTrue(task.closed);
     }
 
