@@ -14,7 +14,6 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.BufferPool;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
@@ -33,11 +32,10 @@ class ChannelUpdateTask extends UpdateTask<ChannelSource> {
 
     ChannelUpdateTask(final DigesterPool pDigesterPool,
                       final ResultFuture pFuture,
-                      final UpdateObserver pObserver,
                       final BaseResource<ChannelSource> pResource,
                       final DataReader pReader,
                       final BufferPool pBufferPool) throws IOException {
-        super(pDigesterPool, pFuture, pObserver, pResource, pReader);
+        super(pDigesterPool, pFuture, pResource, pReader);
         bufferPool = pBufferPool;
         channel = pResource.getSource().openChannel();
     }

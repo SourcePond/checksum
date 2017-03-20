@@ -14,7 +14,6 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.StreamSource;
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
@@ -30,10 +29,9 @@ final class StreamUpdateTask extends UpdateTask<StreamSource> {
 
     StreamUpdateTask(final DigesterPool pDigesterPool,
                      final ResultFuture pFuture,
-                     final UpdateObserver pObserver,
                      final BaseResource<StreamSource> pResource,
                      final DataReader pReader) throws IOException {
-        super(pDigesterPool, pFuture, pObserver, pResource, pReader);
+        super(pDigesterPool, pFuture, pResource, pReader);
         in = pResource.getSource().openStream();
     }
 

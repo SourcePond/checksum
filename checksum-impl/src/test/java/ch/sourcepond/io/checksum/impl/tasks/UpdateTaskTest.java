@@ -1,7 +1,6 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.junit.Before;
@@ -23,7 +22,6 @@ import static org.mockito.Mockito.*;
 public abstract class UpdateTaskTest<A> {
     private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
     final DataReader reader = new DataReader(SECONDS, 1);
-    final UpdateObserver observer = mock(UpdateObserver.class);
     final BaseResource<A> resource = mock(BaseResource.class);
     final ResultFuture future = mock(ResultFuture.class);
     private final ExecutorService executor = newCachedThreadPool();

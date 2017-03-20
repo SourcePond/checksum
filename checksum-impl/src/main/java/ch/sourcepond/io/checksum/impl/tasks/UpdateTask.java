@@ -14,7 +14,6 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.slf4j.Logger;
@@ -34,18 +33,15 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     private static final Logger LOG = getLogger(UpdateTask.class);
     private final DigesterPool digesterPool;
     private final ResultFuture future;
-    private final UpdateObserver observer;
     final BaseResource<A> resource;
     final DataReader reader;
 
     UpdateTask(final DigesterPool pDigesterPool,
                final ResultFuture pFuture,
-               final UpdateObserver pObserver,
                final BaseResource<A> pResource,
                final DataReader pReader) {
         digesterPool = pDigesterPool;
         future = pFuture;
-        observer = pObserver;
         resource = pResource;
         reader = pReader;
     }
@@ -80,7 +76,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
             }
 
             try {
-                observer.done(new UpdateImpl(previous, current, failureOrNull));
+                future.done(new UpdateImpl(previous, current, failureOrNull));
             } finally {
                 try {
                     close();

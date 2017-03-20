@@ -23,7 +23,7 @@ public class ChannelUpdateTaskTest extends UpdateTaskTest<ChannelSource> {
     protected UpdateTask<ChannelSource> newTask() throws IOException {
         when(resource.getSource()).thenReturn(new FileChannelSource(
                 FileSystems.getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())));
-        return new ChannelUpdateTask(digesterPool, future, observer, resource, reader, bufferPool);
+        return new ChannelUpdateTask(digesterPool, future, resource, reader, bufferPool);
     }
 
     @Before
