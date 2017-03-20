@@ -41,7 +41,7 @@ public final class ResourcesFactoryImpl implements ResourcesFactory {
     // Used by Felix DM to determine where to inject
     // service references
     public Object[] getComposition() {
-        return new Object[] { internalResourcesFactory };
+        return new Object[] { internalResourcesFactory, internalResourcesFactory.getTaskFactory() };
     }
 
     @Override

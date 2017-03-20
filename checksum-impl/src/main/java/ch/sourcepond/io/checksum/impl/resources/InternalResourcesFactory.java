@@ -42,6 +42,11 @@ public class InternalResourcesFactory {
         taskFactory = pTaskFactory;
     }
 
+    // Used by Felix DM
+    public TaskFactory getTaskFactory() {
+        return taskFactory;
+    }
+
     public Resource newResource(final DigesterPool pDigesterPool, final ChannelSource pSource) {
         return new ChannelResource(
                 updateExecutor,
