@@ -22,6 +22,7 @@ import java.nio.channels.ReadableByteChannel;
  * {@link ResourcesFactory#create(Algorithm, ChannelSource)} to create
  * {@link Resource} instances which fetch their data from a custom source.
  */
+@FunctionalInterface
 public interface ChannelSource {
 
     /**
