@@ -31,9 +31,6 @@
     <properties>
         <repo.project>${project.artifactId}</repo.project>
         <smartswitch.version>3.0.0</smartswitch.version>
-
-        <!-- Remove this when switching to JDK9 -->
-        <threeten-extra.version>1.0</threeten-extra.version>
     </properties>
 
     <modules>
