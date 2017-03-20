@@ -26,19 +26,24 @@ import java.security.MessageDigest;
  *
  */
 final class StreamUpdateTask extends UpdateTask<StreamSource> {
+    private final InputStream in;
 
     StreamUpdateTask(final DigesterPool pDigesterPool,
                      final UpdateObserver pObserver,
                      final BaseResource<StreamSource> pResource,
-                     final DataReader pReader) {
+                     final DataReader pReader) throws IOException {
         super(pDigesterPool, pObserver, pResource, pReader);
+        in = pResource.getSource().openStream();
     }
 
     @Override
     void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
-        try (final InputStream in = resource.getSource().openStream()) {
-            final byte[] buffer = new byte[1024];
-            reader.read(() -> in.read(buffer), readBytes -> pDigest.update(buffer, 0, readBytes));
-        }
+        final byte[] buffer = new byte[1024];
+        reader.read(() -> in.read(buffer), readBytes -> pDigest.update(buffer, 0, readBytes));
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 }

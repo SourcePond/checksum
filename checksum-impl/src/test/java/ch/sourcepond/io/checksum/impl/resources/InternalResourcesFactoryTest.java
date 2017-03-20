@@ -19,6 +19,7 @@ import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -54,28 +55,28 @@ public class InternalResourcesFactoryTest {
     }
 
     @Test
-    public void newChannelResource() {
+    public void newChannelResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, channelSource);
         res.update(observer);
         verify(factory.updateExecutor).submit(task);
     }
 
     @Test
-    public void newStreamResource() {
+    public void newStreamResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, streamSource);
         res.update(observer);
         verify(factory.updateExecutor).submit(task);
     }
 
     @Test
-    public void newPathResource() {
+    public void newPathResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, path);
         res.update(observer);
         verify(factory.updateExecutor).submit(task);
     }
 
     @Test
-    public void newUrlResource() {
+    public void newUrlResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, url);
         res.update(observer);
         verify(factory.updateExecutor).submit(task);

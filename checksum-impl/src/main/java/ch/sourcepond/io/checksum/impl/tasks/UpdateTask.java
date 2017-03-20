@@ -13,21 +13,25 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
+import org.slf4j.Logger;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.Callable;
 
 import static java.time.Instant.now;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Base task for updating a {@link MessageDigest}.
  */
-public abstract class UpdateTask<A> implements Callable<Checksum> {
+public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
+    private static final Logger LOG = getLogger(UpdateTask.class);
     private final DigesterPool digesterPool;
     private final UpdateObserver observer;
     final BaseResource<A> resource;
@@ -69,7 +73,15 @@ public abstract class UpdateTask<A> implements Callable<Checksum> {
                 }
             }
 
-            observer.done(new UpdateImpl(previous, current, failureOrNull));
+            try {
+                observer.done(new UpdateImpl(previous, current, failureOrNull));
+            } finally {
+                try {
+                    close();
+                } catch (final IOException e) {
+                    LOG.error(e.getMessage(), e);
+                }
+            }
             return current;
         } finally {
             digesterPool.release(digest);

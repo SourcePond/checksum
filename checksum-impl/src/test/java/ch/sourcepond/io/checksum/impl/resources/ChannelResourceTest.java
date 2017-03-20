@@ -17,6 +17,8 @@ import ch.sourcepond.io.checksum.api.ChannelSource;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
@@ -38,21 +40,21 @@ public class ChannelResourceTest extends BaseResourceTest<ChannelSource> {
 
     @Test
     @Override
-    public void update() {
+    public void update() throws IOException {
         when(taskFactory.newChannelTask(digesterPool, observer, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
         assertSame(checksumFuture, resource.update(observer));
     }
 
     @Test
     @Override
-    public void updateWithInterval() {
+    public void updateWithInterval() throws IOException {
         when(taskFactory.newChannelTask(digesterPool, observer, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
         assertSame(checksumFuture, resource.update(100L, observer));
     }
 
     @Test
     @Override
-    public void updateWithIntervalAndUnit() {
+    public void updateWithIntervalAndUnit() throws IOException {
         when(taskFactory.newChannelTask(digesterPool, observer, resource, SECONDS, 200L)).thenReturn(updateTask);
         assertSame(checksumFuture, resource.update(SECONDS, 200L, observer));
     }

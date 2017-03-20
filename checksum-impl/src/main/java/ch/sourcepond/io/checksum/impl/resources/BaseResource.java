@@ -17,6 +17,7 @@ import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -78,21 +79,21 @@ public abstract class BaseResource<A> implements Resource {
     }
 
     @Override
-    public final Future<Checksum> update(final UpdateObserver pObserver) {
+    public final Future<Checksum> update(final UpdateObserver pObserver) throws IOException  {
         return update(0L, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) {
+    public final Future<Checksum> update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) throws IOException  {
         return update(MILLISECONDS, pIntervalInMilliseconds, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
+    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) throws IOException {
         return updateExecutor.submit(newUpdateTask(pUnit, pInterval, pObserver));
     }
 
-    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final UpdateObserver pObserver);
+    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final UpdateObserver pObserver) throws IOException;
 
     // Not thread-safe; must be synchronized externally
     public Checksum getCurrent() {

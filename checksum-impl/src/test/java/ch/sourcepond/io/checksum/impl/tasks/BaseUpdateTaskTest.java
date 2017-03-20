@@ -1,8 +1,8 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.junit.Before;
@@ -13,6 +13,7 @@ import org.mockito.InOrder;
 import java.io.IOException;
 import java.security.MessageDigest;
 
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
@@ -25,6 +26,7 @@ public class BaseUpdateTaskTest {
     private static class TestUpdateTask extends UpdateTask<StreamSource> {
         InterruptedException interruptedException;
         IOException ioException;
+        boolean closed;
 
         public TestUpdateTask(final DigesterPool pDigesterPool, final UpdateObserver pObserver, final BaseResource<StreamSource> pResource, final DataReader pReader) {
             super(pDigesterPool, pObserver, pResource, pReader);
@@ -39,6 +41,11 @@ public class BaseUpdateTaskTest {
                 throw ioException;
             }
             pDigest.update(ANY_DATA);
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
         }
     }
 
@@ -77,6 +84,7 @@ public class BaseUpdateTaskTest {
         order.verify(resource).setCurrent(matchCurrent());
         order.verify(observer).done(argThat(u -> checksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
         order.verify(digesterPool).release(digest);
+        assertTrue(task.closed);
     }
 
     @Test
@@ -88,6 +96,7 @@ public class BaseUpdateTaskTest {
         order.verify(resource).getCurrent();
         order.verify(observer).done(argThat(u -> u.getFailureOrNull() == task.interruptedException));
         order.verify(digesterPool).release(digest);
+        assertTrue(task.closed);
     }
 
     @Test
@@ -99,5 +108,6 @@ public class BaseUpdateTaskTest {
         order.verify(resource).getCurrent();
         order.verify(observer).done(argThat(u -> u.getFailureOrNull() == task.ioException));
         order.verify(digesterPool).release(digest);
+        assertTrue(task.closed);
     }
 }

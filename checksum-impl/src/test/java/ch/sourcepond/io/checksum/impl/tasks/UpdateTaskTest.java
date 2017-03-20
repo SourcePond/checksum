@@ -7,6 +7,7 @@ import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +32,7 @@ public abstract class UpdateTaskTest<A> {
     private UpdateTask task;
     private volatile Checksum checksum;
 
-    protected abstract UpdateTask newTask();
+    protected abstract UpdateTask newTask() throws IOException;
 
     @Before
     public void setup() throws Exception {

@@ -29,21 +29,23 @@ import java.security.MessageDigest;
  */
 class ChannelUpdateTask extends UpdateTask<ChannelSource> {
     private final BufferPool bufferPool;
+    private final ReadableByteChannel channel;
 
     ChannelUpdateTask(final DigesterPool pDigesterPool,
                       final UpdateObserver pObserver,
                       final BaseResource<ChannelSource> pResource,
                       final DataReader pReader,
-                      final BufferPool pBufferPool) {
+                      final BufferPool pBufferPool) throws IOException {
         super(pDigesterPool, pObserver, pResource, pReader);
         bufferPool = pBufferPool;
+        channel = pResource.getSource().openChannel();
     }
 
     @Override
     void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
         final ByteBuffer buffer = bufferPool.get();
-        try (final ReadableByteChannel ch = resource.getSource().openChannel()) {
-            reader.read(() -> ch.read(buffer), readBytes -> {
+        try {
+            reader.read(() -> channel.read(buffer), readBytes -> {
                 buffer.flip();
                 pDigest.update(buffer);
                 buffer.clear();
@@ -51,5 +53,10 @@ class ChannelUpdateTask extends UpdateTask<ChannelSource> {
         } finally {
             bufferPool.release(buffer);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        channel.close();
     }
 }

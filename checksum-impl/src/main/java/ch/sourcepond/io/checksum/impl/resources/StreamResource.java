@@ -19,6 +19,7 @@ import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,7 @@ class StreamResource extends BaseResource<StreamSource> {
     }
 
     @Override
-    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
+    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) throws IOException {
         return taskFactory.newStreamTask(digesterPool, pObserver, this, pUnit, pInterval);
     }
 }
