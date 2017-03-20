@@ -33,12 +33,18 @@ import static org.slf4j.LoggerFactory.getLogger;
 public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     private static final Logger LOG = getLogger(UpdateTask.class);
     private final DigesterPool digesterPool;
+    private final ResultFuture future;
     private final UpdateObserver observer;
     final BaseResource<A> resource;
     final DataReader reader;
 
-    UpdateTask(final DigesterPool pDigesterPool, final UpdateObserver pObserver, final BaseResource<A> pResource, final DataReader pReader) {
+    UpdateTask(final DigesterPool pDigesterPool,
+               final ResultFuture pFuture,
+               final UpdateObserver pObserver,
+               final BaseResource<A> pResource,
+               final DataReader pReader) {
         digesterPool = pDigesterPool;
+        future = pFuture;
         observer = pObserver;
         resource = pResource;
         reader = pReader;

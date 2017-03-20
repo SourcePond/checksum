@@ -29,10 +29,11 @@ final class StreamUpdateTask extends UpdateTask<StreamSource> {
     private final InputStream in;
 
     StreamUpdateTask(final DigesterPool pDigesterPool,
+                     final ResultFuture pFuture,
                      final UpdateObserver pObserver,
                      final BaseResource<StreamSource> pResource,
                      final DataReader pReader) throws IOException {
-        super(pDigesterPool, pObserver, pResource, pReader);
+        super(pDigesterPool, pFuture, pObserver, pResource, pReader);
         in = pResource.getSource().openStream();
     }
 

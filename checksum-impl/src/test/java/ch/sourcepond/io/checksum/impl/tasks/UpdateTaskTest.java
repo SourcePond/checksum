@@ -10,8 +10,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -25,7 +25,8 @@ public abstract class UpdateTaskTest<A> {
     final DataReader reader = new DataReader(SECONDS, 1);
     final UpdateObserver observer = mock(UpdateObserver.class);
     final BaseResource<A> resource = mock(BaseResource.class);
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    final ResultFuture future = mock(ResultFuture.class);
+    private final ExecutorService executor = newCachedThreadPool();
     final DigesterPool digesterPool = mock(DigesterPool.class);
     @SuppressWarnings("FieldCanBeLocal")
     private MessageDigest digest;

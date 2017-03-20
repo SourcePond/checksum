@@ -28,8 +28,8 @@ public class BaseUpdateTaskTest {
         IOException ioException;
         boolean closed;
 
-        public TestUpdateTask(final DigesterPool pDigesterPool, final UpdateObserver pObserver, final BaseResource<StreamSource> pResource, final DataReader pReader) {
-            super(pDigesterPool, pObserver, pResource, pReader);
+        public TestUpdateTask(final DigesterPool pDigesterPool, final ResultFuture pFuture, final UpdateObserver pObserver, final BaseResource<StreamSource> pResource, final DataReader pReader) {
+            super(pDigesterPool, pFuture, pObserver, pResource, pReader);
         }
 
         @Override
@@ -56,7 +56,8 @@ public class BaseUpdateTaskTest {
     private final UpdateObserver observer = mock(UpdateObserver.class);
     private final BaseResource<StreamSource> resource = mock(BaseResource.class);
     private final Checksum checksum = mock(Checksum.class);
-    private final TestUpdateTask task = new TestUpdateTask(digesterPool, observer, resource, reader);
+    private final ResultFuture future = mock(ResultFuture.class);
+    private final TestUpdateTask task = new TestUpdateTask(digesterPool, future, observer, resource, reader);
 
     private static Checksum matchCurrent() {
         return argThat(new ArgumentMatcher<Checksum>() {

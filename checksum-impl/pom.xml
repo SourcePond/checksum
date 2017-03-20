@@ -22,6 +22,10 @@
             <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>ch.sourcepond.commons</groupId>
             <artifactId>smartswitch-lib</artifactId>
             <version>${smartswitch.version}</version>

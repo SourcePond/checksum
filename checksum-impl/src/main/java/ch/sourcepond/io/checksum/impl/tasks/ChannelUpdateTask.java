@@ -32,11 +32,12 @@ class ChannelUpdateTask extends UpdateTask<ChannelSource> {
     private final ReadableByteChannel channel;
 
     ChannelUpdateTask(final DigesterPool pDigesterPool,
+                      final ResultFuture pFuture,
                       final UpdateObserver pObserver,
                       final BaseResource<ChannelSource> pResource,
                       final DataReader pReader,
                       final BufferPool pBufferPool) throws IOException {
-        super(pDigesterPool, pObserver, pResource, pReader);
+        super(pDigesterPool, pFuture, pObserver, pResource, pReader);
         bufferPool = pBufferPool;
         channel = pResource.getSource().openChannel();
     }

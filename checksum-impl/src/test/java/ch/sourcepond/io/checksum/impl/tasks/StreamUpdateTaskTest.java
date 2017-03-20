@@ -16,6 +16,6 @@ public class StreamUpdateTaskTest extends UpdateTaskTest<StreamSource> {
     @Override
     protected UpdateTask<StreamSource> newTask() throws IOException {
         when(resource.getSource()).thenReturn(new URLStreamSource(getClass().getResource("/testfile_01.txt")));
-        return new StreamUpdateTask(digesterPool, observer, resource, reader);
+        return new StreamUpdateTask(digesterPool, future, observer, resource, reader);
     }
 }

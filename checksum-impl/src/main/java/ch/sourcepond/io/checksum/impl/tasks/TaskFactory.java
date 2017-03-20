@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Thread.currentThread;
+
 /**
  *
  */
@@ -42,10 +44,10 @@ public class TaskFactory {
     }
 
     public <S> Callable<Checksum> newChannelTask(final DigesterPool digesterPool, final UpdateObserver pObserver, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new ChannelUpdateTask(digesterPool, pObserver, pResource, new DataReader(pUnit, pInterval), bufferPool);
+        return new ChannelUpdateTask(digesterPool, new ResultFuture(currentThread(), pObserver), pObserver, pResource, new DataReader(pUnit, pInterval), bufferPool);
     }
 
     public <S> Callable<Checksum> newStreamTask(final DigesterPool digesterPool, final UpdateObserver pObserver, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new StreamUpdateTask(digesterPool, pObserver, pResource, new DataReader(pUnit, pInterval));
+        return new StreamUpdateTask(digesterPool, new ResultFuture(currentThread(), pObserver), pObserver, pResource, new DataReader(pUnit, pInterval));
     }
 }
