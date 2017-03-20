@@ -39,21 +39,21 @@ public class StreamResourceTest extends BaseResourceTest<StreamSource> {
     @Test
     @Override
     public void update() throws IOException {
-        when(taskFactory.newStreamTask(digesterPool, observer, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(observer));
+        when(taskFactory.newStreamTask(future, digesterPool, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
+        assertSame(future, resource.update(observer));
     }
 
     @Test
     @Override
     public void updateWithInterval() throws IOException {
-        when(taskFactory.newStreamTask(digesterPool, observer, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(100L, observer));
+        when(taskFactory.newStreamTask(future, digesterPool, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
+        assertSame(future, resource.update(100L, observer));
     }
 
     @Test
     @Override
     public void updateWithIntervalAndUnit() throws IOException {
-        when(taskFactory.newStreamTask(digesterPool, observer, resource, SECONDS, 200L)).thenReturn(updateTask);
-        assertSame(checksumFuture, resource.update(SECONDS, 200L, observer));
+        when(taskFactory.newStreamTask(future, digesterPool, resource, SECONDS, 200L)).thenReturn(updateTask);
+        assertSame(future, resource.update(SECONDS, 200L, observer));
     }
 }

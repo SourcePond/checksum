@@ -21,7 +21,7 @@ import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Factory to create {@link Resource} instances for different sources.
@@ -30,7 +30,7 @@ public class InternalResourcesFactory {
     private final TaskFactory taskFactory;
 
     // Service dependency injected by Felix DM
-    volatile ExecutorService updateExecutor;
+    volatile ScheduledExecutorService updateExecutor;
 
     // Constructor used by BundleActivator
     public InternalResourcesFactory() {

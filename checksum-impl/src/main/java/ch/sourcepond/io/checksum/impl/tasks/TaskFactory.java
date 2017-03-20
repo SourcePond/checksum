@@ -14,7 +14,6 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
-import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.BufferPool;
@@ -22,10 +21,8 @@ import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static java.lang.Thread.currentThread;
 
 /**
  *
@@ -33,21 +30,29 @@ import static java.lang.Thread.currentThread;
 public class TaskFactory {
     private final BufferPool bufferPool;
 
+    // Injected by Felix DM
+    private volatile ScheduledExecutorService executor;
+
     // Constructor used by BundleActivator
     public TaskFactory() {
-        this(new BufferPool());
+        bufferPool = new BufferPool();
     }
 
     // Constructor used for testing
-    public TaskFactory(final BufferPool pBufferPool) {
+    public TaskFactory(final ScheduledExecutorService pExecutor, final BufferPool pBufferPool) {
+        executor = pExecutor;
         bufferPool = pBufferPool;
     }
 
-    public <S> Callable<Checksum> newChannelTask(final DigesterPool digesterPool, final UpdateObserver pObserver, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new ChannelUpdateTask(digesterPool, new ResultFuture(currentThread(), pObserver), pResource, new DataReader(pUnit, pInterval), bufferPool);
+    public ResultFuture newResult(final UpdateObserver pObserver) {
+        return new ResultFuture(pObserver);
     }
 
-    public <S> Callable<Checksum> newStreamTask(final DigesterPool digesterPool, final UpdateObserver pObserver, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new StreamUpdateTask(digesterPool, new ResultFuture(currentThread(), pObserver), pResource, new DataReader(pUnit, pInterval));
+    public <S> Runnable newChannelTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
+        return new ChannelUpdateTask(executor, digesterPool, pResult, pResource, bufferPool, pUnit, pInterval);
+    }
+
+    public <S> Runnable newStreamTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
+        return new StreamUpdateTask(executor, digesterPool, pResult, pResource, pUnit, pInterval);
     }
 }

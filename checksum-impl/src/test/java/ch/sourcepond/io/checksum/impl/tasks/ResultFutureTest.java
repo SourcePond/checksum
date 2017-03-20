@@ -39,7 +39,7 @@ public class ResultFutureTest {
     private final UpdateObserver observer = mock(UpdateObserver.class);
     private final Update update = mock(Update.class);
     private final Checksum checksum = mock(Checksum.class);
-    private final ResultFuture future = new ResultFuture(currentThread(), observer);
+    private final ResultFuture future = new ResultFuture(observer);
     private final CountDownLatch resultAvailable = new CountDownLatch(1);
     private final CountDownLatch workerThreadUp = new CountDownLatch(1);
     private volatile Exception workerException;

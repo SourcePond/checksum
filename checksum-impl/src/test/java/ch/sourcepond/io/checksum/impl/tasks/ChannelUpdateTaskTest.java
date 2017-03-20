@@ -7,8 +7,10 @@ import org.junit.Before;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.file.FileSystems;
 
+import static java.nio.ByteBuffer.allocate;
+import static java.nio.file.FileSystems.getDefault;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,19 +18,19 @@ import static org.mockito.Mockito.when;
  *
  */
 public class ChannelUpdateTaskTest extends UpdateTaskTest<ChannelSource> {
-    private final ByteBuffer buffer = ByteBuffer.allocate(1024);
+    private final ByteBuffer buffer = allocate(1024);
     private final BufferPool bufferPool = mock(BufferPool.class);
 
     @Override
     protected UpdateTask<ChannelSource> newTask() throws IOException {
-        when(resource.getSource()).thenReturn(new FileChannelSource(
-                FileSystems.getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())));
-        return new ChannelUpdateTask(digesterPool, future, resource, reader, bufferPool);
+        return new ChannelUpdateTask(executor, digesterPool, future, resource, bufferPool, SECONDS, 1);
     }
 
     @Before
     public void setup() throws Exception {
-        super.setup();
         when(bufferPool.get()).thenReturn(buffer);
+        when(resource.getSource()).thenReturn(new FileChannelSource(
+                getDefault().getPath(getClass().getResource("/testfile_01.txt").getFile())));
+        super.setup();
     }
 }

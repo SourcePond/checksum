@@ -19,6 +19,8 @@ import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -26,18 +28,20 @@ import java.io.InputStream;
 final class StreamUpdateTask extends UpdateTask<StreamSource> {
     private final InputStream in;
 
-    StreamUpdateTask(final DigesterPool pDigesterPool,
+    StreamUpdateTask(final ScheduledExecutorService pExecutor,
+                     final DigesterPool pDigesterPool,
                      final ResultFuture pFuture,
                      final BaseResource<StreamSource> pResource,
-                     final DataReader pReader) throws IOException {
-        super(pDigesterPool, pFuture, pResource, pReader);
+                     final TimeUnit pUnit,
+                     final long pDelay) throws IOException {
+        super(pExecutor, pDigesterPool, pFuture, pResource, pUnit, pDelay);
         in = pResource.getSource().openStream();
     }
 
     @Override
-    void updateDigest() throws InterruptedException, IOException {
+    boolean updateDigest() throws InterruptedException, IOException {
         final byte[] buffer = new byte[1024];
-        reader.read(() -> in.read(buffer), readBytes -> digest.update(buffer, 0, readBytes));
+        return read(() -> in.read(buffer), readBytes -> digest.update(buffer, 0, readBytes));
     }
 
     @Override

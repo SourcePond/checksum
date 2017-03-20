@@ -1,7 +1,6 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
-import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.BufferPool;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -27,9 +26,11 @@ import static org.mockito.Mockito.when;
  */
 @SuppressWarnings({"unchecked", "FieldCanBeLocal"})
 public class TaskFactoryTest {
+    private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
+    private final ResultFuture result = mock(ResultFuture.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final BufferPool bufferPool = mock(BufferPool.class);
-    private final TaskFactory factory = new TaskFactory(bufferPool);
+    private final TaskFactory factory = new TaskFactory(executor, bufferPool);
     private final UpdateObserver observer = mock(UpdateObserver.class);
     private URL anyUrl;
 
@@ -38,7 +39,7 @@ public class TaskFactoryTest {
         anyUrl = new URL("file:///any/path");
     }
 
-    private void assertNotSame(final Callable<Checksum> first, final Callable<Checksum> second) {
+    private void assertNotSame(final Runnable first, final Runnable second) {
         assertNotNull(first);
         assertNotNull(second);
         Assert.assertNotSame(first, second);
@@ -51,8 +52,8 @@ public class TaskFactoryTest {
         final BaseResource<ChannelSource> resource = mock(BaseResource.class);
         when(channelSource.openChannel()).thenReturn(channel);
         when(resource.getSource()).thenReturn(channelSource);
-        assertNotSame(factory.newChannelTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L),
-                factory.newChannelTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newChannelTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newChannelTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 
     @Test
@@ -62,7 +63,7 @@ public class TaskFactoryTest {
         final BaseResource<StreamSource> resource = mock(BaseResource.class);
         when(streamSource.openStream()).thenReturn(stream);
         when(resource.getSource()).thenReturn(streamSource);
-        assertNotSame(factory.newStreamTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L),
-                factory.newStreamTask(digesterPool, observer, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newStreamTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newStreamTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 }

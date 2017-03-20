@@ -15,14 +15,12 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -53,13 +51,13 @@ public abstract class BaseResource<A> implements Resource {
         }
     }
 
-    private final ExecutorService updateExecutor;
+    final ScheduledExecutorService updateExecutor;
     private final A source;
     final DigesterPool digesterPool;
     final TaskFactory taskFactory;
     private Checksum current = new DefaultChecksum();
 
-    BaseResource(final ExecutorService pUpdateExecutor,
+    BaseResource(final ScheduledExecutorService pUpdateExecutor,
                  final A pSource,
                  final DigesterPool pDigesterPool,
                  final TaskFactory pTaskFactory) {
@@ -90,10 +88,12 @@ public abstract class BaseResource<A> implements Resource {
 
     @Override
     public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) throws IOException {
-        return updateExecutor.submit(newUpdateTask(pUnit, pInterval, pObserver));
+        final ResultFuture result = taskFactory.newResult(pObserver);
+        updateExecutor.execute(newUpdateTask(result, pUnit, pInterval));
+        return result;
     }
 
-    abstract Callable<Checksum> newUpdateTask(TimeUnit pUnit, long pInterval, final UpdateObserver pObserver) throws IOException;
+    abstract Runnable newUpdateTask(ResultFuture pResult, TimeUnit pUnit, long pInterval) throws IOException;
 
     // Not thread-safe; must be synchronized externally
     public Checksum getCurrent() {

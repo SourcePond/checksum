@@ -14,14 +14,12 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
-import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 class ChannelResource extends BaseResource<ChannelSource> {
 
-    ChannelResource(final ExecutorService pUpdateExecutor,
+    ChannelResource(final ScheduledExecutorService pUpdateExecutor,
                     final ChannelSource pAccessor,
                     final DigesterPool pDigesterPool,
                     final TaskFactory pTaskFactory) {
@@ -37,7 +35,7 @@ class ChannelResource extends BaseResource<ChannelSource> {
     }
 
     @Override
-    Callable<Checksum> newUpdateTask(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) throws IOException {
-        return taskFactory.newChannelTask(digesterPool, pObserver, this, pUnit, pInterval);
+    Runnable newUpdateTask(final ResultFuture pResult, final TimeUnit pUnit, final long pInterval) throws IOException {
+        return taskFactory.newChannelTask(pResult, digesterPool, this, pUnit, pInterval);
     }
 }

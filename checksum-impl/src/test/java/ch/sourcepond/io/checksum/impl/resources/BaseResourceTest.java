@@ -13,17 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
-import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static org.junit.Assert.*;
@@ -35,19 +33,19 @@ import static org.mockito.Mockito.when;
  */
 @SuppressWarnings("unchecked")
 public abstract class BaseResourceTest<A> {
-    final Future<Checksum> checksumFuture = mock(Future.class);
-    final Callable<Checksum> updateTask = mock(Callable.class);
-    final ExecutorService updateExecutor = mock(ExecutorService.class);
+    final Runnable updateTask = mock(Runnable.class);
+    final ScheduledExecutorService updateExecutor = mock(ScheduledExecutorService.class);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     final TaskFactory taskFactory = mock(TaskFactory.class);
+    final ResultFuture future = mock(ResultFuture.class);
     final UpdateObserver observer = mock(UpdateObserver.class);
     A source;
     BaseResource<A> resource;
 
     @Before
     public void setup() {
+        when(taskFactory.newResult(observer)).thenReturn(future);
         when(digesterPool.getAlgorithm()).thenReturn(SHA256);
-        when(updateExecutor.submit(updateTask)).thenReturn(checksumFuture);
     }
 
     @Test

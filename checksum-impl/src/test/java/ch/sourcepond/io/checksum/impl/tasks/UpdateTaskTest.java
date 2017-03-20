@@ -1,17 +1,19 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
-import static java.util.concurrent.Executors.newCachedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.lang.Thread.sleep;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -21,10 +23,10 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public abstract class UpdateTaskTest<A> {
     private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
-    final DataReader reader = new DataReader(SECONDS, 1);
     final BaseResource<A> resource = mock(BaseResource.class);
-    final ResultFuture future = mock(ResultFuture.class);
-    private final ExecutorService executor = newCachedThreadPool();
+    private final UpdateObserver observer = mock(UpdateObserver.class);
+    final ResultFuture future = new ResultFuture(observer);
+    final ScheduledExecutorService executor = newScheduledThreadPool(1);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     @SuppressWarnings("FieldCanBeLocal")
     private MessageDigest digest;
@@ -43,11 +45,17 @@ public abstract class UpdateTaskTest<A> {
                 }
         ).when(resource).setCurrent(any());
         task = newTask();
+        executor.execute(task);
+        sleep(5000);
+    }
+
+    @After
+    public void tearDown() {
+        executor.shutdown();
     }
 
     @Test(timeout = 6000)
     public void verifyDigest() throws Exception {
-        executor.submit(task).get();
         assertEquals(EXPECTED_SHA_256_HASH, checksum.getHexValue());
     }
 }

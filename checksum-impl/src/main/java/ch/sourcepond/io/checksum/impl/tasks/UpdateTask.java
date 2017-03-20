@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import java.io.Closeable;
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Thread.currentThread;
 import static java.time.Instant.now;
@@ -30,7 +31,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Base task for updating a {@link MessageDigest}.
  */
-public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
+public abstract class UpdateTask<A> implements Closeable, Runnable {
 
     @FunctionalInterface
     interface Reader {
@@ -46,25 +47,31 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
 
     private static final Logger LOG = getLogger(UpdateTask.class);
     private static final int EOF = -1;
+    private final ScheduledExecutorService executor;
     private final DigesterPool digesterPool;
     private final ResultFuture future;
     private volatile byte numOfReSchedules;
     final MessageDigest digest;
     final BaseResource<A> resource;
-    final DataReader reader;
+    private final TimeUnit unit;
+    private final long delay;
 
-    UpdateTask(final DigesterPool pDigesterPool,
+    UpdateTask(final ScheduledExecutorService pExecutor,
+               final DigesterPool pDigesterPool,
                final ResultFuture pFuture,
                final BaseResource<A> pResource,
-               final DataReader pReader) {
+               final TimeUnit pUnit,
+               final long pInterval) {
+        executor = pExecutor;
         digesterPool = pDigesterPool;
         future = pFuture;
         resource = pResource;
-        reader = pReader;
         digest = pDigesterPool.get();
+        unit = pUnit;
+        delay = pInterval;
     }
 
-    abstract void updateDigest() throws InterruptedException, IOException;
+    abstract boolean updateDigest() throws InterruptedException, IOException;
 
     boolean read(final Reader pReader, final Updater pUpdater) throws IOException {
         if (!currentThread().isInterrupted()) {
@@ -72,7 +79,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
             int readBytes = pReader.read();
             if (readBytes == EOF) {
                 // Increment iterations if currently no more data is available.
-                rc = numOfReSchedules++;
+                rc = ++numOfReSchedules;
             } else {
                 // If more data is available, reset iterations to zero.
                 rc = numOfReSchedules = 0;
@@ -89,10 +96,16 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     }
 
     @Override
-    public final Checksum call() {
+    public final void run() {
         Throwable failureOrNull = null;
         try {
-            updateDigest();
+            if (updateDigest()) {
+                // Re-schedule this task somewhen in the future and...
+                executor.schedule(this, delay, unit);
+
+                // ... finish current execution at this point after reschedule
+                return;
+            }
         } catch (final Throwable e) {
             failureOrNull = e;
         }
@@ -124,6 +137,5 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
                 digesterPool.release(digest);
             }
         }
-        return current;
     }
 }

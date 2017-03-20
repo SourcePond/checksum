@@ -21,6 +21,8 @@ import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Updater-task which fetches its data from a {@link ReadableByteChannel} instance.
@@ -29,21 +31,23 @@ class ChannelUpdateTask extends UpdateTask<ChannelSource> {
     private final BufferPool bufferPool;
     private final ReadableByteChannel channel;
 
-    ChannelUpdateTask(final DigesterPool pDigesterPool,
+    ChannelUpdateTask(final ScheduledExecutorService pExecutor,
+                      final DigesterPool pDigesterPool,
                       final ResultFuture pFuture,
                       final BaseResource<ChannelSource> pResource,
-                      final DataReader pReader,
-                      final BufferPool pBufferPool) throws IOException {
-        super(pDigesterPool, pFuture, pResource, pReader);
+                      final BufferPool pBufferPool,
+                      final TimeUnit pUnit,
+                      final long pDelay) throws IOException {
+        super(pExecutor, pDigesterPool, pFuture, pResource, pUnit, pDelay);
         bufferPool = pBufferPool;
         channel = pResource.getSource().openChannel();
     }
 
     @Override
-    void updateDigest() throws InterruptedException, IOException {
+    boolean updateDigest() throws InterruptedException, IOException {
         final ByteBuffer buffer = bufferPool.get();
         try {
-            reader.read(() -> channel.read(buffer), readBytes -> {
+            return read(() -> channel.read(buffer), readBytes -> {
                 buffer.flip();
                 digest.update(buffer);
                 buffer.clear();

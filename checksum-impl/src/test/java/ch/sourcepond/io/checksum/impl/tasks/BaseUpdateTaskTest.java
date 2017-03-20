@@ -11,7 +11,10 @@ import org.mockito.InOrder;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
@@ -27,19 +30,25 @@ public class BaseUpdateTaskTest {
         IOException ioException;
         boolean closed;
 
-        public TestUpdateTask(final DigesterPool pDigesterPool, final ResultFuture pFuture, final BaseResource<StreamSource> pResource, final DataReader pReader) {
-            super(pDigesterPool, pFuture, pResource, pReader);
+        public TestUpdateTask(final ScheduledExecutorService pExecutor,
+                              final DigesterPool pDigesterPool,
+                              final ResultFuture pFuture,
+                              final BaseResource<StreamSource> pResource,
+                              final TimeUnit pUnit,
+                              final long pDelay) {
+            super(pExecutor, pDigesterPool, pFuture, pResource, pUnit, pDelay);
         }
 
         @Override
-        void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
+        boolean updateDigest() throws InterruptedException, IOException {
             if (interruptedException != null) {
                 throw interruptedException;
             }
             if (ioException != null) {
                 throw ioException;
             }
-            pDigest.update(ANY_DATA);
+            digest.update(ANY_DATA);
+            return false;
         }
 
         @Override
@@ -49,7 +58,7 @@ public class BaseUpdateTaskTest {
     }
 
     private static final byte[] ANY_DATA = new byte[0];
-    private final DataReader reader = mock(DataReader.class);
+    private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final MessageDigest digest = mock(MessageDigest.class);
     private final BaseResource<StreamSource> resource = mock(BaseResource.class);
@@ -70,13 +79,13 @@ public class BaseUpdateTaskTest {
     public void setup() {
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
-        task = new TestUpdateTask(digesterPool, future, resource, reader);
+        task = new TestUpdateTask(executor, digesterPool, future, resource, SECONDS, 1);
     }
 
     @Test
     public void verifySuccess() throws Exception {
         when(resource.getCurrent()).thenReturn(checksum);
-        task.call();
+        task.run();
         final InOrder order = inOrder(digesterPool, digest, resource, future);
         order.verify(digesterPool).get();
         order.verify(digest).update(ANY_DATA);
@@ -90,7 +99,7 @@ public class BaseUpdateTaskTest {
     @Test
     public void verifyCancel() throws Exception {
         task.interruptedException = new InterruptedException();
-        task.call();
+        task.run();
         final InOrder order = inOrder(digest, resource, future, digesterPool);
         order.verify(digesterPool).get();
         order.verify(resource).getCurrent();
@@ -102,7 +111,7 @@ public class BaseUpdateTaskTest {
     @Test
     public void verifyFailure() throws Exception {
         task.ioException = new IOException();
-        task.call();
+        task.run();
         final InOrder order = inOrder(digest, resource, future, digesterPool);
         order.verify(digesterPool).get();
         order.verify(resource).getCurrent();

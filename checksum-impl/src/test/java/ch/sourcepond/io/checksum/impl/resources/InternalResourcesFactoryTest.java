@@ -13,8 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
-import ch.sourcepond.io.checksum.api.*;
+import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.Resource;
+import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mockito.Mockito.*;
@@ -34,7 +37,8 @@ import static org.mockito.Mockito.*;
  */
 @SuppressWarnings({"unchecked", "FieldCanBeLocal"})
 public class InternalResourcesFactoryTest {
-    private final Callable<Checksum> task = mock(Callable.class);
+    private final Runnable task = mock(Runnable.class);
+    private final ResultFuture result = mock(ResultFuture.class);
     private final TaskFactory taskFactory = mock(TaskFactory.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final ChannelSource channelSource = mock(ChannelSource.class);
@@ -48,38 +52,39 @@ public class InternalResourcesFactoryTest {
     public void setup() throws Exception {
         path = FileSystems.getDefault().getPath("src", "test", "resources", "testfile_01.txt");
         url = getClass().getResource("/testfile_01.txt");
-        when(taskFactory.newChannelTask(same(digesterPool), same(observer), notNull(), same(MILLISECONDS),same(0L))).thenReturn(task);
-        when(taskFactory.newStreamTask(same(digesterPool), same(observer), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
+        when(taskFactory.newResult(observer)).thenReturn(result);
+        when(taskFactory.newChannelTask(same(result), same(digesterPool), notNull(), same(MILLISECONDS),same(0L))).thenReturn(task);
+        when(taskFactory.newStreamTask(same(result), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
         factory = new InternalResourcesFactory(taskFactory);
-        factory.updateExecutor = mock(ExecutorService.class);
+        factory.updateExecutor = mock(ScheduledExecutorService.class);
     }
 
     @Test
     public void newChannelResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, channelSource);
         res.update(observer);
-        verify(factory.updateExecutor).submit(task);
+        verify(factory.updateExecutor).execute(task);
     }
 
     @Test
     public void newStreamResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, streamSource);
         res.update(observer);
-        verify(factory.updateExecutor).submit(task);
+        verify(factory.updateExecutor).execute(task);
     }
 
     @Test
     public void newPathResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, path);
         res.update(observer);
-        verify(factory.updateExecutor).submit(task);
+        verify(factory.updateExecutor).execute(task);
     }
 
     @Test
     public void newUrlResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, url);
         res.update(observer);
-        verify(factory.updateExecutor).submit(task);
+        verify(factory.updateExecutor).execute(task);
     }
 
 }

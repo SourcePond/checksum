@@ -35,7 +35,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  * Represents the future result of a checksum update. Until a result is determined,
  * an instance of this class will be accessed from multiple consecutive threads.
  */
-class ResultFuture implements UpdateObserver, Future<Checksum> {
+public class ResultFuture implements UpdateObserver, Future<Checksum> {
     private final Lock lock = new ReentrantLock();
     private final Condition resultAvailable = lock.newCondition();
     private final UpdateObserver delegate;
@@ -44,8 +44,7 @@ class ResultFuture implements UpdateObserver, Future<Checksum> {
     private volatile Thread executingThread;
     private boolean cancelled;
 
-    ResultFuture(final Thread pInitiallyExecutingThread, final UpdateObserver pDelegate) {
-        executingThread = pInitiallyExecutingThread;
+    ResultFuture(final UpdateObserver pDelegate) {
         delegate = pDelegate;
     }
 
