@@ -49,7 +49,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     private final DigesterPool digesterPool;
     private final ResultFuture future;
     private volatile byte numOfReSchedules;
-    private final MessageDigest digest;
+    final MessageDigest digest;
     final BaseResource<A> resource;
     final DataReader reader;
 
@@ -64,7 +64,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
         digest = pDigesterPool.get();
     }
 
-    abstract void updateDigest(MessageDigest pDigest) throws InterruptedException, IOException;
+    abstract void updateDigest() throws InterruptedException, IOException;
 
     boolean read(final Reader pReader, final Updater pUpdater) throws IOException {
         if (!currentThread().isInterrupted()) {
@@ -92,7 +92,7 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     public final Checksum call() {
         Throwable failureOrNull = null;
         try {
-            updateDigest(digest);
+            updateDigest();
         } catch (final Throwable e) {
             failureOrNull = e;
         }

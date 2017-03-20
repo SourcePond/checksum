@@ -21,7 +21,6 @@ import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
-import java.security.MessageDigest;
 
 /**
  * Updater-task which fetches its data from a {@link ReadableByteChannel} instance.
@@ -41,12 +40,12 @@ class ChannelUpdateTask extends UpdateTask<ChannelSource> {
     }
 
     @Override
-    void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
+    void updateDigest() throws InterruptedException, IOException {
         final ByteBuffer buffer = bufferPool.get();
         try {
             reader.read(() -> channel.read(buffer), readBytes -> {
                 buffer.flip();
-                pDigest.update(buffer);
+                digest.update(buffer);
                 buffer.clear();
             });
         } finally {

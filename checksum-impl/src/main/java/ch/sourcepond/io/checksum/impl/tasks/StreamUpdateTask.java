@@ -19,7 +19,6 @@ import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
 
 /**
  *
@@ -36,9 +35,9 @@ final class StreamUpdateTask extends UpdateTask<StreamSource> {
     }
 
     @Override
-    void updateDigest(final MessageDigest pDigest) throws InterruptedException, IOException {
+    void updateDigest() throws InterruptedException, IOException {
         final byte[] buffer = new byte[1024];
-        reader.read(() -> in.read(buffer), readBytes -> pDigest.update(buffer, 0, readBytes));
+        reader.read(() -> in.read(buffer), readBytes -> digest.update(buffer, 0, readBytes));
     }
 
     @Override
