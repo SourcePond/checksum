@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.concurrent.Callable;
 
+import static java.lang.Thread.currentThread;
 import static java.time.Instant.now;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -30,9 +31,24 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Base task for updating a {@link MessageDigest}.
  */
 public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
+
+    @FunctionalInterface
+    interface Reader {
+
+        int read() throws IOException;
+    }
+
+    @FunctionalInterface
+    interface Updater {
+
+        void update(int pReadBytes);
+    }
+
     private static final Logger LOG = getLogger(UpdateTask.class);
+    private static final int EOF = -1;
     private final DigesterPool digesterPool;
     private final ResultFuture future;
+    private volatile byte numOfReSchedules;
     final BaseResource<A> resource;
     final DataReader reader;
 
@@ -47,6 +63,28 @@ public abstract class UpdateTask<A> implements Closeable, Callable<Checksum> {
     }
 
     abstract void updateDigest(MessageDigest pDigest) throws InterruptedException, IOException;
+
+    boolean read(final Reader pReader, final Updater pUpdater) throws IOException {
+        if (!currentThread().isInterrupted()) {
+            final int rc;
+            int readBytes = pReader.read();
+            if (readBytes == EOF) {
+                // Increment iterations if currently no more data is available.
+                rc = numOfReSchedules++;
+            } else {
+                // If more data is available, reset iterations to zero.
+                rc = numOfReSchedules = 0;
+                pUpdater.update(readBytes);
+            }
+
+            while (!currentThread().isInterrupted() && (readBytes = pReader.read()) != -1) {
+                pUpdater.update(readBytes);
+            }
+
+            return 1 >= rc;
+        }
+        return false;
+    }
 
     @Override
     public final Checksum call() {
