@@ -24,7 +24,7 @@ import java.security.MessageDigest;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.currentThread;
+import static java.lang.Thread.interrupted;
 import static java.time.Instant.now;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -73,31 +73,36 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
 
     abstract boolean updateDigest() throws InterruptedException, IOException;
 
-    boolean read(final Reader pReader, final Updater pUpdater) throws IOException {
-        if (!currentThread().isInterrupted()) {
-            final int rc;
-            int readBytes = pReader.read();
-            if (readBytes == EOF) {
-                // Increment iterations if currently no more data is available.
-                rc = ++numOfReSchedules;
-            } else {
-                // If more data is available, reset iterations to zero.
-                rc = numOfReSchedules = 0;
-                pUpdater.update(readBytes);
-            }
-
-            while (!currentThread().isInterrupted() && (readBytes = pReader.read()) != -1) {
-                pUpdater.update(readBytes);
-            }
-
-            return 1 >= rc && delay > 0;
+    private static void checkInterrupted() throws InterruptedException {
+        if (interrupted()) {
+            throw new InterruptedException();
         }
-        return false;
+    }
+
+    boolean read(final Reader pReader, final Updater pUpdater) throws InterruptedException, IOException {
+        checkInterrupted();
+        final int rc;
+        int readBytes = pReader.read();
+        if (readBytes == EOF) {
+            // Increment iterations if currently no more data is available.
+            rc = ++numOfReSchedules;
+        } else {
+            // If more data is available, reset iterations to zero.
+            rc = numOfReSchedules = 0;
+            pUpdater.update(readBytes);
+        }
+
+        while ((readBytes = pReader.read()) != -1) {
+            checkInterrupted();
+            pUpdater.update(readBytes);
+        }
+
+        return 1 >= rc && delay > 0;
     }
 
     @Override
     public final void run() {
-        Throwable failureOrNull = null;
+        Exception failureOrNull = null;
         try {
             if (updateDigest()) {
                 // Re-schedule this task somewhen in the future and...
@@ -106,14 +111,14 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
                 // ... finish current execution at this point after reschedule
                 return;
             }
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             failureOrNull = e;
         }
 
         finalizeResult(failureOrNull);
     }
 
-    private void finalizeResult(final Throwable pFailureOrNull) {
+    private void finalizeResult(final Exception pFailureOrNull) {
         final byte[] checksum = digest.digest();
         final Checksum current;
         final Checksum previous;

@@ -22,9 +22,9 @@ import ch.sourcepond.io.checksum.api.Update;
 class UpdateImpl implements Update {
     private final Checksum previous;
     private final Checksum current;
-    private final Throwable failureOrNull;
+    private final Exception failureOrNull;
 
-    UpdateImpl(final Checksum pPrevious, final Checksum pCurrent, final Throwable pFailureOrNull) {
+    UpdateImpl(final Checksum pPrevious, final Checksum pCurrent, final Exception pFailureOrNull) {
         previous = pPrevious;
         current = pCurrent;
         failureOrNull = pFailureOrNull;

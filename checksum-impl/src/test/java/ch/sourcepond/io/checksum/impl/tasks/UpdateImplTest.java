@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 public class UpdateImplTest {
     private final Checksum previous = mock(Checksum.class);
     private final Checksum current = mock(Checksum.class);
-    private final Throwable failure = new Throwable();
+    private final Exception failure = new Exception();
     private UpdateImpl update = new UpdateImpl(previous, current, null);
 
     @Test
