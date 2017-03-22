@@ -109,26 +109,30 @@ public class ResultFuture implements UpdateObserver, Future<Checksum> {
         return result;
     }
 
+    private void waitForResult(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        Instant now = now();
+        final Instant end = now.plusNanos(unit.toNanos(timeout));
+
+        boolean withinTime = now.isBefore(end);
+        while (result == null && exception == null && (withinTime = now.isBefore(end))) {
+            resultAvailable.await(now.until(end, NANOS), NANOSECONDS);
+            now = now();
+        }
+
+        checkException();
+        if (!withinTime) {
+            throw new TimeoutException(format("Timeout after %d %s", timeout, unit));
+        }
+    }
+
     @Override
     public Checksum get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         checkException();
         if (result == null) {
-            Instant now = now();
-            final Instant end = now.plusNanos(unit.toNanos(timeout));
-
             lock.lock();
             try {
                 if (result == null) {
-                    boolean withinTime = now.isBefore(end);
-                    while (result == null && exception == null && (withinTime = now.isBefore(end))) {
-                        resultAvailable.await(now.until(end, NANOS), NANOSECONDS);
-                        now = now();
-                    }
-
-                    checkException();
-                    if (!withinTime) {
-                        throw new TimeoutException(format("Timeout after %d %s", timeout, unit));
-                    }
+                    waitForResult(timeout, unit);
                 }
             } finally {
                 lock.unlock();
