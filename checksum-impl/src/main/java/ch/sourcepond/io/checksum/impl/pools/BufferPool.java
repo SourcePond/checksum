@@ -15,17 +15,16 @@ package ch.sourcepond.io.checksum.impl.pools;
 
 import java.nio.ByteBuffer;
 
+import static java.nio.ByteBuffer.allocateDirect;
+
 /**
  * Pool of direct {@link ByteBuffer} instances.
  */
 public class BufferPool extends BasePool<ByteBuffer> {
 
-    public BufferPool() {
-    }
-
     @Override
     ByteBuffer newPooledObject() {
-        return ByteBuffer.allocateDirect(8192);
+        return allocateDirect(8192);
     }
 
     @Override
