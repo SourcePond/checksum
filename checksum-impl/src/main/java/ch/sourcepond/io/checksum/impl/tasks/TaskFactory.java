@@ -48,11 +48,11 @@ public class TaskFactory {
         return new ResultFuture(pObserver);
     }
 
-    public <S> Runnable newChannelTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
+    public Runnable newChannelTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
         return new ChannelUpdateTask(executor, digesterPool, pResult, pResource, bufferPool, pUnit, pInterval);
     }
 
-    public <S> Runnable newStreamTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
+    public Runnable newStreamTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
         return new StreamUpdateTask(executor, digesterPool, pResult, pResource, pUnit, pInterval);
     }
 }
