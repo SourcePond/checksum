@@ -10,9 +10,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -25,6 +25,7 @@ public abstract class UpdateTaskTest<A> {
     private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
     final BaseResource<A> resource = mock(BaseResource.class);
     private final UpdateObserver observer = mock(UpdateObserver.class);
+    private final CountDownLatch latch = new CountDownLatch(1);
     final ResultFuture future = new ResultFuture(observer);
     final ScheduledExecutorService executor = newScheduledThreadPool(1);
     final DigesterPool digesterPool = mock(DigesterPool.class);
@@ -41,12 +42,13 @@ public abstract class UpdateTaskTest<A> {
         when(digesterPool.get()).thenReturn(digest);
         doAnswer(invocationOnMock -> {
                     checksum = invocationOnMock.getArgument(0);
+                    latch.countDown();
                     return null;
                 }
         ).when(resource).setCurrent(any());
         task = newTask();
         executor.execute(task);
-        sleep(5000);
+        latch.await();
     }
 
     @After
@@ -54,7 +56,7 @@ public abstract class UpdateTaskTest<A> {
         executor.shutdown();
     }
 
-    @Test(timeout = 6000)
+    @Test(timeout = 5000)
     public void verifyDigest() throws Exception {
         assertEquals(EXPECTED_SHA_256_HASH, checksum.getHexValue());
     }
