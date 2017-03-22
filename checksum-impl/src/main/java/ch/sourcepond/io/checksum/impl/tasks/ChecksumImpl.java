@@ -50,12 +50,13 @@ final class ChecksumImpl implements Checksum {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        final ChecksumImpl checksum = (ChecksumImpl) o;
-
-        return hexValue.equals(checksum.hexValue);
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return hexValue.equals(((ChecksumImpl) o).hexValue);
     }
 
     @Override
