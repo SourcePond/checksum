@@ -2,6 +2,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="checksum-feature">
     <repository>mvn:ch.sourcepond.commons/smartswitch-feature/${smartswitch.version}/xml/features</repository>
     <feature name="checksum-feature" description="checksum-feature">
+        <feature prerequisite="true">scr</feature>
         <feature prerequisite="true">smartswitch-feature</feature>
     </feature>
 </features>
