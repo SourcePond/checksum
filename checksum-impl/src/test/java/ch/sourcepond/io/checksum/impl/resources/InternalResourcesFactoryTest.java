@@ -37,6 +37,7 @@ import static org.mockito.Mockito.*;
  */
 @SuppressWarnings({"unchecked", "FieldCanBeLocal"})
 public class InternalResourcesFactoryTest {
+    private final ScheduledExecutorService updateExecutor = mock(ScheduledExecutorService.class);
     private final Runnable task = mock(Runnable.class);
     private final ResultFuture result = mock(ResultFuture.class);
     private final TaskFactory taskFactory = mock(TaskFactory.class);
@@ -56,35 +57,35 @@ public class InternalResourcesFactoryTest {
         when(taskFactory.newChannelTask(same(result), same(digesterPool), notNull(), same(MILLISECONDS),same(0L))).thenReturn(task);
         when(taskFactory.newStreamTask(same(result), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
         factory = new InternalResourcesFactory(taskFactory);
-        factory.updateExecutor = mock(ScheduledExecutorService.class);
+        factory.setUpdateExecutor(updateExecutor);
     }
 
     @Test
     public void newChannelResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, channelSource);
         res.update(observer);
-        verify(factory.updateExecutor).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
     @Test
     public void newStreamResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, streamSource);
         res.update(observer);
-        verify(factory.updateExecutor).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
     @Test
     public void newPathResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, path);
         res.update(observer);
-        verify(factory.updateExecutor).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
     @Test
     public void newUrlResource() throws IOException  {
         final Resource res = factory.newResource(digesterPool, url);
         res.update(observer);
-        verify(factory.updateExecutor).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
 }

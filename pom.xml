@@ -15,7 +15,7 @@
     <parent>
         <groupId>ch.sourcepond</groupId>
         <artifactId>bundle</artifactId>
-        <version>0.7.5</version>
+        <version>0.7.7</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,7 +30,7 @@
 
     <properties>
         <repo.project>${project.artifactId}</repo.project>
-        <smartswitch.version>3.0.0</smartswitch.version>
+        <smartswitch.version>4.0.1</smartswitch.version>
     </properties>
 
     <modules>

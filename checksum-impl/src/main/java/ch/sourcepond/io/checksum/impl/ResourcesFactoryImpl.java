@@ -13,16 +13,24 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
+import ch.sourcepond.commons.smartswitch.api.SmartSwitchBuilderFactory;
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPoolRegistry;
 import ch.sourcepond.io.checksum.impl.resources.InternalResourcesFactory;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
  *
  */
+@Component
 public final class ResourcesFactoryImpl implements ResourcesFactory {
     private final InternalResourcesFactory internalResourcesFactory;
     private final DigesterPoolRegistry digesterPoolRegistry;
@@ -38,10 +46,12 @@ public final class ResourcesFactoryImpl implements ResourcesFactory {
         digesterPoolRegistry = pDigesterPoolRegistry;
     }
 
-    // Used by Felix DM to determine where to inject
-    // service references
-    public Object[] getComposition() {
-        return new Object[] { internalResourcesFactory, internalResourcesFactory.getTaskFactory() };
+    @Reference
+    public void initExecutor(final SmartSwitchBuilderFactory pFactory) {
+        final ScheduledExecutorService executor = pFactory.newBuilder(ScheduledExecutorService.class).setFilter("(sourcepond.io.checksum.updateexecutor=*)").
+                setShutdownHook(ExecutorService::shutdown).
+                build(() -> newScheduledThreadPool(4));
+        internalResourcesFactory.setUpdateExecutor(executor);
     }
 
     @Override

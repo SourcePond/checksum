@@ -30,13 +30,14 @@ public class TaskFactoryTest {
     private final ResultFuture result = mock(ResultFuture.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final BufferPool bufferPool = mock(BufferPool.class);
-    private final TaskFactory factory = new TaskFactory(executor, bufferPool);
+    private final TaskFactory factory = new TaskFactory(bufferPool);
     private final UpdateObserver observer = mock(UpdateObserver.class);
     private URL anyUrl;
 
     @Before
     public void setup() throws Exception {
         anyUrl = new URL("file:///any/path");
+        factory.setUpdateExecutor(executor);
     }
 
     private void assertNotSame(final Runnable first, final Runnable second) {

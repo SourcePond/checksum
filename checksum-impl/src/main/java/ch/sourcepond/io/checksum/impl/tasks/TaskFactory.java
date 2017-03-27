@@ -31,7 +31,7 @@ public class TaskFactory {
     private final BufferPool bufferPool;
 
     // Injected by Felix DM
-    private volatile ScheduledExecutorService executor;
+    private ScheduledExecutorService updateExecutor;
 
     // Constructor used by BundleActivator
     public TaskFactory() {
@@ -39,9 +39,12 @@ public class TaskFactory {
     }
 
     // Constructor used for testing
-    public TaskFactory(final ScheduledExecutorService pExecutor, final BufferPool pBufferPool) {
-        executor = pExecutor;
+    public TaskFactory(final BufferPool pBufferPool) {
         bufferPool = pBufferPool;
+    }
+
+    public void setUpdateExecutor(final ScheduledExecutorService pUpdateExecutor) {
+        updateExecutor = pUpdateExecutor;
     }
 
     public ResultFuture newResult(final UpdateObserver pObserver) {
@@ -49,10 +52,10 @@ public class TaskFactory {
     }
 
     public Runnable newChannelTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new ChannelUpdateTask(executor, digesterPool, pResult, pResource, bufferPool, pUnit, pInterval);
+        return new ChannelUpdateTask(updateExecutor, digesterPool, pResult, pResource, bufferPool, pUnit, pInterval);
     }
 
     public Runnable newStreamTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new StreamUpdateTask(executor, digesterPool, pResult, pResource, pUnit, pInterval);
+        return new StreamUpdateTask(updateExecutor, digesterPool, pResult, pResource, pUnit, pInterval);
     }
 }

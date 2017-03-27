@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ch.sourcepond</groupId>
 		<artifactId>bundle-test</artifactId>
-		<version>0.7.5</version>
+		<version>0.7.7</version>
 		<relativePath />
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -19,16 +19,9 @@
 
 	<properties>
 		<repo.project>checksum</repo.project>
-		<smartswitch.version>3.0.0</smartswitch.version>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<scope>test</scope>
-			<groupId>ch.sourcepond.commons</groupId>
-			<artifactId>smartswitch-lib</artifactId>
-			<version>${smartswitch.version}</version>
-		</dependency>
 		<dependency>
 			<scope>runtime</scope>
 			<type>xml</type>
@@ -42,6 +35,14 @@
 			<groupId>org.apache.karaf</groupId>
 			<artifactId>apache-karaf</artifactId>
 			<type>tar.gz</type>
+			<version>${karaf.version}</version>
+		</dependency>
+		<dependency>
+			<scope>runtime</scope>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>standard</artifactId>
+			<classifier>features</classifier>
+			<type>xml</type>
 			<version>${karaf.version}</version>
 		</dependency>
 		<dependency>
@@ -67,12 +68,6 @@
 			<scope>test</scope>
 			<groupId>ch.sourcepond.io</groupId>
 			<artifactId>checksum-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<scope>test</scope>
-			<groupId>ch.sourcepond.io</groupId>
-			<artifactId>checksum-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

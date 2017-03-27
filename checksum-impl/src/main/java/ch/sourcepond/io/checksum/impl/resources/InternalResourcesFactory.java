@@ -29,8 +29,8 @@ import java.util.concurrent.ScheduledExecutorService;
 public class InternalResourcesFactory {
     private final TaskFactory taskFactory;
 
-    // Service dependency injected by Felix DM
-    volatile ScheduledExecutorService updateExecutor;
+    // Service dependency injected by DS
+    private ScheduledExecutorService updateExecutor;
 
     // Constructor used by BundleActivator
     public InternalResourcesFactory() {
@@ -42,9 +42,9 @@ public class InternalResourcesFactory {
         taskFactory = pTaskFactory;
     }
 
-    // Used by Felix DM
-    public TaskFactory getTaskFactory() {
-        return taskFactory;
+    public void setUpdateExecutor(final ScheduledExecutorService pUpdateExecutor) {
+        updateExecutor = pUpdateExecutor;
+        taskFactory.setUpdateExecutor(pUpdateExecutor);
     }
 
     public Resource newResource(final DigesterPool pDigesterPool, final ChannelSource pSource) {
