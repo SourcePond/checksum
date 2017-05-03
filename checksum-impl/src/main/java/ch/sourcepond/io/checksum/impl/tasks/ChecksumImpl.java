@@ -17,6 +17,8 @@ import ch.sourcepond.io.checksum.api.Checksum;
 
 import java.time.Instant;
 
+import static java.lang.System.arraycopy;
+
 /**
  * Default implementation of the {@link Checksum} interface.
  */
@@ -67,7 +69,7 @@ final class ChecksumImpl implements Checksum {
     @Override
     public byte[] toByteArray() {
         final byte[] copy = new byte[value.length];
-        System.arraycopy(value, 0, copy, 0, copy.length);
+        arraycopy(value, 0, copy, 0, copy.length);
         return value;
     }
 

@@ -16,6 +16,8 @@ package ch.sourcepond.io.checksum.impl.tasks;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Update;
 
+import static java.lang.String.format;
+
 /**
  *
  */
@@ -48,5 +50,15 @@ class UpdateImpl implements Update {
     @Override
     public boolean hasChanged() {
         return failureOrNull == null && !previous.equals(current);
+    }
+
+    public String toString() {
+        final String s;
+        if (failureOrNull == null) {
+            s = format("Update[previous: %s, current: %s]", previous, current);
+        } else {
+            s = format("Update[previous: %s, current: %s, failure: %s]", previous, current, failureOrNull.getMessage());
+        }
+        return s;
     }
 }

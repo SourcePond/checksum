@@ -18,14 +18,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 /**
  *
  */
 public class UpdateImplTest {
-    private final Checksum previous = mock(Checksum.class);
-    private final Checksum current = mock(Checksum.class);
-    private final Exception failure = new Exception();
+    private final Checksum previous = mock(Checksum.class, withSettings().name("previousHexValue"));
+    private final Checksum current = mock(Checksum.class, withSettings().name("currentHexValue"));
+    private final Exception failure = new Exception("someFailure");
     private UpdateImpl update = new UpdateImpl(previous, current, null);
 
     @Test
@@ -53,5 +54,12 @@ public class UpdateImplTest {
         assertTrue(update.hasChanged());
         update = new UpdateImpl(previous, current, failure);
         assertFalse(update.hasChanged());
+    }
+
+    @Test
+    public void verifyToString() {
+        assertEquals("Update[previous: previousHexValue, current: currentHexValue]", update.toString());
+        update = new UpdateImpl(previous, current, failure);
+        assertEquals("Update[previous: previousHexValue, current: currentHexValue, failure: someFailure]", update.toString());
     }
 }
