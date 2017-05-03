@@ -1,9 +1,9 @@
 package ch.sourcepond.io.checksum;
 
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.ResourcesFactory;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +14,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 
 import javax.inject.Inject;
 import java.io.*;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static ch.sourcepond.testing.OptionsHelper.karafContainer;
 import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.StandardOpenOption.APPEND;
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
@@ -67,7 +67,7 @@ public class ResourcesTest {
     }
 
     private void appendToTestFile() throws IOException {
-        try (final BufferedWriter writer = newBufferedWriter(testfile.toPath(), StandardOpenOption.APPEND)) {
+        try (final BufferedWriter writer = newBufferedWriter(testfile.toPath(), APPEND)) {
             writer.write(FIRST_EXPECTED_SHA_256_HASH);
         }
     }

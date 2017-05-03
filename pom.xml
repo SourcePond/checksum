@@ -33,6 +33,7 @@
         <smartswitch.version>4.0.1</smartswitch.version>
     </properties>
 
+
     <modules>
         <module>checksum-api</module>
         <module>checksum-impl</module>

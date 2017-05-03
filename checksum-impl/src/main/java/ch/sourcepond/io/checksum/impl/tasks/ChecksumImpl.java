@@ -17,6 +17,7 @@ import ch.sourcepond.io.checksum.api.Checksum;
 
 import java.time.Instant;
 
+import static java.lang.String.format;
 import static java.lang.System.arraycopy;
 
 /**
@@ -80,6 +81,6 @@ final class ChecksumImpl implements Checksum {
 
     @Override
     public String toString() {
-        return getHexValue();
+        return format("Checksum[hexValue: %s, timestamp: %s]", hexValue, timestamp.toEpochMilli());
     }
 }
