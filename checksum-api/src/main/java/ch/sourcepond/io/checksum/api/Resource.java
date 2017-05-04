@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
-import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -42,23 +41,21 @@ public interface Resource {
      * Short-hand method for {@code update(0, TimeUnit.MILLISECONDS)}.
      *
      * @return Returns a future representing the newly calculated checksum object, never {@code null}
-     * @throws IOException Thrown, if the resource could not be opened for reading.
      * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
      *                                    submitted.
      */
-    Future<Checksum> update(UpdateObserver pObserver) throws IOException;
+    Future<Checksum> update(UpdateObserver pObserver);
 
     /**
      * Short-hand method for {@code update(long, TimeUnit.MILLISECONDS)}.
      *
      * @param pIntervalInMilliseconds Time to wait in milliseconds.
      * @return Returns a future representing the newly calculated checksum object, never {@code null}
-     * @throws IOException Thrown, if the resource could not be opened for reading.
      * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
      *                                    submitted.
      * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
-    Future<Checksum> update(long pIntervalInMilliseconds, UpdateObserver pObserver) throws IOException;
+    Future<Checksum> update(long pIntervalInMilliseconds, UpdateObserver pObserver);
 
     /**
      * <p>
@@ -83,11 +80,10 @@ public interface Resource {
      *                  currently no more data is available. Must not be negative, 0
      *                  indicates no wait.
      * @return Returns a future representing the newly calculated checksum object, never {@code null}
-     * @throws IOException Thrown, if the resource could not be opened for reading.
      * @throws RejectedExecutionException Thrown, if the asynchronous update task could not be
      *                                    submitted.
      * @throws NullPointerException       Thrown, if the time-unit specified is {@code null}
      * @throws IllegalArgumentException   Thrown, if the interval specified is negative.
      */
-    Future<Checksum> update(TimeUnit pUnit, long pInterval, UpdateObserver pObserver) throws IOException;
+    Future<Checksum> update(TimeUnit pUnit, long pInterval, UpdateObserver pObserver);
 }

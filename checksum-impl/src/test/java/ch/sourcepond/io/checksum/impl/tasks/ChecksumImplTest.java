@@ -54,7 +54,7 @@ public class ChecksumImplTest {
 
     @Test
     public void verifyToString() {
-        assertEquals("Checksum[hexValue: b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336, " +
+        assertEquals("ChecksumImpl[hexValue: b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336, " +
                 "timestamp: " + timestamp.toEpochMilli() + "]", checksum.toString());
     }
 }

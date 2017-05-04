@@ -14,6 +14,7 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.slf4j.Logger;
@@ -58,20 +59,24 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
 
     UpdateTask(final ScheduledExecutorService pExecutor,
                final DigesterPool pDigesterPool,
-               final ResultFuture pFuture,
+               final UpdateObserver pObserver,
                final BaseResource<A> pResource,
                final TimeUnit pUnit,
-               final long pInterval) {
+               final long pDelay) {
         executor = pExecutor;
         digesterPool = pDigesterPool;
-        future = pFuture;
+        future = new ResultFuture(pObserver);
         resource = pResource;
         digest = pDigesterPool.get();
         unit = pUnit;
-        delay = pInterval;
+        delay = pDelay;
     }
 
     abstract boolean updateDigest() throws InterruptedException, IOException;
+
+    public ResultFuture getFuture() {
+        return future;
+    }
 
     private static void checkInterrupted() throws InterruptedException {
         if (interrupted()) {
@@ -123,19 +128,19 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
         final Checksum current;
         final Checksum previous;
 
-        // Mutex on resource, getCurrent and setCurrent
-        // must be synchronized externally.
-        synchronized (resource) {
-            previous = resource.getCurrent();
-            if (pFailureOrNull == null) {
-                current = new ChecksumImpl(now(), checksum);
-                resource.setCurrent(current);
-            } else {
-                current = previous;
-            }
-        }
-
         try {
+            // Mutex on resource, getCurrent and setCurrent
+            // must be synchronized externally.
+            synchronized (resource) {
+                previous = resource.getCurrent();
+                if (pFailureOrNull == null) {
+                    current = new ChecksumImpl(now(), checksum);
+                    resource.setCurrent(current);
+                } else {
+                    current = previous;
+                }
+            }
+
             future.done(new UpdateImpl(previous, current, pFailureOrNull));
         } finally {
             try {

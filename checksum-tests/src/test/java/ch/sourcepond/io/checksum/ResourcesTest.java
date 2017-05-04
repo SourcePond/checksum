@@ -100,7 +100,7 @@ public class ResourcesTest {
         assertEquals(4, observerChecksums.size());
         observerChecksums.sort(Comparator.comparing(Checksum::getTimestamp));
 
-        assertEquals("", observerChecksums.get(0).getHexValue());
+        assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(0).getHexValue());
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(1).getHexValue());
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(2).getHexValue());
         assertEquals(SECOND_EXPECTED_SHA_256_HASH, observerChecksums.get(3).getHexValue());

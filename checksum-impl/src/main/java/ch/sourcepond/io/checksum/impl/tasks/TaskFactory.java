@@ -47,15 +47,29 @@ public class TaskFactory {
         updateExecutor = pUpdateExecutor;
     }
 
+    public ResultFuture newInitialResult() {
+        return null;
+    }
+
+
     public ResultFuture newResult(final UpdateObserver pObserver) {
         return new ResultFuture(pObserver);
     }
 
-    public Runnable newChannelTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<ChannelSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new ChannelUpdateTask(updateExecutor, digesterPool, pResult, pResource, bufferPool, pUnit, pInterval);
+    public UpdateTask<ChannelSource> newChannelTask(final UpdateObserver pObserver,
+                                                    final DigesterPool digesterPool,
+                                                    final BaseResource<ChannelSource> pResource,
+                                                    final TimeUnit pUnit, final long pInterval)
+            throws IOException {
+        return new ChannelUpdateTask(updateExecutor, digesterPool, pObserver, pResource, bufferPool, pUnit, pInterval);
     }
 
-    public Runnable newStreamTask(final ResultFuture pResult, final DigesterPool digesterPool, final BaseResource<StreamSource> pResource, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return new StreamUpdateTask(updateExecutor, digesterPool, pResult, pResource, pUnit, pInterval);
+    public UpdateTask<StreamSource> newStreamTask(final UpdateObserver pObserver,
+                                                  final DigesterPool digesterPool,
+                                                  final BaseResource<StreamSource> pResource,
+                                                  final TimeUnit pUnit,
+                                                  final long pInterval)
+            throws IOException {
+        return new StreamUpdateTask(updateExecutor, digesterPool, pObserver, pResource, pUnit, pInterval);
     }
 }

@@ -15,14 +15,18 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
+import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
+import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import static ch.sourcepond.io.checksum.impl.resources.ResourceNotAvailable.RESOURCE_NOT_AVAILABLE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Abstract base implementation of the {@link Resource} interface.
@@ -31,31 +35,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  *            {@link ChannelSource} or {@link StreamSource}.
  */
 public abstract class BaseResource<A> implements Resource {
-
-    private static class DefaultChecksum implements Checksum {
-        private static final byte[] ARR = new byte[0];
-
-        @Override
-        public Instant getTimestamp() {
-            return Instant.MIN;
-        }
-
-        @Override
-        public byte[] toByteArray() {
-            return ARR;
-        }
-
-        @Override
-        public String getHexValue() {
-            return "";
-        }
-    }
-
+    private static final Logger LOG = getLogger(BaseResource.class);
     final ScheduledExecutorService updateExecutor;
     private final A source;
     final DigesterPool digesterPool;
     final TaskFactory taskFactory;
-    private Checksum current = new DefaultChecksum();
+    private Checksum current;
 
     BaseResource(final ScheduledExecutorService pUpdateExecutor,
                  final A pSource,
@@ -77,23 +62,35 @@ public abstract class BaseResource<A> implements Resource {
     }
 
     @Override
-    public final Future<Checksum> update(final UpdateObserver pObserver) throws IOException  {
+    public final Future<Checksum> update(final UpdateObserver pObserver) {
         return update(0L, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) throws IOException  {
+    public final Future<Checksum> update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) {
         return update(MILLISECONDS, pIntervalInMilliseconds, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) throws IOException {
-        final ResultFuture result = taskFactory.newResult(pObserver);
-        updateExecutor.execute(newUpdateTask(result, pUnit, pInterval));
+    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
+        Future<Checksum> result;
+        try {
+            final UpdateTask<A> task = newUpdateTask(pObserver, pUnit, pInterval);
+            updateExecutor.execute(task);
+            result = task.getFuture();
+        } catch (final IOException e) {
+            LOG.warn(e.getMessage(), e);
+            result = RESOURCE_NOT_AVAILABLE;
+        }
         return result;
     }
 
-    abstract Runnable newUpdateTask(ResultFuture pResult, TimeUnit pUnit, long pInterval) throws IOException;
+    abstract UpdateTask<A> newUpdateTask(UpdateObserver pObserver, TimeUnit pUnit, long pInterval) throws IOException;
+
+    synchronized Resource initialUpdate() {
+        setCurrent(new InitialChecksum(update(u -> {})));
+        return this;
+    }
 
     // Not thread-safe; must be synchronized externally
     public Checksum getCurrent() {

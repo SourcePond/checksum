@@ -14,16 +14,16 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.impl.BaseChecksum;
 
 import java.time.Instant;
 
-import static java.lang.String.format;
 import static java.lang.System.arraycopy;
 
 /**
  * Default implementation of the {@link Checksum} interface.
  */
-final class ChecksumImpl implements Checksum {
+final class ChecksumImpl extends BaseChecksum {
     private final Instant timestamp;
     private final byte[] value;
     private final String hexValue;
@@ -52,22 +52,6 @@ final class ChecksumImpl implements Checksum {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        return hexValue.equals(((ChecksumImpl) o).hexValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return hexValue.hashCode();
-    }
-
-    @Override
     public byte[] toByteArray() {
         final byte[] copy = new byte[value.length];
         arraycopy(value, 0, copy, 0, copy.length);
@@ -77,10 +61,5 @@ final class ChecksumImpl implements Checksum {
     @Override
     public String getHexValue() {
         return hexValue;
-    }
-
-    @Override
-    public String toString() {
-        return format("Checksum[hexValue: %s, timestamp: %s]", hexValue, timestamp.toEpochMilli());
     }
 }

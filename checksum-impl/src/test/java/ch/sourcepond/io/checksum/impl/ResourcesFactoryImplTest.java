@@ -22,6 +22,7 @@ import ch.sourcepond.io.checksum.impl.resources.InternalResourcesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -53,25 +54,25 @@ public class ResourcesFactoryImplTest {
     }
 
     @Test
-    public void newChannelResource() {
+    public void newChannelResource() throws IOException {
         when(internalResourcesFactory.newResource(digesterPool, channelSource)).thenReturn(resource);
         assertSame(resource, factory.create(SHA256, channelSource));
     }
 
     @Test
-    public void newPathResource() {
+    public void newPathResource() throws IOException {
         when(internalResourcesFactory.newResource(digesterPool, path)).thenReturn(resource);
         assertSame(resource, factory.create(SHA256, path));
     }
 
     @Test
-    public void newStreamResource() {
+    public void newStreamResource() throws IOException {
         when(internalResourcesFactory.newResource(digesterPool, streamSource)).thenReturn(resource);
         assertSame(resource, factory.create(SHA256, streamSource));
     }
 
     @Test
-    public void newURLResource() {
+    public void newURLResource() throws IOException {
         when(internalResourcesFactory.newResource(digesterPool, url)).thenReturn(resource);
         assertSame(resource, factory.create(SHA256, url));
     }

@@ -14,9 +14,10 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
+import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +36,7 @@ class ChannelResource extends BaseResource<ChannelSource> {
     }
 
     @Override
-    Runnable newUpdateTask(final ResultFuture pResult, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return taskFactory.newChannelTask(pResult, digesterPool, this, pUnit, pInterval);
+    UpdateTask<ChannelSource> newUpdateTask(final UpdateObserver pObserver, final TimeUnit pUnit, final long pInterval) throws IOException {
+        return taskFactory.newChannelTask(pObserver, digesterPool, this, pUnit, pInterval);
     }
 }

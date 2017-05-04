@@ -52,7 +52,7 @@ public class InternalResourcesFactory {
                 updateExecutor,
                 pSource,
                 pDigesterPool,
-                taskFactory);
+                taskFactory).initialUpdate();
     }
 
     public Resource newResource(final DigesterPool pDigesterPool, final Path pSource) {
@@ -60,7 +60,7 @@ public class InternalResourcesFactory {
                 updateExecutor,
                 new FileChannelSource(pSource),
                 pDigesterPool,
-                taskFactory);
+                taskFactory).initialUpdate();
     }
 
     public Resource newResource(final DigesterPool pDigesterPool, final StreamSource pSource) {
@@ -68,7 +68,7 @@ public class InternalResourcesFactory {
                 updateExecutor,
                 pSource,
                 pDigesterPool,
-                taskFactory);
+                taskFactory).initialUpdate();
     }
 
     public Resource newResource(final DigesterPool pDigesterPool, final URL pSource) {
@@ -76,6 +76,6 @@ public class InternalResourcesFactory {
                 updateExecutor,
                 new URLStreamSource(pSource),
                 pDigesterPool,
-                taskFactory);
+                taskFactory).initialUpdate();
     }
 }

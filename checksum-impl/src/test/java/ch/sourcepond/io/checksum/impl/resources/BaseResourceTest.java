@@ -17,6 +17,7 @@ import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
+import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,15 +26,15 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  *
  */
 @SuppressWarnings("unchecked")
 public abstract class BaseResourceTest<A> {
-    final Runnable updateTask = mock(Runnable.class);
+    final UpdateTask<A> initialUpdateTask = mock(UpdateTask.class);
+    final UpdateTask<A> updateTask = mock(UpdateTask.class);
     final ScheduledExecutorService updateExecutor = mock(ScheduledExecutorService.class);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     final TaskFactory taskFactory = mock(TaskFactory.class);
@@ -43,10 +44,17 @@ public abstract class BaseResourceTest<A> {
     BaseResource<A> resource;
 
     @Before
-    public void setup() {
-        when(taskFactory.newResult(observer)).thenReturn(future);
+    public void setup() throws IOException {
+        when(updateTask.getFuture()).thenReturn(future);
         when(digesterPool.getAlgorithm()).thenReturn(SHA256);
     }
+
+    @Test
+    public void initialUpdate() throws IOException {
+        verify(updateExecutor).execute(initialUpdateTask);
+    }
+
+    public abstract void updateIOExceptionOccurred() throws IOException;
 
     @Test
     public void getAlgorithm() {
