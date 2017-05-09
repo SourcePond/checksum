@@ -92,8 +92,7 @@ public abstract class BaseResource<A> implements Resource {
         return this;
     }
 
-    // Not thread-safe; must be synchronized externally
-    public Checksum getCurrent() {
+    public synchronized Checksum getCurrent() {
         return current;
     }
 

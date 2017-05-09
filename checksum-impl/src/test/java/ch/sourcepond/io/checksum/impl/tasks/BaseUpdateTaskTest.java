@@ -59,6 +59,7 @@ public class BaseUpdateTaskTest {
     }
 
     private static final byte[] ANY_DATA = new byte[0];
+    private final Checksum initialChecksum = mock(Checksum.class);
     private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final MessageDigest digest = mock(MessageDigest.class);
@@ -80,6 +81,7 @@ public class BaseUpdateTaskTest {
     public void setup() {
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
+        when(resource.getCurrent()).thenReturn(initialChecksum);
         task = new TestUpdateTask(executor, digesterPool, future, resource, SECONDS, 1);
     }
 
@@ -104,7 +106,7 @@ public class BaseUpdateTaskTest {
         order.verify(digest).update(ANY_DATA);
         order.verify(digest).digest();
         order.verify(resource).setCurrent(matchCurrent());
-        order.verify(future).done(argThat(u -> checksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
+        order.verify(future).done(argThat(u -> initialChecksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
         order.verify(digesterPool).release(digest);
         verifyZeroInteractions(executor);
         assertTrue(task.closed);

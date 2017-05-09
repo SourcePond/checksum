@@ -54,6 +54,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
     private volatile byte numOfReSchedules;
     final MessageDigest digest;
     final BaseResource<A> resource;
+    private final Checksum previous;
     private final TimeUnit unit;
     private final long delay;
 
@@ -70,6 +71,10 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
         digest = pDigesterPool.get();
         unit = pUnit;
         delay = pDelay;
+
+        // It's important to keep the previous value over
+        // all following executions of this task.
+        previous = pResource.getCurrent();
     }
 
     abstract boolean updateDigest() throws InterruptedException, IOException;
@@ -126,13 +131,11 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
     private void finalizeResult(final Exception pFailureOrNull) {
         final byte[] checksum = digest.digest();
         final Checksum current;
-        final Checksum previous;
 
         try {
             // Mutex on resource, getCurrent and setCurrent
             // must be synchronized externally.
             synchronized (resource) {
-                previous = resource.getCurrent();
                 if (pFailureOrNull == null) {
                     current = new ChecksumImpl(now(), checksum);
                     resource.setCurrent(current);
