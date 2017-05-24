@@ -10,6 +10,7 @@
     <packaging>bundle</packaging>
     <description>Provides an implementation for the checksum-api bundle.</description>
 
+    
     <dependencies>
         <dependency>
             <groupId>ch.sourcepond.io</groupId>

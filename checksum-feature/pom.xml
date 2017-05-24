@@ -11,6 +11,7 @@
     <artifactId>checksum-feature</artifactId>
     <packaging>feature</packaging>
 
+
     <dependencies>
         <dependency>
             <scope>provided</scope>

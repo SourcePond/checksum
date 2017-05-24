@@ -17,6 +17,7 @@
 		OSGi integration tests for checksum-impl.
 	</description>
 
+
 	<properties>
 		<repo.project>checksum</repo.project>
 	</properties>
