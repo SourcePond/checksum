@@ -30,7 +30,7 @@
 
     <properties>
         <repo.project>${project.artifactId}</repo.project>
-        <smartswitch.version>4.0.1</smartswitch.version>
+        <smartswitch.version>4.0.2</smartswitch.version>
     </properties>
 
     <modules>
