@@ -60,8 +60,8 @@ public class InternalResourcesFactoryTest {
         path = FileSystems.getDefault().getPath("src", "test", "resources", "testfile_01.txt");
         url = getClass().getResource("/testfile_01.txt");
         when(task.getFuture()).thenReturn(result);
-        when(taskFactory.newChannelTask(notNull(), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
-        when(taskFactory.newStreamTask(notNull(), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
+        when(taskFactory.newChannelTask(same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
+        when(taskFactory.newStreamTask(same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
         factory = new InternalResourcesFactory(taskFactory);
         factory.setUpdateExecutor(updateExecutor);
     }

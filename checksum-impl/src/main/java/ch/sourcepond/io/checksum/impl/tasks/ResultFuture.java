@@ -18,6 +18,8 @@ import ch.sourcepond.io.checksum.api.Update;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -38,14 +40,24 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 public class ResultFuture implements UpdateObserver, Future<Checksum> {
     private final Lock lock = new ReentrantLock();
     private final Condition resultAvailable = lock.newCondition();
-    private final UpdateObserver delegate;
+    private final Collection<UpdateObserver> observers = new LinkedList<>();
     private volatile Checksum result;
     private volatile ExecutionException exception;
     private volatile Thread executingThread;
+    private volatile Update update;
     private boolean cancelled;
 
-    ResultFuture(final UpdateObserver pDelegate) {
-        delegate = pDelegate;
+    public void addObserver(final UpdateObserver pObserver) {
+        lock.lock();
+        try {
+            if (!unsafeIsDone()) {
+                observers.add(pObserver);
+            } else {
+                pObserver.done(update);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -75,11 +87,15 @@ public class ResultFuture implements UpdateObserver, Future<Checksum> {
         }
     }
 
+    private boolean unsafeIsDone() {
+        return result != null || exception != null || cancelled;
+    }
+
     @Override
     public boolean isDone() {
         lock.lock();
         try {
-            return result != null || exception != null || cancelled;
+            return unsafeIsDone();
         } finally {
             lock.unlock();
         }
@@ -143,11 +159,10 @@ public class ResultFuture implements UpdateObserver, Future<Checksum> {
 
     @Override
     public void done(final Update pUpdate) {
-        // Inform delegate before lock is aquired
-        delegate.done(pUpdate);
-
         lock.lock();
         try {
+            observers.forEach(o -> o.done(pUpdate));
+
             if (pUpdate.getFailureOrNull() != null) {
                 exception = new ExecutionException(pUpdate.getFailureOrNull());
             } else {

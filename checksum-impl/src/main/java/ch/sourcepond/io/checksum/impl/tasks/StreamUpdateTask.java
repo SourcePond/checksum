@@ -31,11 +31,10 @@ final class StreamUpdateTask extends UpdateTask<StreamSource> {
 
     StreamUpdateTask(final ScheduledExecutorService pExecutor,
                      final DigesterPool pDigesterPool,
-                     final UpdateObserver pObserver,
                      final BaseResource<StreamSource> pResource,
                      final TimeUnit pUnit,
                      final long pDelay) throws IOException {
-        super(pExecutor, pDigesterPool, pObserver, pResource, pUnit, pDelay);
+        super(pExecutor, new ResultFuture(), pDigesterPool, pResource, pUnit, pDelay);
         in = pResource.getSource().openStream();
     }
 

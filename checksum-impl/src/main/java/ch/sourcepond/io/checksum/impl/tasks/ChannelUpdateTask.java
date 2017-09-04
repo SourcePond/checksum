@@ -34,12 +34,11 @@ class ChannelUpdateTask extends UpdateTask<ChannelSource> {
 
     ChannelUpdateTask(final ScheduledExecutorService pExecutor,
                       final DigesterPool pDigesterPool,
-                      final UpdateObserver pObserver,
                       final BaseResource<ChannelSource> pResource,
                       final BufferPool pBufferPool,
                       final TimeUnit pUnit,
                       final long pDelay) throws IOException {
-        super(pExecutor, pDigesterPool, pObserver, pResource, pUnit, pDelay);
+        super(pExecutor, new ResultFuture(), pDigesterPool, pResource, pUnit, pDelay);
         bufferPool = pBufferPool;
         channel = pResource.getSource().openChannel();
     }

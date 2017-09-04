@@ -35,37 +35,38 @@ public class StreamResourceTest extends BaseResourceTest<StreamSource> {
     @Before
     @Override
     public void setup() throws IOException {
-        resource = new StreamResource(updateExecutor, source, digesterPool, taskFactory);
-        when(taskFactory.newStreamTask(notNull(), same(digesterPool), same(resource), eq(MILLISECONDS), eq(0L))).thenReturn(initialUpdateTask);
-        resource.initialUpdate();
         super.setup();
+        resource = new StreamResource(updateExecutor, source, digesterPool, taskFactory);
+        when(taskFactory.newStreamTask(same(digesterPool), same(resource), eq(MILLISECONDS), eq(0L))).thenReturn(initialUpdateTask);
+        resource.initialUpdate();
     }
 
     @Test
     @Override
     public void updateIOExceptionOccurred() throws IOException {
-        doThrow(IOException.class).when(taskFactory).newStreamTask(observer, digesterPool, resource, MILLISECONDS, 0L);
+        resource = new StreamResource(updateExecutor, source, digesterPool, taskFactory);
+        doThrow(IOException.class).when(taskFactory).newStreamTask(digesterPool, resource, MILLISECONDS, 0L);
         assertSame(RESOURCE_NOT_AVAILABLE, resource.update(observer));
     }
 
     @Test
     @Override
     public void update() throws IOException {
-        when(taskFactory.newStreamTask(observer, digesterPool, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
+        when(taskFactory.newStreamTask(digesterPool, resource, MILLISECONDS, 0L)).thenReturn(updateTask);
         assertSame(future, resource.update(observer));
     }
 
     @Test
     @Override
     public void updateWithInterval() throws IOException {
-        when(taskFactory.newStreamTask(observer, digesterPool, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
+        when(taskFactory.newStreamTask(digesterPool, resource, MILLISECONDS, 100L)).thenReturn(updateTask);
         assertSame(future, resource.update(100L, observer));
     }
 
     @Test
     @Override
     public void updateWithIntervalAndUnit() throws IOException {
-        when(taskFactory.newStreamTask(observer, digesterPool, resource, SECONDS, 200L)).thenReturn(updateTask);
+        when(taskFactory.newStreamTask(digesterPool, resource, SECONDS, 200L)).thenReturn(updateTask);
         assertSame(future, resource.update(SECONDS, 200L, observer));
     }
 }

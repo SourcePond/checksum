@@ -15,6 +15,7 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.*;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
+import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public abstract class BaseResource<A> implements Resource {
     final DigesterPool digesterPool;
     final TaskFactory taskFactory;
     private Checksum current;
-    private Future<Checksum> result;
+    private Future<Checksum>  result;
 
     BaseResource(final ScheduledExecutorService pUpdateExecutor,
                  final A pSource,
@@ -74,20 +75,23 @@ public abstract class BaseResource<A> implements Resource {
 
     @Override
     public synchronized final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
-        if (result == null || result == RESOURCE_NOT_AVAILABLE) {
+        if (result == null || RESOURCE_NOT_AVAILABLE.equals(result)) {
             try {
-                final UpdateTask<A> task = newUpdateTask(pObserver, pUnit, pInterval);
+                final UpdateTask<A> task = newUpdateTask(pUnit, pInterval);
+                task.getFuture().addObserver(pObserver);
                 updateExecutor.execute(task);
                 result = task.getFuture();
             } catch (final IOException e) {
                 LOG.warn(e.getMessage(), e);
                 result = RESOURCE_NOT_AVAILABLE;
             }
+        } else {
+            ((ResultFuture)result).addObserver(pObserver);
         }
         return result;
     }
 
-    abstract UpdateTask<A> newUpdateTask(UpdateObserver pObserver, TimeUnit pUnit, long pInterval) throws IOException;
+    abstract UpdateTask<A> newUpdateTask(TimeUnit pUnit, long pInterval) throws IOException;
 
     private void setCurrent(final Checksum pCurrent) {
         current = pCurrent;

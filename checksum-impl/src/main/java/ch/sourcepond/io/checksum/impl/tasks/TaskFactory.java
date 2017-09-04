@@ -53,23 +53,21 @@ public class TaskFactory {
 
 
     public ResultFuture newResult(final UpdateObserver pObserver) {
-        return new ResultFuture(pObserver);
+        return new ResultFuture();
     }
 
-    public UpdateTask<ChannelSource> newChannelTask(final UpdateObserver pObserver,
-                                                    final DigesterPool digesterPool,
+    public UpdateTask<ChannelSource> newChannelTask(final DigesterPool digesterPool,
                                                     final BaseResource<ChannelSource> pResource,
                                                     final TimeUnit pUnit, final long pInterval)
             throws IOException {
-        return new ChannelUpdateTask(updateExecutor, digesterPool, pObserver, pResource, bufferPool, pUnit, pInterval);
+        return new ChannelUpdateTask(updateExecutor, digesterPool, pResource, bufferPool, pUnit, pInterval);
     }
 
-    public UpdateTask<StreamSource> newStreamTask(final UpdateObserver pObserver,
-                                                  final DigesterPool digesterPool,
+    public UpdateTask<StreamSource> newStreamTask(final DigesterPool digesterPool,
                                                   final BaseResource<StreamSource> pResource,
                                                   final TimeUnit pUnit,
                                                   final long pInterval)
             throws IOException {
-        return new StreamUpdateTask(updateExecutor, digesterPool, pObserver, pResource, pUnit, pInterval);
+        return new StreamUpdateTask(updateExecutor, digesterPool, pResource, pUnit, pInterval);
     }
 }

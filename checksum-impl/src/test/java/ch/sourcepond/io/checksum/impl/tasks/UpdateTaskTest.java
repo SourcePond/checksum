@@ -24,9 +24,8 @@ import static org.mockito.Mockito.*;
 public abstract class UpdateTaskTest<A> {
     private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
     final BaseResource<A> resource = mock(BaseResource.class);
-    private final UpdateObserver observer = mock(UpdateObserver.class);
     private final CountDownLatch latch = new CountDownLatch(1);
-    final ResultFuture future = new ResultFuture(observer);
+    final ResultFuture future = new ResultFuture();
     final ScheduledExecutorService executor = newScheduledThreadPool(1);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     @SuppressWarnings("FieldCanBeLocal")

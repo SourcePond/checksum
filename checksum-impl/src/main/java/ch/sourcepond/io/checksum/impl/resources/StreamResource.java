@@ -36,7 +36,7 @@ class StreamResource extends BaseResource<StreamSource> {
     }
 
     @Override
-    UpdateTask<StreamSource> newUpdateTask(final UpdateObserver pObserver, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return taskFactory.newStreamTask(pObserver, digesterPool, this, pUnit, pInterval);
+    UpdateTask<StreamSource> newUpdateTask(final TimeUnit pUnit, final long pInterval) throws IOException {
+        return taskFactory.newStreamTask(digesterPool, this, pUnit, pInterval);
     }
 }

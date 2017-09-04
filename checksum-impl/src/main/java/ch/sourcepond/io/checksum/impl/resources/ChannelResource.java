@@ -36,7 +36,7 @@ class ChannelResource extends BaseResource<ChannelSource> {
     }
 
     @Override
-    UpdateTask<ChannelSource> newUpdateTask(final UpdateObserver pObserver, final TimeUnit pUnit, final long pInterval) throws IOException {
-        return taskFactory.newChannelTask(pObserver, digesterPool, this, pUnit, pInterval);
+    UpdateTask<ChannelSource> newUpdateTask(final TimeUnit pUnit, final long pInterval) throws IOException {
+        return taskFactory.newChannelTask(digesterPool, this, pUnit, pInterval);
     }
 }

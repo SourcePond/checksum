@@ -46,6 +46,7 @@ public abstract class BaseResourceTest<A> {
     @Before
     public void setup() throws IOException {
         when(updateTask.getFuture()).thenReturn(future);
+        when(initialUpdateTask.getFuture()).thenReturn(future);
         when(digesterPool.getAlgorithm()).thenReturn(SHA256);
     }
 

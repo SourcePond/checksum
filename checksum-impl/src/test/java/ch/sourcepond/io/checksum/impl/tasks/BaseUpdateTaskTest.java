@@ -11,6 +11,7 @@ import org.mockito.InOrder;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -32,12 +33,12 @@ public class BaseUpdateTaskTest {
         boolean delay;
 
         public TestUpdateTask(final ScheduledExecutorService pExecutor,
-                              final DigesterPool pDigesterPool,
                               final ResultFuture pFuture,
+                              final DigesterPool pDigesterPool,
                               final BaseResource<StreamSource> pResource,
                               final TimeUnit pUnit,
                               final long pDelay) {
-            super(pExecutor, pDigesterPool, pFuture, pResource, pUnit, pDelay);
+            super(pExecutor, pFuture, pDigesterPool, pResource, pUnit, pDelay);
         }
 
         @Override
@@ -82,7 +83,7 @@ public class BaseUpdateTaskTest {
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
         when(resource.getCurrent()).thenReturn(initialChecksum);
-        task = new TestUpdateTask(executor, digesterPool, future, resource, SECONDS, 1);
+        task = new TestUpdateTask(executor, future, digesterPool, resource, SECONDS, 1);
     }
 
     @Test

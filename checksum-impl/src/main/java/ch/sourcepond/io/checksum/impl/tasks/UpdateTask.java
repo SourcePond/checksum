@@ -59,14 +59,14 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
     private final long delay;
 
     UpdateTask(final ScheduledExecutorService pExecutor,
+               final ResultFuture pFuture,
                final DigesterPool pDigesterPool,
-               final UpdateObserver pObserver,
                final BaseResource<A> pResource,
                final TimeUnit pUnit,
                final long pDelay) {
         executor = pExecutor;
         digesterPool = pDigesterPool;
-        future = new ResultFuture(pObserver);
+        future = pFuture;
         resource = pResource;
         digest = pDigesterPool.get();
         unit = pUnit;

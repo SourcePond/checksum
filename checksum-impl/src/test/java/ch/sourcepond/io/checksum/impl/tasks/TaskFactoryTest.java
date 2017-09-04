@@ -31,7 +31,6 @@ public class TaskFactoryTest {
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final BufferPool bufferPool = mock(BufferPool.class);
     private final TaskFactory factory = new TaskFactory(bufferPool);
-    private final UpdateObserver observer = mock(UpdateObserver.class);
     private URL anyUrl;
 
     @Before
@@ -53,8 +52,8 @@ public class TaskFactoryTest {
         final BaseResource<ChannelSource> resource = mock(BaseResource.class);
         when(channelSource.openChannel()).thenReturn(channel);
         when(resource.getSource()).thenReturn(channelSource);
-        assertNotSame(factory.newChannelTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L),
-                factory.newChannelTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newChannelTask(digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newChannelTask(digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 
     @Test
@@ -64,7 +63,7 @@ public class TaskFactoryTest {
         final BaseResource<StreamSource> resource = mock(BaseResource.class);
         when(streamSource.openStream()).thenReturn(stream);
         when(resource.getSource()).thenReturn(streamSource);
-        assertNotSame(factory.newStreamTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L),
-                factory.newStreamTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newStreamTask(digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newStreamTask(digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 }
