@@ -31,7 +31,11 @@ import java.nio.file.Path;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.notNull;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -66,28 +70,28 @@ public class InternalResourcesFactoryTest {
     public void newChannelResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, channelSource);
         res.update(observer);
-        verify(updateExecutor, times(2)).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
     @Test
     public void newStreamResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, streamSource);
         res.update(observer);
-        verify(updateExecutor, times(2)).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
     @Test
     public void newPathResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, path);
         res.update(observer);
-        verify(updateExecutor, times(2)).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
     @Test
     public void newUrlResource() throws IOException {
         final Resource res = factory.newResource(digesterPool, url);
         res.update(observer);
-        verify(updateExecutor, times(2)).execute(task);
+        verify(updateExecutor).execute(task);
     }
 
 }

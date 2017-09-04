@@ -45,7 +45,7 @@ public abstract class UpdateTaskTest<A> {
                     latch.countDown();
                     return null;
                 }
-        ).when(resource).setCurrent(any());
+        ).when(resource).finalizeUpdate(any());
         task = newTask();
         executor.execute(task);
         latch.await();

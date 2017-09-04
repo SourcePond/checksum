@@ -80,14 +80,12 @@ public class ResourcesTest {
 
     @Test
     public void verifyPathResource() throws Exception {
-        final CountDownLatch latch = new CountDownLatch(2);
         final List<Checksum> observerChecksums = Collections.synchronizedList(new ArrayList<>());
         final Resource resource = registry.create(SHA256, testfile.toPath());
 
         UpdateObserver observer = (pUpdate) -> {
             observerChecksums.add(pUpdate.getPrevious());
             observerChecksums.add(pUpdate.getCurrent());
-            latch.countDown();
         };
 
         final Checksum firstChecksum = resource.update(observer).get();
@@ -96,13 +94,10 @@ public class ResourcesTest {
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, firstChecksum.getHexValue());
         assertEquals(SECOND_EXPECTED_SHA_256_HASH, secondChecksum.getHexValue());
 
-        latch.await();
-        assertEquals(4, observerChecksums.size());
+        assertEquals(2, observerChecksums.size());
         observerChecksums.sort(Comparator.comparing(Checksum::getTimestamp));
 
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(0).getHexValue());
-        assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(1).getHexValue());
-        assertEquals(FIRST_EXPECTED_SHA_256_HASH, observerChecksums.get(2).getHexValue());
-        assertEquals(SECOND_EXPECTED_SHA_256_HASH, observerChecksums.get(3).getHexValue());
+        assertEquals(SECOND_EXPECTED_SHA_256_HASH, observerChecksums.get(1).getHexValue());
     }
 }

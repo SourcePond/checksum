@@ -41,6 +41,7 @@ public abstract class BaseResource<A> implements Resource {
     final DigesterPool digesterPool;
     final TaskFactory taskFactory;
     private Checksum current;
+    private Future<Checksum> result;
 
     BaseResource(final ScheduledExecutorService pUpdateExecutor,
                  final A pSource,
@@ -72,20 +73,30 @@ public abstract class BaseResource<A> implements Resource {
     }
 
     @Override
-    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
-        Future<Checksum> result;
-        try {
-            final UpdateTask<A> task = newUpdateTask(pObserver, pUnit, pInterval);
-            updateExecutor.execute(task);
-            result = task.getFuture();
-        } catch (final IOException e) {
-            LOG.warn(e.getMessage(), e);
-            result = RESOURCE_NOT_AVAILABLE;
+    public synchronized final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
+        if (result == null || result == RESOURCE_NOT_AVAILABLE) {
+            try {
+                final UpdateTask<A> task = newUpdateTask(pObserver, pUnit, pInterval);
+                updateExecutor.execute(task);
+                result = task.getFuture();
+            } catch (final IOException e) {
+                LOG.warn(e.getMessage(), e);
+                result = RESOURCE_NOT_AVAILABLE;
+            }
         }
         return result;
     }
 
     abstract UpdateTask<A> newUpdateTask(UpdateObserver pObserver, TimeUnit pUnit, long pInterval) throws IOException;
+
+    private void setCurrent(final Checksum pCurrent) {
+        current = pCurrent;
+    }
+
+    public synchronized void finalizeUpdate(final Checksum pChecksum) {
+        setCurrent(pChecksum);
+        result = null;
+    }
 
     synchronized Resource initialUpdate() {
         setCurrent(new InitialChecksum(update(u -> {})));
@@ -94,10 +105,5 @@ public abstract class BaseResource<A> implements Resource {
 
     public synchronized Checksum getCurrent() {
         return current;
-    }
-
-    // Not thread-safe, must be synchronized externally
-    public void setCurrent(final Checksum pCurrent) {
-        current = pCurrent;
     }
 }

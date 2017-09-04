@@ -133,15 +133,11 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
         final Checksum current;
 
         try {
-            // Mutex on resource, getCurrent and setCurrent
-            // must be synchronized externally.
-            synchronized (resource) {
-                if (pFailureOrNull == null) {
-                    current = new ChecksumImpl(now(), checksum);
-                    resource.setCurrent(current);
-                } else {
-                    current = previous;
-                }
+            if (pFailureOrNull == null) {
+                current = new ChecksumImpl(now(), checksum);
+                resource.finalizeUpdate(current);
+            } else {
+                current = previous;
             }
 
             future.done(new UpdateImpl(previous, current, pFailureOrNull));

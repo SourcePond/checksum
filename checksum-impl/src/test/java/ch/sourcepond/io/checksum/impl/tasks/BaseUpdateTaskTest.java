@@ -105,7 +105,7 @@ public class BaseUpdateTaskTest {
         order.verify(digesterPool).get();
         order.verify(digest).update(ANY_DATA);
         order.verify(digest).digest();
-        order.verify(resource).setCurrent(matchCurrent());
+        order.verify(resource).finalizeUpdate(matchCurrent());
         order.verify(future).done(argThat(u -> initialChecksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
         order.verify(digesterPool).release(digest);
         verifyZeroInteractions(executor);
