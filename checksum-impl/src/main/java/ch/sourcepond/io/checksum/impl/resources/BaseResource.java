@@ -13,18 +13,21 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
-import ch.sourcepond.io.checksum.api.*;
+import ch.sourcepond.io.checksum.api.Algorithm;
+import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.Resource;
+import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static ch.sourcepond.io.checksum.impl.resources.ResourceNotAvailable.RESOURCE_NOT_AVAILABLE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -62,35 +65,36 @@ public abstract class BaseResource<A> implements Resource {
     }
 
     @Override
-    public final Future<Checksum> update(final UpdateObserver pObserver) {
-        return update(0L, pObserver);
+    public final void update(final UpdateObserver pObserver) throws IOException {
+        update(0L, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) {
-        return update(MILLISECONDS, pIntervalInMilliseconds, pObserver);
+    public final void update(final long pIntervalInMilliseconds, final UpdateObserver pObserver) throws IOException {
+        update(MILLISECONDS, pIntervalInMilliseconds, pObserver);
     }
 
     @Override
-    public final Future<Checksum> update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) {
-        Future<Checksum> result;
+    public final void update(final TimeUnit pUnit, final long pInterval, final UpdateObserver pObserver) throws IOException {
+        final UpdateTask<A> task = newUpdateTask(pObserver, pUnit, pInterval);
+        updateExecutor.execute(task);
+    }
+
+    Resource initialUpdate() {
+        final InitialChecksum initialChecksum = new InitialChecksum();
+        synchronized (this) {
+            setCurrent(initialChecksum);
+        }
         try {
-            final UpdateTask<A> task = newUpdateTask(pObserver, pUnit, pInterval);
-            updateExecutor.execute(task);
-            result = task.getFuture();
+            update(initialChecksum);
         } catch (final IOException e) {
             LOG.warn(e.getMessage(), e);
-            result = RESOURCE_NOT_AVAILABLE;
+            initialChecksum.initDefaults();
         }
-        return result;
+        return this;
     }
 
     abstract UpdateTask<A> newUpdateTask(UpdateObserver pObserver, TimeUnit pUnit, long pInterval) throws IOException;
-
-    synchronized Resource initialUpdate() {
-        setCurrent(new InitialChecksum(update(u -> {})));
-        return this;
-    }
 
     public synchronized Checksum getCurrent() {
         return current;

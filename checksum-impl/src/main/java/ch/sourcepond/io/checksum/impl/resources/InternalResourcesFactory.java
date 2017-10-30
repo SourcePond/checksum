@@ -19,6 +19,7 @@ import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.concurrent.ScheduledExecutorService;

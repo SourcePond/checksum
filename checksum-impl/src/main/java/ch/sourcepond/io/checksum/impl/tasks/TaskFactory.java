@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 public class TaskFactory {
     private final BufferPool bufferPool;
 
-    // Injected by Felix DM
     private ScheduledExecutorService updateExecutor;
 
     // Constructor used by BundleActivator
@@ -45,15 +44,6 @@ public class TaskFactory {
 
     public void setUpdateExecutor(final ScheduledExecutorService pUpdateExecutor) {
         updateExecutor = pUpdateExecutor;
-    }
-
-    public ResultFuture newInitialResult() {
-        return null;
-    }
-
-
-    public ResultFuture newResult(final UpdateObserver pObserver) {
-        return new ResultFuture(pObserver);
     }
 
     public UpdateTask<ChannelSource> newChannelTask(final UpdateObserver pObserver,

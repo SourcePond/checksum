@@ -15,7 +15,6 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
 import org.junit.Before;
@@ -25,8 +24,10 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -38,23 +39,18 @@ public abstract class BaseResourceTest<A> {
     final ScheduledExecutorService updateExecutor = mock(ScheduledExecutorService.class);
     final DigesterPool digesterPool = mock(DigesterPool.class);
     final TaskFactory taskFactory = mock(TaskFactory.class);
-    final ResultFuture future = mock(ResultFuture.class);
     final UpdateObserver observer = mock(UpdateObserver.class);
     A source;
     BaseResource<A> resource;
 
     @Before
     public void setup() throws IOException {
-        when(updateTask.getFuture()).thenReturn(future);
         when(digesterPool.getAlgorithm()).thenReturn(SHA256);
     }
 
-    @Test
-    public void initialUpdate() throws IOException {
-        verify(updateExecutor).execute(initialUpdateTask);
-    }
-
     public abstract void updateIOExceptionOccurred() throws IOException;
+
+    public abstract void initialUpdateIOExceptionOccurred() throws IOException;
 
     @Test
     public void getAlgorithm() {

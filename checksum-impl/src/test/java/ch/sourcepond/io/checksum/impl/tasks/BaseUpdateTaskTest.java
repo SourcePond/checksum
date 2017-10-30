@@ -2,6 +2,7 @@ package ch.sourcepond.io.checksum.impl.tasks;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.StreamSource;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
 import ch.sourcepond.io.checksum.impl.resources.BaseResource;
 import org.junit.Before;
@@ -15,9 +16,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -33,11 +37,11 @@ public class BaseUpdateTaskTest {
 
         public TestUpdateTask(final ScheduledExecutorService pExecutor,
                               final DigesterPool pDigesterPool,
-                              final ResultFuture pFuture,
+                              final UpdateObserver pObserver,
                               final BaseResource<StreamSource> pResource,
                               final TimeUnit pUnit,
                               final long pDelay) {
-            super(pExecutor, pDigesterPool, pFuture, pResource, pUnit, pDelay);
+            super(pExecutor, pDigesterPool, pObserver, pResource, pUnit, pDelay);
         }
 
         @Override
@@ -65,7 +69,7 @@ public class BaseUpdateTaskTest {
     private final MessageDigest digest = mock(MessageDigest.class);
     private final BaseResource<StreamSource> resource = mock(BaseResource.class);
     private final Checksum checksum = mock(Checksum.class);
-    private final ResultFuture future = mock(ResultFuture.class);
+    private final UpdateObserver observer = mock(UpdateObserver.class);
     private TestUpdateTask task;
 
     private static Checksum matchCurrent() {
@@ -82,7 +86,7 @@ public class BaseUpdateTaskTest {
         when(digesterPool.get()).thenReturn(digest);
         when(digest.digest()).thenReturn(ANY_DATA);
         when(resource.getCurrent()).thenReturn(initialChecksum);
-        task = new TestUpdateTask(executor, digesterPool, future, resource, SECONDS, 1);
+        task = new TestUpdateTask(executor, digesterPool, observer, resource, SECONDS, 1);
     }
 
     @Test
@@ -90,7 +94,7 @@ public class BaseUpdateTaskTest {
         when(resource.getCurrent()).thenReturn(checksum);
         task.delay = true;
         task.run();
-        final InOrder order = inOrder(digesterPool, digest, executor, resource, future);
+        final InOrder order = inOrder(digesterPool, digest, executor, resource, observer);
         order.verify(digesterPool).get();
         order.verify(digest).update(ANY_DATA);
         order.verify(executor).schedule(task, 1, SECONDS);
@@ -101,12 +105,12 @@ public class BaseUpdateTaskTest {
     public void verifySuccess() throws Exception {
         when(resource.getCurrent()).thenReturn(checksum);
         task.run();
-        final InOrder order = inOrder(digesterPool, digest, resource, future);
+        final InOrder order = inOrder(digesterPool, digest, resource, observer);
         order.verify(digesterPool).get();
         order.verify(digest).update(ANY_DATA);
         order.verify(digest).digest();
         order.verify(resource).setCurrent(matchCurrent());
-        order.verify(future).done(argThat(u -> initialChecksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
+        order.verify(observer).done(argThat(u -> initialChecksum.equals(u.getPrevious()) && "".equals(u.getCurrent().getHexValue())));
         order.verify(digesterPool).release(digest);
         verifyZeroInteractions(executor);
         assertTrue(task.closed);
@@ -116,10 +120,10 @@ public class BaseUpdateTaskTest {
     public void verifyCancel() throws Exception {
         task.interruptedException = new InterruptedException();
         task.run();
-        final InOrder order = inOrder(digest, resource, future, digesterPool);
+        final InOrder order = inOrder(digest, resource, observer, digesterPool);
         order.verify(digesterPool).get();
         order.verify(resource).getCurrent();
-        order.verify(future).done(argThat(u -> u.getFailureOrNull() == task.interruptedException));
+        order.verify(observer).done(argThat(u -> u.getFailureOrNull() == task.interruptedException));
         order.verify(digesterPool).release(digest);
         assertTrue(task.closed);
     }
@@ -128,10 +132,10 @@ public class BaseUpdateTaskTest {
     public void verifyFailure() throws Exception {
         task.ioException = new IOException();
         task.run();
-        final InOrder order = inOrder(digest, resource, future, digesterPool);
+        final InOrder order = inOrder(digest, resource, observer, digesterPool);
         order.verify(digesterPool).get();
         order.verify(resource).getCurrent();
-        order.verify(future).done(argThat(u -> u.getFailureOrNull() == task.ioException));
+        order.verify(observer).done(argThat(u -> u.getFailureOrNull() == task.ioException));
         order.verify(digesterPool).release(digest);
         assertTrue(task.closed);
     }

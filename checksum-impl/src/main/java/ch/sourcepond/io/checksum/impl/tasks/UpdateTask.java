@@ -50,7 +50,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
     private static final int EOF = -1;
     private final ScheduledExecutorService executor;
     private final DigesterPool digesterPool;
-    private final ResultFuture future;
+    private final UpdateObserver observer;
     private volatile byte numOfReSchedules;
     final MessageDigest digest;
     final BaseResource<A> resource;
@@ -66,7 +66,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
                final long pDelay) {
         executor = pExecutor;
         digesterPool = pDigesterPool;
-        future = new ResultFuture(pObserver);
+        observer = pObserver;
         resource = pResource;
         digest = pDigesterPool.get();
         unit = pUnit;
@@ -78,10 +78,6 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
     }
 
     abstract boolean updateDigest() throws InterruptedException, IOException;
-
-    public ResultFuture getFuture() {
-        return future;
-    }
 
     private static void checkInterrupted() throws InterruptedException {
         if (interrupted()) {
@@ -115,7 +111,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
         Exception failureOrNull = null;
         try {
             if (updateDigest()) {
-                // Re-schedule this task somewhen in the future and...
+                // Re-schedule this task sometime in the future and...
                 executor.schedule(this, delay, unit);
 
                 // ... finish current execution at this point after reschedule
@@ -144,7 +140,7 @@ public abstract class UpdateTask<A> implements Closeable, Runnable {
                 }
             }
 
-            future.done(new UpdateImpl(previous, current, pFailureOrNull));
+            observer.done(new UpdateImpl(previous, current, pFailureOrNull));
         } finally {
             try {
                 close();

@@ -18,7 +18,6 @@ import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPool;
-import ch.sourcepond.io.checksum.impl.tasks.ResultFuture;
 import ch.sourcepond.io.checksum.impl.tasks.TaskFactory;
 import ch.sourcepond.io.checksum.impl.tasks.UpdateTask;
 import org.junit.Before;
@@ -31,7 +30,12 @@ import java.nio.file.Path;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.notNull;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -41,7 +45,6 @@ public class InternalResourcesFactoryTest {
     private final ScheduledExecutorService updateExecutor = mock(ScheduledExecutorService.class);
     private final UpdateTask initialTask = mock(UpdateTask.class);
     private final UpdateTask task = mock(UpdateTask.class);
-    private final ResultFuture result = mock(ResultFuture.class);
     private final TaskFactory taskFactory = mock(TaskFactory.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final ChannelSource channelSource = mock(ChannelSource.class);
@@ -55,7 +58,6 @@ public class InternalResourcesFactoryTest {
     public void setup() throws Exception {
         path = FileSystems.getDefault().getPath("src", "test", "resources", "testfile_01.txt");
         url = getClass().getResource("/testfile_01.txt");
-        when(task.getFuture()).thenReturn(result);
         when(taskFactory.newChannelTask(notNull(), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
         when(taskFactory.newStreamTask(notNull(), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
         factory = new InternalResourcesFactory(taskFactory);

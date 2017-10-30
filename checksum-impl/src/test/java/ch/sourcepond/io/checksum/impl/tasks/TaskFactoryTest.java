@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings({"unchecked", "FieldCanBeLocal"})
 public class TaskFactoryTest {
     private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
-    private final ResultFuture result = mock(ResultFuture.class);
     private final DigesterPool digesterPool = mock(DigesterPool.class);
     private final BufferPool bufferPool = mock(BufferPool.class);
     private final TaskFactory factory = new TaskFactory(bufferPool);
@@ -53,8 +52,8 @@ public class TaskFactoryTest {
         final BaseResource<ChannelSource> resource = mock(BaseResource.class);
         when(channelSource.openChannel()).thenReturn(channel);
         when(resource.getSource()).thenReturn(channelSource);
-        assertNotSame(factory.newChannelTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L),
-                factory.newChannelTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newChannelTask(observer, digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newChannelTask(observer, digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 
     @Test
@@ -64,7 +63,7 @@ public class TaskFactoryTest {
         final BaseResource<StreamSource> resource = mock(BaseResource.class);
         when(streamSource.openStream()).thenReturn(stream);
         when(resource.getSource()).thenReturn(streamSource);
-        assertNotSame(factory.newStreamTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L),
-                factory.newStreamTask(result, digesterPool, resource, TimeUnit.SECONDS, 1L));
+        assertNotSame(factory.newStreamTask(observer, digesterPool, resource, TimeUnit.SECONDS, 1L),
+                factory.newStreamTask(observer, digesterPool, resource, TimeUnit.SECONDS, 1L));
     }
 }

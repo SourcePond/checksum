@@ -3,6 +3,7 @@ package ch.sourcepond.io.checksum;
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
 import ch.sourcepond.io.checksum.api.ResourcesFactory;
+import ch.sourcepond.io.checksum.api.Update;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import org.junit.After;
 import org.junit.Before;
@@ -33,6 +34,26 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
  */
 @RunWith(PaxExam.class)
 public class ResourcesTest {
+
+    private static class TestOberver implements UpdateObserver {
+        private final CountDownLatch latch;
+        List<Checksum> observerChecksums;
+        volatile Checksum checksum;
+
+        public TestOberver(CountDownLatch latch, List<Checksum> observerChecksums) {
+            this.latch = latch;
+            this.observerChecksums = observerChecksums;
+        }
+
+        @Override
+        public void done(final Update pUpdate) {
+            observerChecksums.add(pUpdate.getPrevious());
+            observerChecksums.add(pUpdate.getCurrent());
+            checksum = pUpdate.getCurrent();
+            latch.countDown();
+        }
+    }
+
     private static final String FIRST_EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
     private static final String SECOND_EXPECTED_SHA_256_HASH = "6c0f8adc6aac283543b974b395a8f9bb61e837076b2118fb9fbec71e1540b28e";
     private final File testfile = new File("target", "testfile_01.txt");
@@ -80,23 +101,27 @@ public class ResourcesTest {
 
     @Test
     public void verifyPathResource() throws Exception {
-        final CountDownLatch latch = new CountDownLatch(2);
+        CountDownLatch latch = new CountDownLatch(1);
         final List<Checksum> observerChecksums = Collections.synchronizedList(new ArrayList<>());
         final Resource resource = registry.create(SHA256, testfile.toPath());
 
-        UpdateObserver observer = (pUpdate) -> {
-            observerChecksums.add(pUpdate.getPrevious());
-            observerChecksums.add(pUpdate.getCurrent());
-            latch.countDown();
-        };
+        TestOberver observer = new TestOberver(latch, observerChecksums);
+        resource.update(observer);
+        latch.await();
 
-        final Checksum firstChecksum = resource.update(observer).get();
+        final Checksum firstChecksum = observer.checksum;
+        latch = new CountDownLatch(1);
+
         appendToTestFile();
-        final Checksum secondChecksum = resource.update(observer).get();
+        observer = new TestOberver(latch, observerChecksums);
+        resource.update(observer);
+        latch.await();
+
+        final Checksum secondChecksum = observer.checksum;
         assertEquals(FIRST_EXPECTED_SHA_256_HASH, firstChecksum.getHexValue());
         assertEquals(SECOND_EXPECTED_SHA_256_HASH, secondChecksum.getHexValue());
 
-        latch.await();
+        //latch.await();
         assertEquals(4, observerChecksums.size());
         observerChecksums.sort(Comparator.comparing(Checksum::getTimestamp));
 

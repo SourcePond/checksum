@@ -1,4 +1,4 @@
-/*Copyright (C) 2015 Roland Hauser, <sourcepond@gmail.com>
+/*Copyright (C) 2017 Roland Hauser, <sourcepond@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,97 +14,60 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.Update;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.time.Instant;
+import java.util.concurrent.ScheduledExecutorService;
 
-import static ch.sourcepond.io.checksum.impl.resources.ResourceNotAvailable.EMPTY;
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.interrupted;
-import static java.time.Instant.MAX;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static ch.sourcepond.io.checksum.impl.resources.InitialChecksum.EMPTY;
+import static java.time.Instant.MIN;
+import static java.time.Instant.now;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-/**
- *
- */
 public class InitialChecksumTest {
-    private static final String HEX_VALUE = "hexValue";
-    private static final byte[] ARR = new byte[0];
-    private final Checksum delegate = mock(Checksum.class);
-    private final Future<Checksum> future = mock(Future.class);
-    private final InitialChecksum initialChecksum = new InitialChecksum(future);
+    private static final Instant EXPECTED_TIMESTAMP = now();
+    private static final String EXPECTED_HEX_VALUE = "someHexValue";
+    private static final byte[] EXPECTED_BYTES = new byte[10];
+    private final Checksum current = mock(Checksum.class);
+    private final Update update = mock(Update.class);
+    private final InitialChecksum checksum = new InitialChecksum();
+    private final ScheduledExecutorService executor = newSingleThreadScheduledExecutor();
 
     @Before
-    public void setup() throws Exception {
-        when(future.get()).thenReturn(delegate);
-        when(delegate.getHexValue()).thenReturn(HEX_VALUE);
-        when(delegate.getTimestamp()).thenReturn(MAX);
-        when(delegate.toByteArray()).thenReturn(ARR);
+    public void setup() {
+        when(current.getHexValue()).thenReturn(EXPECTED_HEX_VALUE);
+        when(current.getTimestamp()).thenReturn(EXPECTED_TIMESTAMP);
+        when(current.toByteArray()).thenReturn(EXPECTED_BYTES);
+        when(update.getCurrent()).thenReturn(current);
     }
 
     @After
     public void tearDown() {
-        interrupted();
+        executor.shutdown();
+    }
+
+    @Test(timeout = 2000)
+    public void awaitCalculation() {
+        executor.schedule(() -> {
+            checksum.done(update);
+        }, 500, MILLISECONDS);
+        assertSame(EXPECTED_BYTES, checksum.toByteArray());
+        assertSame(EXPECTED_HEX_VALUE, checksum.getHexValue());
+        assertSame(EXPECTED_TIMESTAMP, checksum.getTimestamp());
     }
 
     @Test
-    public void getTimestamp() {
-        assertEquals(MAX, initialChecksum.getTimestamp());
-    }
-
-    @Test
-    public void toByteArray() {
-        assertSame(ARR, initialChecksum.toByteArray());
-    }
-
-    @Test
-    public void getHexValue() {
-        assertEquals(HEX_VALUE, initialChecksum.getHexValue());
-    }
-
-    @Test
-    public void getHexValueExecutionExeceptionOccurred() throws Exception {
-        doThrow(ExecutionException.class).when(future).get();
-        assertEquals(EMPTY.getHexValue(), initialChecksum.getHexValue());
-        assertFalse(currentThread().isInterrupted());
-    }
-
-    @Test
-    public void getTimestampExeceptionOccurred() throws Exception {
-        doThrow(ExecutionException.class).when(future).get();
-        assertEquals(EMPTY.getTimestamp(), initialChecksum.getTimestamp());
-        assertFalse(currentThread().isInterrupted());
-    }
-
-    @Test
-    public void toByteArrayExeceptionOccurred() throws Exception {
-        doThrow(ExecutionException.class).when(future).get();
-        assertEquals(EMPTY.toByteArray(), initialChecksum.toByteArray());
-        assertFalse(currentThread().isInterrupted());
-    }
-
-    @Test
-    public void getHexValueInterrupted() throws Exception {
-        doThrow(InterruptedException.class).when(future).get();
-        assertEquals(EMPTY.getHexValue(), initialChecksum.getHexValue());
-        assertTrue(currentThread().isInterrupted());
-    }
-
-    @Test
-    public void getTimestampInterrupted() throws Exception {
-        doThrow(InterruptedException.class).when(future).get();
-        assertEquals(EMPTY.getTimestamp(), initialChecksum.getTimestamp());
-        assertTrue(currentThread().isInterrupted());
-    }
-
-    @Test
-    public void toByteArrayInterrupted() throws Exception {
-        doThrow(InterruptedException.class).when(future).get();
-        assertEquals(EMPTY.toByteArray(), initialChecksum.toByteArray());
-        assertTrue(currentThread().isInterrupted());
+    public void verifyDefaults() {
+        checksum.initDefaults();
+        assertSame("", checksum.getHexValue());
+        assertSame(MIN, checksum.getTimestamp());
+        assertSame(EMPTY, checksum.toByteArray());
     }
 }

@@ -23,7 +23,7 @@ public class ChannelUpdateTaskTest extends UpdateTaskTest<ChannelSource> {
 
     @Override
     protected UpdateTask<ChannelSource> newTask() throws IOException {
-        return new ChannelUpdateTask(executor, digesterPool, future, resource, bufferPool, SECONDS, 1);
+        return new ChannelUpdateTask(executor, digesterPool, observer, resource, bufferPool, SECONDS, 1);
     }
 
     @Before

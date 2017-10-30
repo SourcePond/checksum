@@ -14,62 +14,73 @@ limitations under the License.*/
 package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.Checksum;
+import ch.sourcepond.io.checksum.api.Update;
+import ch.sourcepond.io.checksum.api.UpdateObserver;
 import ch.sourcepond.io.checksum.impl.BaseChecksum;
-import org.slf4j.Logger;
 
 import java.time.Instant;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-import static ch.sourcepond.io.checksum.impl.resources.ResourceNotAvailable.ARR;
 import static java.lang.Thread.currentThread;
 import static java.time.Instant.MIN;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  *
  */
-final class InitialChecksum extends BaseChecksum {
+final class InitialChecksum extends BaseChecksum implements UpdateObserver {
+    static final byte[] EMPTY = new byte[0];
+    private Instant timestamp;
+    private byte[] bytes;
+    private String hexValue;
 
-    @FunctionalInterface
-    private interface ValueOf<T> {
-
-        T get() throws ExecutionException, InterruptedException;
-    }
-
-    private static final Logger LOG = getLogger(InitialChecksum.class);
-    private final Future<Checksum> future;
-
-    InitialChecksum(final Future<Checksum> pFuture) {
-        future = pFuture;
-    }
-
-    private static <T> T valueOf(final ValueOf<T> pSupplier, T pDefault) {
-        T value;
+    private void awaitCalculation() {
         try {
-            value = pSupplier.get();
-        } catch (final ExecutionException e) {
-            LOG.error(e.getMessage(), e);
-            value = pDefault;
+            while (timestamp == null) {
+                wait();
+            }
         } catch (final InterruptedException e) {
             currentThread().interrupt();
-            value = pDefault;
+            internalInitDefaults();
         }
-        return value;
+    }
+
+    private void internalInitDefaults() {
+        timestamp = MIN;
+        bytes = EMPTY;
+        hexValue = "";
+    }
+
+    synchronized void initDefaults() {
+        internalInitDefaults();
+        notifyAll();
     }
 
     @Override
-    public Instant getTimestamp() {
-        return valueOf(() -> future.get().getTimestamp(), MIN);
+    public synchronized Instant getTimestamp() {
+        awaitCalculation();
+        return timestamp;
     }
 
     @Override
-    public byte[] toByteArray() {
-        return valueOf(() -> future.get().toByteArray(), ARR);
+    public synchronized byte[] toByteArray() {
+        awaitCalculation();
+        return bytes;
     }
 
     @Override
-    public String getHexValue() {
-        return valueOf(() -> future.get().getHexValue(), "");
+    public synchronized String getHexValue() {
+        awaitCalculation();
+        return hexValue;
+    }
+
+    @Override
+    public synchronized void done(final Update pUpdate) {
+        try {
+            final Checksum current = pUpdate.getCurrent();
+            timestamp = current.getTimestamp();
+            bytes = current.toByteArray();
+            hexValue = current.getHexValue();
+        } finally {
+            notifyAll();
+        }
     }
 }
