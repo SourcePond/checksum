@@ -27,11 +27,11 @@ import static java.time.Instant.MIN;
  *
  */
 final class InitialChecksum extends BaseChecksum implements UpdateObserver {
-    private Instant timestamp;
-    private byte[] bytes;
-    private String hexValue;
+    private volatile Instant timestamp;
+    private volatile byte[] bytes;
+    private volatile String hexValue;
 
-    private void awaitCalculation() {
+    private synchronized void awaitCalculation() {
         try {
             while (timestamp == null) {
                 wait();
@@ -54,19 +54,19 @@ final class InitialChecksum extends BaseChecksum implements UpdateObserver {
     }
 
     @Override
-    public synchronized Instant getTimestamp() {
+    public Instant getTimestamp() {
         awaitCalculation();
         return timestamp;
     }
 
     @Override
-    public synchronized byte[] toByteArray() {
+    public byte[] toByteArray() {
         awaitCalculation();
         return bytes;
     }
 
     @Override
-    public synchronized String getHexValue() {
+    public String getHexValue() {
         awaitCalculation();
         return hexValue;
     }
