@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,13 +45,19 @@ public class ResourcesFactoryImplTest {
     private final StreamSource streamSource = mock(StreamSource.class);
     private final Resource resource = mock(Resource.class);
     private URL url;
-    private ResourcesFactoryImpl factory;
+    private ResourceProducerImpl factory;
 
     @Before
     public void setup() throws Exception {
         url = new URL("file:///any/url");
-        factory = new ResourcesFactoryImpl(internalResourcesFactory, digesterPoolRegistry);
+        factory = new ResourceProducerImpl(internalResourcesFactory, digesterPoolRegistry);
         when(digesterPoolRegistry.get(SHA256)).thenReturn(digesterPool);
+    }
+
+    @Test
+    public void verifyClose() {
+        factory.close();
+        verify(internalResourcesFactory).close();
     }
 
     @Test

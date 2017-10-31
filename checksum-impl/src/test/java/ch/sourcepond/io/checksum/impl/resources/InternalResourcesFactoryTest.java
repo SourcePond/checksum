@@ -60,8 +60,13 @@ public class InternalResourcesFactoryTest {
         url = getClass().getResource("/testfile_01.txt");
         when(taskFactory.newChannelTask(notNull(), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
         when(taskFactory.newStreamTask(notNull(), same(digesterPool), notNull(), same(MILLISECONDS), same(0L))).thenReturn(task);
-        factory = new InternalResourcesFactory(taskFactory);
-        factory.setUpdateExecutor(updateExecutor);
+        factory = new InternalResourcesFactory(updateExecutor, taskFactory);
+    }
+
+    @Test
+    public void verifyClose() {
+        factory.close();
+        verify(updateExecutor).shutdown();
     }
 
     @Test

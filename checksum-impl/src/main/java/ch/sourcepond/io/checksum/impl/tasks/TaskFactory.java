@@ -30,20 +30,17 @@ import java.util.concurrent.TimeUnit;
 public class TaskFactory {
     private final BufferPool bufferPool;
 
-    private ScheduledExecutorService updateExecutor;
+    private final ScheduledExecutorService updateExecutor;
 
     // Constructor used by BundleActivator
-    public TaskFactory() {
-        bufferPool = new BufferPool();
+    public TaskFactory(final ScheduledExecutorService pUpdateExector) {
+        this(pUpdateExector, new BufferPool());
     }
 
     // Constructor used for testing
-    public TaskFactory(final BufferPool pBufferPool) {
+    public TaskFactory(final ScheduledExecutorService pUpdateExector, final BufferPool pBufferPool) {
+        updateExecutor = pUpdateExector;
         bufferPool = pBufferPool;
-    }
-
-    public void setUpdateExecutor(final ScheduledExecutorService pUpdateExecutor) {
-        updateExecutor = pUpdateExecutor;
     }
 
     public UpdateTask<ChannelSource> newChannelTask(final UpdateObserver pObserver,

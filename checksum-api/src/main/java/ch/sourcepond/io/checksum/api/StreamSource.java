@@ -19,7 +19,7 @@ import java.io.InputStream;
 /**
  * Implementations of this interface allow to open an {@link InputStream} from a
  * specific source. Use implementations of this interface in conjunction with
- * {@link ResourcesFactory#create(Algorithm, StreamSource)} to create
+ * {@link ResourceProducer#create(Algorithm, StreamSource)} to create
  * {@link Checksum} instances which fetch their data from a custom source.
  *
  */

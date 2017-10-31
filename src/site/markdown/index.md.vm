@@ -45,5 +45,5 @@ Alternatively, there is also a [Karaf](http://karaf.apache.org/) feature availab
 The feature references all necessary dependencies, so after installing the "checksum-feature", the checksum service will work out-of-the-box.
 
 $h2 Usage
-The entry point to Checksum is the [ch.sourcepond.io.checksum.api.ResourcesFactory](https://sourcepond.ch/ch.sourcepond.io/checksum-api/${project.version}/apidocs/index.html) interface from the checksum-api.
+The entry point to Checksum is the [ch.sourcepond.io.checksum.api.ResourceProducer](https://sourcepond.ch/ch.sourcepond.io/checksum-api/${project.version}/apidocs/index.html) interface from the checksum-api.
 You can import a service with that interface in any way your OSGi environment may support (plain plumbing, Blueprint, Declarative Services etc.).

@@ -2,7 +2,8 @@ package ch.sourcepond.io.checksum;
 
 import ch.sourcepond.io.checksum.api.Checksum;
 import ch.sourcepond.io.checksum.api.Resource;
-import ch.sourcepond.io.checksum.api.ResourcesFactory;
+import ch.sourcepond.io.checksum.api.ResourceProducer;
+import ch.sourcepond.io.checksum.api.ResourceProducerFactory;
 import ch.sourcepond.io.checksum.api.Update;
 import ch.sourcepond.io.checksum.api.UpdateObserver;
 import org.junit.After;
@@ -14,7 +15,11 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
 import javax.inject.Inject;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,7 +30,7 @@ import static ch.sourcepond.io.checksum.api.Algorithm.SHA256;
 import static ch.sourcepond.testing.OptionsHelper.karafContainer;
 import static java.nio.file.Files.newBufferedWriter;
 import static java.nio.file.StandardOpenOption.APPEND;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 
@@ -60,7 +65,10 @@ public class ResourcesTest {
 
     @SuppressWarnings("CanBeFinal")
     @Inject
-    private ResourcesFactory registry;
+    private ResourceProducerFactory factory;
+
+    @SuppressWarnings("CanBeFinal")
+    private ResourceProducer producer;
 
     @Configuration
     public Option[] config() {
@@ -76,6 +84,7 @@ public class ResourcesTest {
 
     @Before
     public void setup() throws IOException {
+        producer = factory.create(2);
         try (final InputStream in = getClass().getResourceAsStream("/testfile_01.txt")) {
             try (final FileOutputStream out = new FileOutputStream(testfile)) {
                 byte[] buffer = new byte[4096];
@@ -96,6 +105,7 @@ public class ResourcesTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @After
     public void tearDown() throws IOException {
+        producer.close();
         testfile.delete();
     }
 
@@ -103,7 +113,7 @@ public class ResourcesTest {
     public void verifyPathResource() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
         final List<Checksum> observerChecksums = Collections.synchronizedList(new ArrayList<>());
-        final Resource resource = registry.create(SHA256, testfile.toPath());
+        final Resource resource = producer.create(SHA256, testfile.toPath());
 
         TestOberver observer = new TestOberver(latch, observerChecksums);
         resource.update(observer);

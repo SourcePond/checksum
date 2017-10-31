@@ -17,12 +17,11 @@ import java.net.URL;
 import java.nio.file.Path;
 
 /**
- * Factory to create new {@link Resource} instances. This interface is the
- * entry-point to use the checksum API.
+ * Object to create new {@link Resource} instances.
  *
  */
 @SuppressWarnings("ALL")
-public interface ResourcesFactory {
+public interface ResourceProducer extends AutoCloseable {
 
 	/**
 	 * <p>
@@ -107,4 +106,7 @@ public interface ResourcesFactory {
      * @throws NullPointerException Thrown, if either the algorithm or the source specified is {@code null}.
      */
 	Resource create(Algorithm pAlgorithm, URL pSource);
+
+	// Do not throw an exception in overridden close method
+	void close();
 }

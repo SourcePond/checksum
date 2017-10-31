@@ -13,45 +13,40 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.impl;
 
-import ch.sourcepond.commons.smartswitch.api.SmartSwitchBuilderFactory;
-import ch.sourcepond.io.checksum.api.*;
+import ch.sourcepond.io.checksum.api.Algorithm;
+import ch.sourcepond.io.checksum.api.ChannelSource;
+import ch.sourcepond.io.checksum.api.Resource;
+import ch.sourcepond.io.checksum.api.ResourceProducer;
+import ch.sourcepond.io.checksum.api.StreamSource;
 import ch.sourcepond.io.checksum.impl.pools.DigesterPoolRegistry;
 import ch.sourcepond.io.checksum.impl.resources.InternalResourcesFactory;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
-
-import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
  *
  */
-@Component
-public final class ResourcesFactoryImpl implements ResourcesFactory {
+final class ResourceProducerImpl implements ResourceProducer {
     private final InternalResourcesFactory internalResourcesFactory;
     private final DigesterPoolRegistry digesterPoolRegistry;
 
     // Constructor used by BundleActivator
-    public ResourcesFactoryImpl() {
-        this(new InternalResourcesFactory(), new DigesterPoolRegistry());
+    public ResourceProducerImpl(final ScheduledExecutorService pUpdateExecutor) {
+        this(new InternalResourcesFactory(pUpdateExecutor), new DigesterPoolRegistry());
     }
 
     // Constructor used for testing
-    public ResourcesFactoryImpl(final InternalResourcesFactory pInternalResourcesFactory, final DigesterPoolRegistry pDigesterPoolRegistry) {
+    public ResourceProducerImpl(final InternalResourcesFactory pInternalResourcesFactory,
+                                final DigesterPoolRegistry pDigesterPoolRegistry) {
         internalResourcesFactory = pInternalResourcesFactory;
         digesterPoolRegistry = pDigesterPoolRegistry;
     }
 
-    @Reference
-    public void initExecutor(final SmartSwitchBuilderFactory pFactory) {
-        final ScheduledExecutorService executor = pFactory.newBuilder(ScheduledExecutorService.class).setFilter("(sourcepond.io.checksum.updateexecutor=*)").
-                setShutdownHook(ExecutorService::shutdown).
-                build(() -> newScheduledThreadPool(4));
-        internalResourcesFactory.setUpdateExecutor(executor);
+    @Override
+    public void close() {
+        internalResourcesFactory.close();
     }
 
     @Override

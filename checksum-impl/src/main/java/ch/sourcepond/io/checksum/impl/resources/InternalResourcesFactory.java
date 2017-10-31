@@ -27,25 +27,25 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Factory to create {@link Resource} instances for different sources.
  */
-public class InternalResourcesFactory {
+public class InternalResourcesFactory implements AutoCloseable {
     private final TaskFactory taskFactory;
 
-    // Service dependency injected by DS
-    private ScheduledExecutorService updateExecutor;
+    private final ScheduledExecutorService updateExecutor;
 
     // Constructor used by BundleActivator
-    public InternalResourcesFactory() {
-        this(new TaskFactory());
+    public InternalResourcesFactory(final ScheduledExecutorService pUpdateExecutor) {
+        this(pUpdateExecutor, new TaskFactory(pUpdateExecutor));
     }
 
     // Constructor used for testing
-    public InternalResourcesFactory(final TaskFactory pTaskFactory) {
+    public InternalResourcesFactory(final ScheduledExecutorService pUpdateExecutor, final TaskFactory pTaskFactory) {
         taskFactory = pTaskFactory;
+        updateExecutor = pUpdateExecutor;
     }
 
-    public void setUpdateExecutor(final ScheduledExecutorService pUpdateExecutor) {
-        updateExecutor = pUpdateExecutor;
-        taskFactory.setUpdateExecutor(pUpdateExecutor);
+    @Override
+    public void close() {
+        updateExecutor.shutdown();
     }
 
     public Resource newResource(final DigesterPool pDigesterPool, final ChannelSource pSource) {
