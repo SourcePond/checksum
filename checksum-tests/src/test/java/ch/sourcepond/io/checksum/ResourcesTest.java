@@ -1,3 +1,16 @@
+/*Copyright (C) 2017 Roland Hauser, <sourcepond@gmail.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.*/
 package ch.sourcepond.io.checksum;
 
 import ch.sourcepond.io.checksum.api.Checksum;
@@ -37,8 +50,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 /**
  *
  */
-@RunWith(PaxExam.class)
-public class ResourcesTest {
+public abstract class ResourcesTest {
 
     private static class TestOberver implements UpdateObserver {
         private final CountDownLatch latch;
@@ -64,10 +76,6 @@ public class ResourcesTest {
     private final File testfile = new File("target", "testfile_01.txt");
 
     @SuppressWarnings("CanBeFinal")
-    @Inject
-    private ResourceProducerFactory factory;
-
-    @SuppressWarnings("CanBeFinal")
     private ResourceProducer producer;
 
     @Configuration
@@ -82,9 +90,11 @@ public class ResourcesTest {
         };
     }
 
+    protected abstract ResourceProducerFactory getFactory();
+
     @Before
     public void setup() throws IOException {
-        producer = factory.create(2);
+        producer = getFactory().create(2);
         try (final InputStream in = getClass().getResourceAsStream("/testfile_01.txt")) {
             try (final FileOutputStream out = new FileOutputStream(testfile)) {
                 byte[] buffer = new byte[4096];
