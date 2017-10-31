@@ -27,7 +27,6 @@ import static java.time.Instant.MIN;
  *
  */
 final class InitialChecksum extends BaseChecksum implements UpdateObserver {
-    static final byte[] EMPTY = new byte[0];
     private Instant timestamp;
     private byte[] bytes;
     private String hexValue;
@@ -45,7 +44,7 @@ final class InitialChecksum extends BaseChecksum implements UpdateObserver {
 
     private void internalInitDefaults() {
         timestamp = MIN;
-        bytes = EMPTY;
+        bytes = new byte[0];
         hexValue = "";
     }
 

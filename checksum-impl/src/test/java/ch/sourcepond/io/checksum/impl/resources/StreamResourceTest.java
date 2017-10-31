@@ -20,12 +20,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static ch.sourcepond.io.checksum.impl.resources.InitialChecksum.EMPTY;
 import static java.time.Instant.MIN;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
@@ -63,7 +62,7 @@ public class StreamResourceTest extends BaseResourceTest<StreamSource> {
         final Checksum checksum = resource.getCurrent();
         assertSame("", checksum.getHexValue());
         assertSame(MIN, checksum.getTimestamp());
-        assertSame(EMPTY, checksum.toByteArray());
+        assertArrayEquals(new byte[0], checksum.toByteArray());
     }
 
     @Test

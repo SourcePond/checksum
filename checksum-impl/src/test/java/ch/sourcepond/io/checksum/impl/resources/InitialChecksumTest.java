@@ -22,11 +22,11 @@ import org.junit.Test;
 import java.time.Instant;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static ch.sourcepond.io.checksum.impl.resources.InitialChecksum.EMPTY;
 import static java.time.Instant.MIN;
 import static java.time.Instant.now;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,6 +68,6 @@ public class InitialChecksumTest {
         checksum.initDefaults();
         assertSame("", checksum.getHexValue());
         assertSame(MIN, checksum.getTimestamp());
-        assertSame(EMPTY, checksum.toByteArray());
+        assertArrayEquals(new byte[0], checksum.toByteArray());
     }
 }

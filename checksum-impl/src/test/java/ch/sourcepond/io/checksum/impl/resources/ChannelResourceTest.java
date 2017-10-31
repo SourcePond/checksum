@@ -15,18 +15,15 @@ package ch.sourcepond.io.checksum.impl.resources;
 
 import ch.sourcepond.io.checksum.api.ChannelSource;
 import ch.sourcepond.io.checksum.api.Checksum;
-import ch.sourcepond.io.checksum.api.UpdateObserver;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-import static ch.sourcepond.io.checksum.impl.resources.InitialChecksum.EMPTY;
 import static java.time.Instant.MIN;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -67,7 +64,7 @@ public class ChannelResourceTest extends BaseResourceTest<ChannelSource> {
         final Checksum checksum = resource.getCurrent();
         assertSame("", checksum.getHexValue());
         assertSame(MIN, checksum.getTimestamp());
-        assertSame(EMPTY, checksum.toByteArray());
+        assertArrayEquals(new byte[0], checksum.toByteArray());
     }
 
     @Test
