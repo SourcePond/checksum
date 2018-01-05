@@ -16,6 +16,9 @@ package ch.sourcepond.io.checksum.impl;
 import ch.sourcepond.io.checksum.api.ResourceProducer;
 import ch.sourcepond.io.checksum.api.ResourceProducerFactory;
 
+import java.util.concurrent.ScheduledExecutorService;
+
+import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
@@ -28,6 +31,11 @@ public class ResourceProducerFactoryImpl implements ResourceProducerFactory {
         if (0 >= pConcurrency) {
             throw new IllegalArgumentException(String.format("Concurrency must be positive, illegal argument %d", pConcurrency));
         }
-        return new ResourceProducerImpl(newScheduledThreadPool(pConcurrency));
+        return create(newScheduledThreadPool(pConcurrency));
+    }
+
+    @Override
+    public ResourceProducer create(final ScheduledExecutorService pExecutor) {
+        return new ResourceProducerImpl(requireNonNull(pExecutor, "Executor is null"));
     }
 }

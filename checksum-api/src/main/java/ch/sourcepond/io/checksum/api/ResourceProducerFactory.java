@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package ch.sourcepond.io.checksum.api;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 /**
  * Factory to create {@link ResourceProducer} instances. This interface is the entry-point to use the checksum API.
  */
@@ -26,4 +28,13 @@ public interface ResourceProducerFactory {
      * @throws IllegalArgumentException Thrown, if the concurrency specified is zero or negative.
      */
     ResourceProducer create(int pConcurrency);
+
+    /**
+     * Creates a new {@link ResourceProducer} object.
+     *
+     * @param pExecutor Specifies the thread-pool to be used by the resource producer.
+     * @return New resource producer, never {@code null}
+     * @throws NullPointerException Thrown, if the executor specified is {@code null}.
+     */
+    ResourceProducer create(ScheduledExecutorService pExecutor);
 }

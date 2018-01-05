@@ -55,4 +55,9 @@ public class ResourceProducerFactoryImplTest {
         assertNotNull(p2);
         assertNotSame(p1, p2);
     }
+
+    @Test(expected = NullPointerException.class)
+    public void createExecutorIsNull() {
+        factory.create(null);
+    }
 }
