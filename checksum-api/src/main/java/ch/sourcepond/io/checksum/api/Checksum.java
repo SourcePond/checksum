@@ -16,6 +16,8 @@ package ch.sourcepond.io.checksum.api;
 import java.security.MessageDigest;
 import java.time.Instant;
 
+import static java.lang.Integer.toHexString;
+
 /**
  * Abstracts a checksum based on a specific hashing algorithm (see
  * {@link MessageDigest} for further information) and provides the ability to
@@ -62,4 +64,18 @@ public interface Checksum {
      * @return The calculated checksum as string, never {@code null}
      */
     String getHexValue();
+
+    static String toHexString(final byte[] pDigest) {
+        final StringBuilder b = new StringBuilder();
+        for (int i = 0; i < pDigest.length; i++) {
+            int temp = 0xFF & pDigest[i];
+            String s = Integer.toHexString(temp);
+            if (temp <= 0x0F) {
+                b.append('0').append(s);
+            } else {
+                b.append(s);
+            }
+        }
+        return b.toString();
+    }
 }

@@ -18,6 +18,7 @@ import ch.sourcepond.io.checksum.impl.BaseChecksum;
 
 import java.time.Instant;
 
+import static ch.sourcepond.io.checksum.api.Checksum.toHexString;
 import static java.lang.System.arraycopy;
 
 /**
@@ -33,17 +34,7 @@ final class ChecksumImpl extends BaseChecksum {
         assert pTimestamp != null : "pTimestamp is null";
         timestamp = pTimestamp;
         value = pValue;
-        final StringBuilder b = new StringBuilder();
-        for (int i = 0; i < pValue.length; i++) {
-            int temp = 0xFF & pValue[i];
-            String s = Integer.toHexString(temp);
-            if (temp <= 0x0F) {
-                b.append('0').append(s);
-            } else {
-                b.append(s);
-            }
-        }
-        hexValue = b.toString();
+        hexValue = toHexString(pValue);
     }
 
     @Override

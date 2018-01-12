@@ -1,41 +1,27 @@
 package ch.sourcepond.io.checksum.impl.tasks;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.InputStream;
-import java.security.MessageDigest;
 import java.time.Instant;
 
 import static java.time.Instant.now;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
  */
 public class ChecksumImplTest {
-    private static final String EXPECTED_SHA_256_HASH = "b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336";
+    private static final String EXPECTED_SHA_256_HASH = "536f6d65207465787420746f206265206469676573746564";
+    private static final byte[] EXPECTED_BYTES = "Some text to be digested".getBytes();
     private final Instant timestamp = now();
-    private byte[] expectedBytes;
-    private ChecksumImpl checksum;
-
-    @Before
-    public void setup() throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (final InputStream in = getClass().getResourceAsStream("/testfile_01.txt")) {
-            final byte[] buffer = new byte[1024];
-            int readBytes;
-            while ((readBytes = in.read(buffer)) != -1) {
-                digest.update(buffer, 0, readBytes);
-            }
-        }
-        expectedBytes = digest.digest();
-        checksum = new ChecksumImpl(timestamp, expectedBytes);
-    }
+    private ChecksumImpl checksum = new ChecksumImpl(timestamp, EXPECTED_BYTES);
 
     @Test
     public void verifyChecksum() throws Exception {
-        assertSame(expectedBytes, checksum.toByteArray());
+        assertSame(EXPECTED_BYTES, checksum.toByteArray());
         assertEquals(EXPECTED_SHA_256_HASH, checksum.getHexValue());
         assertSame(timestamp, checksum.getTimestamp());
     }
@@ -54,7 +40,7 @@ public class ChecksumImplTest {
 
     @Test
     public void verifyToString() {
-        assertEquals("ChecksumImpl[hexValue: b0a0a864cf2eb7c20a25bfe12f4cddc6070809e5da8f5da226234a258d17d336, " +
+        assertEquals("ChecksumImpl[hexValue: 536f6d65207465787420746f206265206469676573746564, " +
                 "timestamp: " + timestamp.toEpochMilli() + "]", checksum.toString());
     }
 }
