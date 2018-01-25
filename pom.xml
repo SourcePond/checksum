@@ -28,6 +28,7 @@
         Provides a simple API to calculate checksums for the content of any stream or channel source.
     </description>
 
+
     <properties>
         <repo.project>${project.artifactId}</repo.project>
         <smartswitch.version>4.0.2</smartswitch.version>

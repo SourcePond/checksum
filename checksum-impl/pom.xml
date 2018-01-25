@@ -38,6 +38,7 @@
                     <instructions>
                         <Bundle-Activator>ch.sourcepond.io.checksum.impl.osgi.Activator</Bundle-Activator>
                         <Import-Package>org.slf4j;version="${slf4j-api.version}",*</Import-Package>
+                        <Provide-Capability>osgi.service;objectClass="ch.sourcepond.io.checksum.api.ResourceProducerFactory"</Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>
